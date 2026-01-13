@@ -5,183 +5,198 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>買取表 | トレカショップ</title>
   <style>
-    /* ★★★ デザイン設定エリア ★★★ */
+    /* ★★★ デザイン設定エリア（見やすさ重視） ★★★ */
     :root {
-      /* ネオンイエロー */
-      --neon-color: #ffeb3b;
-      /* ネオンの光り方 */
-      --neon-glow: 0 0 5px #ffeb3b, 0 0 10px #ffc107;
+      /* アクセントカラー（鮮やかな黄色） */
+      --accent: #ffeb3b; 
       
-      /* 全体の文字色 */
-      --text: #ffffff;
-      /* カードの背景（半透明の黒） */
-      --card-bg: rgba(20, 20, 20, 0.85);
-      /* カードの枠線 */
-      --card-border: #444;
+      /* ベースカラー */
+      --bg-dark: #121212;   /* 全体の背景 */
+      --card-bg: #1e1e1e;   /* カードの背景（少し明るく） */
+      --text-main: #ffffff; /* メイン文字 */
+      --text-sub: #cccccc;  /* サブ文字 */
+      --border: #666666;    /* 枠線（明るめのグレーではっきりさせる） */
     }
 
-    /* 全体の背景設定 */
     body { 
       font-family: "Helvetica Neue", Arial, sans-serif; 
       margin: 0; padding: 0; 
-      color: var(--text);
-      
-      /* ★ここに背景画像のURLを入れてください（現在は仮のダーク画像です） */
-      background: url('https://ja.pngtree.com/free-backgrounds-photos/%E9%BB%92%E3%83%AC%E3%83%B3%E3%82%AC%E3%81%AE%E5%A3%81%E3%81%AE%E3%83%8D%E3%82%AA%E3%83%B3') no-repeat center center fixed;
+      color: var(--text-main);
+      background-color: var(--bg-dark);
+      /* 背景画像を入れる場合はここ（暗めの画像を推奨） */
+      background-image: url('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2070&auto=format&fit=crop');
       background-size: cover;
-      background-color: #121212; /* 画像がない場合の黒背景 */
+      background-position: center;
+      background-attachment: fixed;
+    }
+    
+    /* 背景画像を少し暗くして文字を読みやすくするオーバーレイ */
+    body::before {
+      content: "";
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.7); /* 暗さの調整 */
+      z-index: -1;
     }
 
     * { box-sizing: border-box; }
 
     /* ヘッダー */
     header { 
-      background: rgba(0, 0, 0, 0.8); 
-      border-bottom: 1px solid var(--neon-color); 
+      background: #111; 
+      border-bottom: 2px solid var(--accent); 
       padding: 15px; 
       text-align: center; 
-      backdrop-filter: blur(5px);
     }
     h1 { 
       margin: 0; 
       font-size: 20px; 
-      color: var(--neon-color); 
-      text-shadow: var(--neon-glow); /* タイトルも光らせる */
-      font-style: italic;
+      color: var(--accent); 
+      font-weight: bold;
+      letter-spacing: 1px;
     }
 
-    /* カテゴリナビゲーション */
+    /* ナビゲーション */
     .nav-scroll { 
       overflow-x: auto; 
-      background: rgba(0, 0, 0, 0.6); 
-      border-bottom: 1px solid #333; 
+      background: #222; 
+      border-bottom: 1px solid #444; 
       white-space: nowrap; 
       padding: 0 10px; 
     }
     .nav-tabs { display: flex; gap: 10px; max-width: 1000px; margin: 0 auto; padding: 0; list-style: none; }
     .nav-item { 
       cursor: pointer; 
-      padding: 12px 10px; 
+      padding: 14px 12px; 
       font-weight: bold; 
-      color: #aaa; 
+      color: #888; 
       border-bottom: 3px solid transparent; 
       transition: 0.3s; 
-      font-size: 13px; 
+      font-size: 14px; 
     }
     .nav-item:hover { color: #fff; }
     .nav-item.active { 
-      color: var(--neon-color); 
-      border-bottom-color: var(--neon-color); 
-      text-shadow: 0 0 8px rgba(255, 235, 59, 0.5);
+      color: var(--accent); 
+      border-bottom-color: var(--accent); 
     }
 
-    /* 検索・フィルターエリア */
+    /* フィルターエリア */
     .filters { max-width: 1000px; margin: 20px auto; padding: 0 12px; display: flex; gap: 8px; flex-wrap: wrap; }
     
     .search-box { flex: 1; min-width: 150px; position: relative; }
     .search-box input { 
-      width: 100%; padding: 8px 8px 8px 32px; 
-      border: 1px solid #555; border-radius: 6px; 
+      width: 100%; padding: 10px 10px 10px 36px; 
+      border: 1px solid #555; border-radius: 4px; 
       outline: none; font-size: 14px; 
-      background: rgba(0,0,0,0.5); color: #fff;
+      background: #333; color: #fff;
     }
-    .search-icon { position: absolute; left: 8px; top: 9px; color: #888; font-size: 14px; }
+    .search-icon { position: absolute; left: 10px; top: 11px; color: #aaa; }
     
     select, button { 
-      padding: 8px; 
-      border: 1px solid #555; border-radius: 6px; 
-      background: rgba(0,0,0,0.5); color: #fff; 
-      cursor: pointer; font-size: 12px; 
+      padding: 10px; 
+      border: 1px solid #555; border-radius: 4px; 
+      background: #333; color: #fff; 
+      cursor: pointer; font-size: 13px; 
     }
     button { 
-      background: var(--neon-color); 
-      color: #000; /* ボタンの文字は黒で見やすく */
+      background: var(--accent); 
+      color: #000; 
       border: none; 
       font-weight: bold; 
-      box-shadow: 0 0 10px rgba(255, 235, 59, 0.4);
     }
 
-    /* カードリスト */
-    .container { max-width: 1000px; margin: 0 auto; padding: 0 12px 40px; }
+    /* グリッド */
+    .container { max-width: 1000px; margin: 0 auto; padding: 0 12px 60px; }
     .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; }
     
-    /* ★★★ カードデザイン（ここを重点変更） ★★★ */
+    /* ★★★ カードデザイン（見やすく修正） ★★★ */
     .card { 
       background: var(--card-bg); 
-      border-radius: 8px; 
+      border-radius: 6px; 
       overflow: hidden; 
-      border: 1px solid var(--card-border); 
-      transition: transform 0.2s, box-shadow 0.2s; 
+      /* 枠線をはっきりさせる */
+      border: 1px solid var(--border); 
+      box-shadow: 0 4px 8px rgba(0,0,0,0.5);
       display: flex; flex-direction: column; position: relative; 
-      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      transition: transform 0.2s;
     }
     .card:hover { 
-      transform: translateY(-3px); 
-      border-color: #777;
-      box-shadow: 0 0 15px rgba(255, 235, 59, 0.1); /* ホバーでうっすら光る */
+      transform: translateY(-2px); 
+      border-color: var(--accent); /* ホバー時は黄色い枠に */
     }
     
-    .card-img { width: 100%; aspect-ratio: 3/4; background: #222; object-fit: contain; border-bottom: 1px solid #333; }
-    .no-img { display: flex; align-items: center; justify-content: center; color: #555; font-size: 10px; background: #1a1a1a; }
+    .card-img { width: 100%; aspect-ratio: 3/4; background: #000; object-fit: contain; border-bottom: 1px solid #333; }
+    .no-img { display: flex; align-items: center; justify-content: center; color: #555; font-size: 10px; background: #222; }
 
-    .card-body { padding: 10px; flex: 1; display: flex; flex-direction: column; }
+    .card-body { padding: 12px; flex: 1; display: flex; flex-direction: column; }
     
-    /* ★ネオンPSAラベル★ */
+    /* PSAラベル（くっきり表示） */
     .psa-label { 
       font-size: 11px; 
-      color: var(--neon-color); 
-      font-weight: 900; 
+      color: var(--accent); 
+      font-weight: bold; 
       margin-bottom: 4px; 
-      text-shadow: var(--neon-glow); /* 発光 */
       letter-spacing: 0.5px;
     }
 
-    /* カードタイトル */
+    /* タイトル */
     .card-title { 
       font-size: 13px; 
       font-weight: bold; 
-      line-height: 1.4; 
-      margin-bottom: 6px; 
-      color: #fff; /* 読みやすい白 */
-      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 36px; 
+      line-height: 1.5; 
+      margin-bottom: 8px; 
+      color: #fff; 
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 39px; 
     }
     
-    /* バッジエリア（素体のみ使用） */
-    .card-tags { position: absolute; top: 4px; right: 4px; display: flex; flex-direction: column; gap: 2px; align-items: flex-end; }
+    /* バッジ（素体用） */
+    .card-tags { position: absolute; top: 6px; right: 6px; display: flex; flex-direction: column; gap: 2px; align-items: flex-end; }
     .badge { 
-      display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: bold;
+      display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold;
       background: #333; color: #fff; border: 1px solid #555;
     }
-    .badge-sotai { background: #444; color: #ccc; }
+    .badge-sotai { background: #555; color: #eee; }
 
-    .card-footer { margin-top: auto; border-top: 1px dotted #444; padding-top: 8px; }
+    .card-footer { margin-top: auto; border-top: 1px solid #444; padding-top: 8px; }
     
-    .price-label { font-size: 9px; color: #aaa; margin-bottom: 2px; }
+    .price-row { display: flex; align-items: baseline; justify-content: space-between; }
+    .price-label { font-size: 10px; color: #aaa; }
     
-    /* ★ネオン価格★ */
+    /* 価格（くっきり表示） */
     .price-value { 
-      color: var(--neon-color); 
+      color: var(--accent); 
       font-size: 18px; 
-      font-weight: 900; 
+      font-weight: 800; 
       letter-spacing: -0.5px; 
-      text-shadow: var(--neon-glow); /* 発光 */
     }
     
-    .limit { font-size: 10px; color: #aaa; float: right; margin-top: 6px; }
+    /* ★残りの表示（見やすく枠をつける）★ */
+    .limit-container {
+      margin-top: 6px;
+      text-align: right;
+    }
+    .limit { 
+      display: inline-block;
+      font-size: 11px; 
+      color: #fff; 
+      background: #444;
+      padding: 2px 8px;
+      border-radius: 4px;
+      border: 1px solid #666;
+    }
     
     .loading { text-align: center; padding: 40px; color: #aaa; grid-column: 1 / -1; }
-    .error { background: rgba(198, 40, 40, 0.2); color: #ff8a80; padding: 10px; border-radius: 6px; margin-bottom: 20px; display: none; border: 1px solid #c62828; }
+    .error { background: #330000; color: #ff8a80; padding: 15px; border: 1px solid #ff5252; margin-bottom: 20px; display: none; }
 
     /* スマホ対応 */
     @media (max-width: 600px) {
-      .grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-      .card-title { font-size: 10px; height: 28px; margin-bottom: 2px; }
-      .psa-label { font-size: 9px; margin-bottom: 2px; }
-      .price-value { font-size: 14px; }
-      .price-label { font-size: 8px; }
-      .limit { font-size: 9px; margin-top: 3px; }
+      .grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+      .card-title { font-size: 11px; height: 33px; margin-bottom: 4px; }
+      .psa-label { font-size: 10px; margin-bottom: 2px; }
+      .price-value { font-size: 15px; }
+      .price-label { font-size: 9px; }
+      .limit { font-size: 10px; padding: 1px 6px; }
       .card-body { padding: 8px; }
-      .filters { gap: 6px; }
+      .filters { gap: 8px; }
       .search-box { width: 100%; order: -1; }
       #reload { display: none; }
     }
@@ -215,7 +230,7 @@
       <option value="price_asc">安い順</option>
     </select>
 
-    <label style="display:flex; align-items:center; font-size:11px; cursor:pointer; gap:4px; margin-left:auto; color: #fff;">
+    <label style="display:flex; align-items:center; font-size:12px; cursor:pointer; gap:6px; margin-left:auto; color: #fff;">
       <input type="checkbox" id="hideZero" checked> 募集中のみ
     </label>
     <button id="reload">更新</button>
@@ -223,13 +238,13 @@
 
   <div class="container">
     <div id="err" class="error"></div>
-    <div class="muted" id="meta" style="font-size:11px; margin-bottom:8px; text-align:right; color:#888;"></div>
+    <div class="muted" id="meta" style="font-size:12px; margin-bottom:10px; text-align:right; color:#bbb;"></div>
     <div id="grid" class="grid"></div>
   </div>
 
   <script>
     // ★★★ ここにデプロイしたURLを貼り付けてください ★★★
-    const API = "https://script.google.com/macros/s/AKfycbynclYCpgfGu4kODPAlPGGLYQfoB601lfxMGG7BMtfnKelA22h87XthNlW76dycOPhR/exec";
+    const API = "ここにあなたのウェブアプリURLを貼り付け";
 
     let currentCategory = "ポケモン";
     const CACHE = {}; 
@@ -252,7 +267,7 @@
             imgTag = `<img src="${item.imageUrl}" class="card-img" alt="" loading="lazy" />`;
           }
 
-          // ★★★ 表示ロジック（ネオン版） ★★★
+          // ★★★ 表示ロジック ★★★
           let headerHtml = ""; 
           let badgeHtml = ""; 
 
@@ -261,7 +276,7 @@
                 badgeHtml = `<span class="badge badge-sotai">${item.grade}</span>`;
              }
           } else {
-             // 「PSA10」を光る文字で表示
+             // 「PSA10」を表示
              headerHtml = `<div class="psa-label">【PSA10】</div>`;
              badgeHtml = "";
           }
@@ -274,9 +289,13 @@
                 ${headerHtml}
                 <div class="card-title">${item.name}</div>
                 <div class="card-footer">
-                  <div class="price-label">買取価格</div>
-                  <div class="price-value">${yen(item.price)}</div>
-                  <div class="limit">残り:${item.remaining}</div>
+                  <div class="price-row">
+                    <span class="price-label">買取価格</span>
+                    <span class="price-value">${yen(item.price)}</span>
+                  </div>
+                  <div class="limit-container">
+                    <span class="limit">残り: ${item.remaining}</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -352,6 +371,4 @@
     load();
   </script>
 </body>
-
 </html>
-
