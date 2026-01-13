@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>トレカフォース買取表</title>
   <style>
+    /* ★★★ デザイン設定エリア ★★★ */
     :root {
       --accent: #58BDD7; 
       --price-color: #ffffff;
@@ -23,17 +24,11 @@
       font-family: "Helvetica Neue", Arial, sans-serif; 
       margin: 0; padding: 0; 
       color: var(--text-main);
-      
-      /* もし画像が読み込めない時のための予備の色 */
       background-color: var(--bg-dark);
-
-      /* ▼▼ ここから背景画像の設定 ▼▼ */
       background-image: url('./bg-gray.jpg.png');
-      background-size: cover;       /* 画面いっぱいに広げる */
-      background-position: center;  /* 真ん中に合わせる */
-      background-repeat: no-repeat; /* 繰り返さない */
-      background-attachment: fixed; /* スクロールしても固定 */
-      min-height: 100vh;            /* 画面の高さを確保 */
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
     }
     
     body::before {
@@ -58,7 +53,7 @@
       font-size: 22px; 
       color: var(--accent); 
       font-weight: 800;
-      letter-spacing: 1px;
+      letter-spacing: 1px; 
       text-shadow: var(--glow-text); 
       font-style: italic;
     }
@@ -79,19 +74,19 @@
       white-space: nowrap;
     }
 
-    /* ✅ ここが「固定（sticky）」の本体 */
-    .sticky-bars{
+    /* ✅ スクロール固定用の設定 */
+    .sticky-bars {
       position: sticky;
       top: 0;
-      z-index: 2000;
-      background: rgba(18,18,18,0.92);
-      backdrop-filter: blur(6px);
+      z-index: 1000;
+      background: rgba(18, 18, 18, 0.95); /* 背景を少し透けさせる */
+      backdrop-filter: blur(5px);
       border-bottom: 1px solid #444;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
     }
 
     .nav-scroll { 
       overflow-x: auto; 
-      background: #1a1a1a; 
       white-space: nowrap; 
       padding: 0 10px; 
       border-bottom: 1px solid #333;
@@ -116,7 +111,7 @@
     .filters { 
       max-width: 1000px; 
       margin: 0 auto; 
-      padding: 12px 12px; 
+      padding: 10px 12px; 
       display: flex; 
       gap: 8px; 
       flex-wrap: wrap; 
@@ -150,28 +145,29 @@
     .container { max-width: 1000px; margin: 12px auto 0; padding: 0 12px 60px; }
     .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; }
 
-    /* ✅ 受付終了：黄色枠＋白字 */
+    /* ✅ 受付終了：黄色枠＋白字（ご要望通り） */
     .closed-message-container {
       grid-column: 1 / -1;
       text-align: center;
       padding: 60px 20px;
-      margin-top: 20px;
+      margin-top: 40px;
+      /* 黄色枠 */
       border: 2px solid #FFD54F;
       border-radius: 10px;
-      background: rgba(255, 213, 79, 0.10);
-      box-shadow: 0 0 20px rgba(255, 213, 79, 0.25);
+      background: rgba(255, 213, 79, 0.1);
+      box-shadow: 0 0 20px rgba(255, 213, 79, 0.2);
       color: #fff;
     }
     .closed-title {
       font-size: 24px;
       font-weight: 900;
-      color: #fff;
+      color: #fff; /* 白字 */
       margin-bottom: 15px;
-      text-shadow: 0 0 10px rgba(255, 255, 255, 0.25);
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
     }
     .closed-text {
       font-size: 15px;
-      color: #fff;
+      color: #fff; /* 白字 */
       line-height: 1.8;
     }
 
@@ -190,17 +186,18 @@
       box-shadow: 0 0 15px rgba(88, 189, 215, 0.4); 
     }
 
-    /* ✅ 0枚は薄く残す（さらに薄くしたいなら opacity 0.25 などに） */
+    /* ✅ 売り切れ（残り0）：薄くする */
     .card.sold-out {
-      opacity: 0.35;
-      filter: grayscale(85%);
-      border-color: #333;
+      opacity: 0.4; /* 薄く */
+      filter: grayscale(80%); /* 色を抜く */
+      border-color: #444;
       box-shadow: none;
     }
+    /* 売り切れ時はホバーしても動かさない */
     .card.sold-out:hover {
       transform: none;
       box-shadow: none;
-      border-color: #333;
+      border-color: #444;
     }
 
     .card-img { width: 100%; aspect-ratio: 3/4; background: #000; object-fit: contain; border-bottom: 1px solid #333; }
@@ -232,8 +229,12 @@
       background: #333; color: #fff; border: 1px solid #555;
     }
     .badge-sotai { background: #555; color: #eee; }
+    
+    /* ✅ 買取終了バッジ：白字 */
     .badge-end {
-      background: #d32f2f; color: #fff; border: 1px solid #b71c1c;
+      background: #d32f2f; 
+      color: #fff; /* 白字 */
+      border: 1px solid #b71c1c;
       box-shadow: 0 0 5px rgba(211, 47, 47, 0.5);
     }
 
@@ -274,8 +275,7 @@
       .card-body { padding: 8px; }
 
       #date-display {
-        position: static; display: block; transform: none; margin-top: 8px; text-align: center;
-        width: fit-content; margin-left: auto; margin-right: auto;
+        position: static; display: block; transform: none; margin-top: 8px; text-align: center; width: fit-content; margin-left: auto; margin-right: auto;
       }
     }
   </style>
@@ -287,7 +287,6 @@
     <div id="date-display"></div>
   </header>
 
-  <!-- ✅ sticky にしたい範囲をまとめて包む -->
   <div class="sticky-bars">
     <div class="nav-scroll">
       <ul class="nav-tabs" id="categoryTabs">
@@ -311,7 +310,6 @@
         <option value="price_asc">安い順</option>
       </select>
 
-      <!-- ✅ 0枚も残すので「募集中のみ」はやめて、表示切替に変更 -->
       <label style="display:flex; align-items:center; font-size:12px; cursor:pointer; gap:6px; margin-left:auto; color:#fff;">
         <input type="checkbox" id="showSoldOut" checked> 買取終了も表示
       </label>
@@ -327,7 +325,8 @@
   </div>
 
   <script>
-    const API = "https://script.google.com/macros/s/AKfycbzbCG_tzcvDj6Xl10PclrqtdcWamnWpAJV7d2kmTXWpYIpxDauoXfRvWLIK2UJ2WNck/exec";
+    // ★★★ GASを新しいデプロイで更新したら、必ずここを書き換えてください ★★★
+    const API = "https://script.google.com/macros/s/AKfycbx7S986iPsCyNWyaOJUAgJnzibXE1S8-tLDrOzeCNlWLE7Gh1lutg1LtapRGPNE1l8m/exec";
 
     let currentCategory = "ポケモン";
     let CACHE = {};
@@ -348,7 +347,7 @@
       const grid = el("grid");
       el("meta").textContent = "";
 
-      // ✅ 受付終了
+      // ✅ 受付終了時の表示
       if (data.isOpen === false) {
         document.querySelector(".sticky-bars").style.display = "none";
         grid.innerHTML = `
@@ -365,28 +364,23 @@
 
       document.querySelector(".sticky-bars").style.display = "block";
 
-      // データがない
       if (!data.items || data.items.length === 0) {
         el("meta").textContent = `${data.category} (0件)`;
         grid.innerHTML = '<div class="loading">該当なし</div>';
         return;
       }
 
-      // ✅ 0枚（sold-out）を表示する/しない
       const showSoldOut = el("showSoldOut").checked;
-
       let items = data.items.slice();
 
+      // チェックが外れていたら0枚を消す
       if (!showSoldOut) {
         items = items.filter(x => Number(x.remaining) > 0);
       }
 
-      // ✅ 0枚を「下」に回す（見た目が良い）
-      items.sort((a, b) => {
-        const as = Number(a.remaining) <= 0 ? 1 : 0;
-        const bs = Number(b.remaining) <= 0 ? 1 : 0;
-        return as - bs;
-      });
+      // ✅ 0枚を下には回さず、価格順のままその位置に表示したい場合は、
+      // 以前の sort 処理（在庫なしを下にする処理）を削除します。
+      // ↓ ここでは GAS から来た並び順（価格順など）を維持します。
 
       el("meta").textContent = `${data.category} (${items.length}件)`;
 
@@ -402,12 +396,14 @@
         let headerHtml = "";
         let badgeHtml = "";
 
+        // ✅ 0枚なら「買取終了」バッジ（白字）を表示
         if (isSoldOut) badgeHtml += `<span class="badge badge-end">買取終了</span>`;
 
         if (currentCategory === "素体") {
           if (item.grade) badgeHtml += `<span class="badge badge-sotai">${item.grade}</span>`;
         } else {
-          headerHtml = isSoldOut ? `<div style="height:15px;"></div>` : `<div class="psa-label">【PSA10】</div>`;
+          // 0枚でもPSAラベルは消さないでおく（またはお好みで）
+          headerHtml = `<div class="psa-label">【PSA10】</div>`;
         }
 
         return `
@@ -438,7 +434,7 @@
 
       const q = el("q").value.trim();
       const sort = el("sort").value;
-      const showSoldOut = el("showSoldOut").checked ? "1" : "0"; // cacheキーに入れるだけ
+      const showSoldOut = el("showSoldOut").checked ? "1" : "0";
       const cacheKey = `${currentCategory}_${q}_${sort}_${showSoldOut}`;
 
       grid.innerHTML = '<div class="loading">読み込み中...</div>';
@@ -449,7 +445,6 @@
       if (sort) params.set("sort", sort);
 
       try {
-        // ✅ 閉店判定は毎回最新
         const res = await fetch(`${API}?${params.toString()}&t=${Date.now()}`);
         const data = await res.json();
 
@@ -459,7 +454,6 @@
           return;
         }
 
-        // ✅ 営業中だけキャッシュ利用
         if (!forceReload && CACHE[cacheKey]) {
           render(CACHE[cacheKey]);
           return;
@@ -506,13 +500,6 @@
     });
 
     load(true);
-
-    // 任意：閉店切替を自動反映したい場合（1分おき）
-    // setInterval(() => load(true), 60 * 1000);
   </script>
 </body>
 </html>
-
-
-
-
