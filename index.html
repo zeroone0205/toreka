@@ -7,16 +7,17 @@
   <style>
     /* ★★★ デザイン設定エリア ★★★ */
     :root {
-      /* メインカラー（タイトルや枠線など） */
-      --accent: #6396A3; 
+      /* ★メインカラー（旧#6396A3 → 新#58BDD7 に変更） */
+      --accent: #58BDD7; 
       
-      /* ★金額用のカラー（ご指定の色） */
-      --price-color:  #ffffff;
+      /* ★金額用のカラー（白に変更） */
+      --price-color: #ffffff;
       
-      /* ネオンの光り方定義 */
-      --glow-text: 0 0 8px rgba(99, 150, 163, 0.6);
-      --glow-price: 0 0 10px rgba(0, 229, 255, 0.6); /* 金額用の光 */
-      --glow-box: 0 0 12px rgba(99, 150, 163, 0.4);
+      /* ネオンの光り方定義（新しい色に合わせてRGB調整: 88, 189, 215） */
+      --glow-text: 0 0 8px rgba(88, 189, 215, 0.6);
+      /* 金額用の光（白文字に合わせて白く発光） */
+      --glow-price: 0 0 10px rgba(255, 255, 255, 0.7); 
+      --glow-box: 0 0 12px rgba(88, 189, 215, 0.4);
       
       /* ベースカラー */
       --bg-dark: #121212;
@@ -30,7 +31,7 @@
       margin: 0; padding: 0; 
       color: var(--text-main);
       background-color: var(--bg-dark);
-      background-image: url('https://ja.pngtree.com/free-backgrounds-photos/%E9%BB%92%E3%83%AC%E3%83%B3%E3%82%AC%E3%81%AE%E5%A3%81%E3%81%AE%E3%83%8D%E3%82%AA%E3%83%B3');
+      background-image: url('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2070&auto=format&fit=crop');
       background-size: cover;
       background-position: center;
       background-attachment: fixed;
@@ -52,7 +53,8 @@
       padding: 15px 15px 15px 15px; 
       text-align: center; 
       position: relative;
-      box-shadow: 0 2px 15px rgba(99, 150, 163, 0.2); 
+      /* 影の色も新カラーに変更 */
+      box-shadow: 0 2px 15px rgba(88, 189, 215, 0.2); 
     }
     h1 { 
       margin: 0; 
@@ -74,7 +76,8 @@
       color: #fff;
       font-weight: bold;
       border: 1px solid var(--accent);
-      background: rgba(99, 150, 163, 0.15);
+      /* 背景色も新カラーに変更 */
+      background: rgba(88, 189, 215, 0.15);
       padding: 5px 12px;
       border-radius: 20px; 
       box-shadow: var(--glow-box); 
@@ -116,7 +119,11 @@
       outline: none; font-size: 14px; 
       background: rgba(30, 30, 30, 0.8); color: #fff;
     }
-    .search-box input:focus { border-color: var(--accent); box-shadow: 0 0 5px rgba(99, 150, 163, 0.5); }
+    .search-box input:focus { 
+      border-color: var(--accent); 
+      /* フォーカス時の影も新カラーに */
+      box-shadow: 0 0 5px rgba(88, 189, 215, 0.5); 
+    }
     .search-icon { position: absolute; left: 10px; top: 11px; color: #aaa; }
     
     select, button { 
@@ -150,7 +157,8 @@
     .card:hover { 
       transform: translateY(-4px); 
       border-color: var(--accent); 
-      box-shadow: 0 0 15px rgba(99, 150, 163, 0.4); 
+      /* ホバー時の光も新カラーに */
+      box-shadow: 0 0 15px rgba(88, 189, 215, 0.4); 
     }
     
     .card-img { width: 100%; aspect-ratio: 3/4; background: #000; object-fit: contain; border-bottom: 1px solid #333; }
@@ -190,16 +198,16 @@
     
     .price-row { display: flex; align-items: baseline; justify-content: space-between; }
     
-    /* ★買取価格ラベル（見やすく変更） */
+    /* 買取価格ラベル */
     .price-label { font-size: 10px; color: #e0e0e0; font-weight: normal; }
     
-    /* ★価格（#00E5FFに変更） */
+    /* ★価格（白に変更＋白ネオン） */
     .price-value { 
       color: var(--price-color); 
       font-size: 19px; 
       font-weight: 800; 
       letter-spacing: -0.5px; 
-      text-shadow: var(--glow-price); /* 専用の発光色 */
+      text-shadow: var(--glow-price); 
     }
     
     /* 残りの表示 */
@@ -423,4 +431,3 @@
   </script>
 </body>
 </html>
-
