@@ -23,28 +23,17 @@
       font-family: "Helvetica Neue", Arial, sans-serif; 
       margin: 0; padding: 0; 
       color: var(--text-main);
+      
+      /* もし画像が読み込めない時のための予備の色 */
       background-color: var(--bg-dark);
-      bbody {
-  /* 画像の指定（ファイル名が合っているか注意！） */
-  background-image: url('./bg-gray.jpg.png');
 
-  /* ▼▼ これが重要！ ▼▼ */
-  
-  /* 1. 画面いっぱいに引き伸ばす（比率は崩さない） */
-  background-size: cover;
-
-  /* 2. 画像を常に真ん中に合わせる */
-  background-position: center;
-
-  /* 3. 画像を繰り返さない（タイル状にしない） */
-  background-repeat: no-repeat;
-
-  /* 4. スクロールしても背景を固定する（お好みで） */
-  background-attachment: fixed;
-  
-  /* 5. コンテンツが少なくても画面の高さを確保する */
-  min-height: 100vh;
-}
+      /* ▼▼ ここから背景画像の設定 ▼▼ */
+      background-image: url('./bg-gray.jpg.png');
+      background-size: cover;       /* 画面いっぱいに広げる */
+      background-position: center;  /* 真ん中に合わせる */
+      background-repeat: no-repeat; /* 繰り返さない */
+      background-attachment: fixed; /* スクロールしても固定 */
+      min-height: 100vh;            /* 画面の高さを確保 */
     }
     
     body::before {
@@ -523,5 +512,6 @@
   </script>
 </body>
 </html>
+
 
 
