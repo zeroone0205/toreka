@@ -9,15 +9,12 @@
     :root {
       /* メインカラー */
       --accent: #58BDD7; 
-      
       /* 金額用のカラー */
       --price-color: #ffffff;
-      
       /* ネオンの光り方定義 */
       --glow-text: 0 0 8px rgba(88, 189, 215, 0.6);
       --glow-price: 0 0 10px rgba(255, 255, 255, 0.7); 
       --glow-box: 0 0 12px rgba(88, 189, 215, 0.4);
-      
       /* ベースカラー */
       --bg-dark: #121212;
       --card-bg: #1e1e1e;
@@ -306,7 +303,7 @@
 
   <script>
     // ★★★ ここにデプロイしたURLを貼り付けてください ★★★
-    // 必ず「新しいデプロイ」で発行したURLを使ってください
+    // 新しいデプロイで発行されたURLを必ず使ってください
     const API = "https://script.google.com/macros/s/AKfycbx2wlV2f1wc6qSvIz9Ko9b1oFM1f2rxjG1VanMXhDwhfI2JlBOrrmW9fwJY90SKw9CJ/exec";
 
     let currentCategory = "ポケモン";
@@ -426,7 +423,8 @@
       if (hideZero) params.set("hideZero", hideZero);
 
       try {
-        const res = await fetch(`${API}?${params.toString()}`);
+        // ★キャッシュ回避のおまじない（&t=...）を追加しました
+        const res = await fetch(`${API}?${params.toString()}&t=${Date.now()}`);
         const data = await res.json();
 
         if (data.error) {
@@ -472,4 +470,3 @@
   </script>
 </body>
 </html>
-
