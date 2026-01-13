@@ -24,10 +24,27 @@
       margin: 0; padding: 0; 
       color: var(--text-main);
       background-color: var(--bg-dark);
-      background-image: url('./bg-gray.jpg.png');
-      background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
+      bbody {
+  /* 画像の指定（ファイル名が合っているか注意！） */
+  background-image: url('./bg-gray.jpg.png');
+
+  /* ▼▼ これが重要！ ▼▼ */
+  
+  /* 1. 画面いっぱいに引き伸ばす（比率は崩さない） */
+  background-size: cover;
+
+  /* 2. 画像を常に真ん中に合わせる */
+  background-position: center;
+
+  /* 3. 画像を繰り返さない（タイル状にしない） */
+  background-repeat: no-repeat;
+
+  /* 4. スクロールしても背景を固定する（お好みで） */
+  background-attachment: fixed;
+  
+  /* 5. コンテンツが少なくても画面の高さを確保する */
+  min-height: 100vh;
+}
     }
     
     body::before {
@@ -506,4 +523,5 @@
   </script>
 </body>
 </html>
+
 
