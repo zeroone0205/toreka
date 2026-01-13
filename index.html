@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>トレカフォース買取表 v3.2</title>
+  <title>トレカフォース買取表 v3.3</title>
   <style>
     /* ★★★ デザイン設定エリア ★★★ */
     :root {
@@ -22,17 +22,11 @@
       font-family: "Helvetica Neue", Arial, sans-serif; 
       margin: 0; padding: 0; 
       color: var(--text-main);
-      
-      /* もし画像が読み込めない時のための予備の色 */
       background-color: var(--bg-dark);
-
-      /* ▼▼ ここから背景画像の設定 ▼▼ */
       background-image: url('./bg-gray.jpg.png');
-      background-size: cover;       /* 画面いっぱいに広げる */
-      background-position: center;  /* 真ん中に合わせる */
-      background-repeat: no-repeat; /* 繰り返さない */
-      background-attachment: fixed; /* スクロールしても固定 */
-      min-height: 100vh;            /* 画面の高さを確保 */
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
     }
     
     body::before {
@@ -78,19 +72,20 @@
       white-space: nowrap;
     }
 
-    /* ★修正: バージョン表示を白色に変更 */
+    /* ★修正: バージョン表示を小さく（10px） */
     .version-tag {
       position: absolute; 
-      top: 10px; 
-      left: 10px; 
-      font-size: 14px; 
-      color: #ffffff; /* 白 */
-      font-weight: bold;
+      top: 5px; 
+      left: 5px; 
+      font-size: 10px; /* 小さくしました */
+      color: #ffffff; 
+      font-weight: normal;
       z-index: 9999;
       background: rgba(0,0,0,0.6);
-      padding: 2px 8px;
-      border-radius: 4px;
+      padding: 1px 5px;
+      border-radius: 3px;
       border: 1px solid #ffffff;
+      opacity: 0.7;
     }
 
     /* 固定バー */
@@ -208,8 +203,8 @@
     
     /* 売り切れスタイル */
     .card.sold-out {
-      opacity: 0.4; 
-      filter: grayscale(100%); 
+      /* カード全体は少し暗くする */
+      filter: grayscale(100%) brightness(60%);
       border-color: #333;
       box-shadow: none;
     }
@@ -247,13 +242,28 @@
     }
     .badge-sotai { background: #555; color: #eee; }
     
-    /* ★修正: 買取終了バッジを発光させる */
-    .badge-end {
-      background: #d32f2f; 
-      color: #fff; 
-      border: 1px solid #ff5252;
-      box-shadow: 0 0 8px rgba(255, 82, 82, 0.8); /* 赤く発光 */
-      text-shadow: 0 0 5px rgba(255, 255, 255, 0.8); /* 文字も少し光らせる */
+    /* ★修正: 買取終了バッジを中央に配置＋薄くしない */
+    .sold-out-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      
+      /* バッジのデザイン */
+      background: rgba(211, 47, 47, 0.9); /* 赤背景 */
+      color: #ffffff !important; /* 文字は真っ白（重要） */
+      font-weight: 900;
+      font-size: 14px;
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: 2px solid #ff5252;
+      box-shadow: 0 0 15px rgba(255, 82, 82, 0.8);
+      white-space: nowrap;
+      z-index: 100; /* 最前面に */
+      
+      /* フィルターの影響を受けないように補正 */
+      /* 親要素にfilterがかかっているため、ここは影響を受けてしまいます。
+         ですので、HTML構造側で対応します（後述のスクリプト参照） */
     }
 
     .card-footer { margin-top: auto; border-top: 1px solid #444; padding-top: 8px; }
@@ -304,7 +314,7 @@
 
   <header>
     <h1>トレカフォース買取表</h1>
-    <div class="version-tag">v3.2</div>
+    <div class="version-tag">v3.3</div>
     <div id="date-display"></div>
   </header>
 
@@ -345,7 +355,6 @@
   </div>
 
   <script>
-    // ★★★ GASのURL（最新版） ★★★
     const API = "https://script.google.com/macros/s/AKfycbz3Ir-AAVg5QTH6UQ5vcyo7Y_9h_Ty7R1Wu4eUoNufIdDQXwYKg_tEy35QshMA4CZAJ/exec";
 
     let currentCategory = "ポケモン";
@@ -367,7 +376,6 @@
         const grid = el("grid");
         el("meta").textContent = "";
 
-        // ★受付終了画面
         if (data.isOpen === false) {
            document.querySelector('.sticky-container').style.display = 'none';
            grid.innerHTML = `
@@ -406,14 +414,20 @@
           }
 
           const isSoldOut = Number(item.remaining) <= 0;
+          
+          // ★重要: 「sold-out」クラスをつけると全体が暗くなるので、
+          // 文字だけ明るくするために、カード全体とは別にオーバーレイを置く
+          let overlayHtml = "";
+          
+          if (isSoldOut) {
+             overlayHtml = `<div class="sold-out-overlay">買取終了</div>`;
+          }
+
+          // カード自体のクラス（画像などを暗くするため）
           const cardClass = isSoldOut ? "card sold-out" : "card";
 
           let headerHtml = ""; 
           let badgeHtml = ""; 
-
-          if (isSoldOut) {
-             badgeHtml += `<span class="badge badge-end">買取終了</span>`;
-          }
 
           if (currentCategory === "素体") {
              if (item.grade) {
@@ -423,20 +437,51 @@
              headerHtml = `<div class="psa-label">【PSA10】</div>`;
           }
 
+          // ★HTML構造: オーバーレイ（買取終了）はカードの外（または影響を受けない場所）に置きたいが、
+          // position:absoluteで制御しているので、ここではカードの中に入れつつ
+          // CSSでfilterの影響を回避するのは難しいため、
+          // カード全体を暗くするのではなく「画像とテキスト」を暗くする方針に変更するのがベストですが、
+          // 簡易的に「sold-out」クラスで暗くしつつ、オーバーレイは強引に明るく見せる手法をとります。
+          // ただし filter: grayscale() は子要素にも効くので、ここでは
+          // 「背景色を半透明の黒で覆う」方式で暗さを表現し、その上に文字を乗せます。
+
+          let innerOverlay = "";
+          if(isSoldOut) {
+             // カード全体を覆う黒い膜 + 中央に文字
+             innerOverlay = `
+               <div style="
+                 position: absolute; top:0; left:0; width:100%; height:100%;
+                 background: rgba(0,0,0,0.6); z-index: 50;
+                 display: flex; align-items: center; justify-content: center;
+               ">
+                 <div style="
+                   background: #d32f2f; color: #fff; font-weight: bold; font-size: 14px;
+                   padding: 6px 12px; border-radius: 4px; border: 2px solid #ff5252;
+                   box-shadow: 0 0 10px rgba(255,0,0,0.5);
+                 ">
+                   買取終了
+                 </div>
+               </div>
+             `;
+          }
+
           return `
-            <div class="${cardClass}">
-              ${imgTag}
-              <div class="card-tags">${badgeHtml}</div>
-              <div class="card-body">
-                ${headerHtml}
-                <div class="card-title">${item.name}</div>
-                <div class="card-footer">
-                  <div class="price-row">
-                    <span class="price-label">買取価格</span>
-                    <span class="price-value">${yen(item.price)}</span>
-                  </div>
-                  <div class="limit-container">
-                    <span class="limit ${isSoldOut ? 'zero' : ''}">残り: ${item.remaining}</span>
+            <div class="card" style="position:relative;">
+              ${innerOverlay}
+              <div style="${isSoldOut ? 'opacity:0.5; filter:grayscale(100%);' : ''}">
+                ${imgTag}
+                <div class="card-tags">${badgeHtml}</div>
+                <div class="card-body">
+                  ${headerHtml}
+                  <div class="card-title">${item.name}</div>
+                  <div class="card-footer">
+                    <div class="price-row">
+                      <span class="price-label">買取価格</span>
+                      <span class="price-value">${yen(item.price)}</span>
+                    </div>
+                    <div class="limit-container">
+                      <span class="limit ${isSoldOut ? 'zero' : ''}">残り: ${item.remaining}</span>
+                    </div>
                   </div>
                 </div>
               </div>
