@@ -5,17 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>トレカフォース買取表</title>
   <style>
-    /* ★★★ デザイン設定エリア ★★★ */
+    /* ★★★ デザイン設定エリア（ネオン・インパクト強化版） ★★★ */
     :root {
-      /* ★ご指定の色に変更しました */
+      /* メインカラー */
       --accent: #6396A3; 
       
+      /* ネオンの光り方定義（文字や枠線用） */
+      --glow-text: 0 0 8px rgba(99, 150, 163, 0.6);
+      --glow-box: 0 0 12px rgba(99, 150, 163, 0.4);
+      
       /* ベースカラー */
-      --bg-dark: #121212;   /* 全体の背景 */
-      --card-bg: #1e1e1e;   /* カードの背景 */
-      --text-main: #ffffff; /* メイン文字 */
-      --text-sub: #cccccc;  /* サブ文字 */
-      --border: #666666;    /* 枠線 */
+      --bg-dark: #121212;
+      --card-bg: #1e1e1e;
+      --text-main: #ffffff;
+      --border: #555555;
     }
 
     body { 
@@ -32,43 +35,54 @@
     body::before {
       content: "";
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.7); 
+      background: rgba(0, 0, 0, 0.75); /* 背景を少し暗くしてネオンを際立たせる */
       z-index: -1;
     }
 
     * { box-sizing: border-box; }
 
-    /* ヘッダー（日付表示のためにrelative設定） */
+    /* ヘッダー */
     header { 
       background: #111; 
       border-bottom: 2px solid var(--accent); 
-      padding: 15px; 
+      padding: 15px 15px 15px 15px; /* 右側に日付用の余白 */
       text-align: center; 
       position: relative;
+      box-shadow: 0 2px 15px rgba(99, 150, 163, 0.2); /* ヘッダー下の影 */
     }
     h1 { 
       margin: 0; 
-      font-size: 20px; 
+      font-size: 22px; 
       color: var(--accent); 
-      font-weight: bold;
+      font-weight: 800;
       letter-spacing: 1px;
+      text-shadow: var(--glow-text); /* ★タイトルを発光 */
+      font-style: italic;
     }
     
-    /* ★日付表示のデザイン★ */
+    /* ★日付表示のデザイン（見やすく改良）★ */
     #date-display {
       position: absolute;
       top: 50%;
-      right: 15px;
+      right: 20px;
       transform: translateY(-50%);
-      font-size: 12px;
-      color: #aaa;
-      font-weight: normal;
+      font-size: 11px;
+      color: #fff;
+      font-weight: bold;
+      
+      /* 枠線と背景を追加 */
+      border: 1px solid var(--accent);
+      background: rgba(99, 150, 163, 0.15);
+      padding: 5px 12px;
+      border-radius: 20px; /* 丸みをつける */
+      box-shadow: var(--glow-box); /* ★日付も発光 */
+      white-space: nowrap;
     }
 
     /* ナビゲーション */
     .nav-scroll { 
       overflow-x: auto; 
-      background: #222; 
+      background: #1a1a1a; 
       border-bottom: 1px solid #444; 
       white-space: nowrap; 
       padding: 0 10px; 
@@ -83,10 +97,11 @@
       transition: 0.3s; 
       font-size: 14px; 
     }
-    .nav-item:hover { color: #fff; }
+    .nav-item:hover { color: #fff; text-shadow: 0 0 5px #fff; }
     .nav-item.active { 
       color: var(--accent); 
-      border-bottom-color: var(--accent); 
+      border-bottom-color: var(--accent);
+      text-shadow: var(--glow-text); /* アクティブなタブも光らせる */
     }
 
     /* フィルターエリア */
@@ -97,21 +112,23 @@
       width: 100%; padding: 10px 10px 10px 36px; 
       border: 1px solid #555; border-radius: 4px; 
       outline: none; font-size: 14px; 
-      background: #333; color: #fff;
+      background: rgba(30, 30, 30, 0.8); color: #fff;
     }
+    .search-box input:focus { border-color: var(--accent); box-shadow: 0 0 5px rgba(99, 150, 163, 0.5); }
     .search-icon { position: absolute; left: 10px; top: 11px; color: #aaa; }
     
     select, button { 
       padding: 10px; 
       border: 1px solid #555; border-radius: 4px; 
-      background: #333; color: #fff; 
+      background: rgba(30, 30, 30, 0.8); color: #fff; 
       cursor: pointer; font-size: 13px; 
     }
     button { 
       background: var(--accent); 
-      color: #fff; /* 文字色を白にして視認性を確保 */
+      color: #fff; 
       border: none; 
       font-weight: bold; 
+      box-shadow: var(--glow-text); /* ボタンも光らせる */
     }
 
     /* グリッド */
@@ -121,16 +138,18 @@
     /* カードデザイン */
     .card { 
       background: var(--card-bg); 
-      border-radius: 6px; 
+      border-radius: 8px; 
       overflow: hidden; 
       border: 1px solid var(--border); 
-      box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.6);
       display: flex; flex-direction: column; position: relative; 
-      transition: transform 0.2s;
+      transition: all 0.2s ease;
     }
     .card:hover { 
-      transform: translateY(-2px); 
+      transform: translateY(-4px); 
       border-color: var(--accent); 
+      /* ★ホバー時に強めの光彩を追加 */
+      box-shadow: 0 0 15px rgba(99, 150, 163, 0.4); 
     }
     
     .card-img { width: 100%; aspect-ratio: 3/4; background: #000; object-fit: contain; border-bottom: 1px solid #333; }
@@ -142,9 +161,10 @@
     .psa-label { 
       font-size: 11px; 
       color: var(--accent); 
-      font-weight: bold; 
+      font-weight: 900; 
       margin-bottom: 4px; 
       letter-spacing: 0.5px;
+      text-shadow: var(--glow-text); /* 発光 */
     }
 
     /* タイトル */
@@ -168,21 +188,19 @@
     .card-footer { margin-top: auto; border-top: 1px solid #444; padding-top: 8px; }
     
     .price-row { display: flex; align-items: baseline; justify-content: space-between; }
-    .price-label { font-size: 10px; color: #aaa; }
+    .price-label { font-size: 10px; color: #bbb; }
     
     /* 価格 */
     .price-value { 
       color: var(--accent); 
-      font-size: 18px; 
+      font-size: 19px; 
       font-weight: 800; 
       letter-spacing: -0.5px; 
+      text-shadow: var(--glow-text); /* 発光 */
     }
     
     /* 残りの表示 */
-    .limit-container {
-      margin-top: 6px;
-      text-align: right;
-    }
+    .limit-container { margin-top: 6px; text-align: right; }
     .limit { 
       display: inline-block;
       font-size: 11px; 
@@ -198,7 +216,7 @@
 
     /* スマホ対応 */
     @media (max-width: 600px) {
-      .grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+      .grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
       .card-title { font-size: 11px; height: 33px; margin-bottom: 4px; }
       .psa-label { font-size: 10px; margin-bottom: 2px; }
       .price-value { font-size: 15px; }
@@ -209,13 +227,16 @@
       .search-box { width: 100%; order: -1; }
       #reload { display: none; }
       
-      /* スマホでの日付表示位置調整 */
+      /* スマホでの日付位置 */
       #date-display {
         position: static;
         display: block;
         transform: none;
-        margin-top: 5px;
-        font-size: 11px;
+        margin-top: 8px;
+        text-align: center;
+        width: fit-content;
+        margin-left: auto;
+        margin-right: auto;
       }
     }
   </style>
@@ -271,7 +292,7 @@
     const el = (id) => document.getElementById(id);
     const yen = (n) => "¥" + Number(n).toLocaleString();
 
-    // ★日付自動更新関数
+    // ★日付自動更新
     function updateDate() {
         const now = new Date();
         const year = now.getFullYear();
@@ -279,7 +300,6 @@
         const day = String(now.getDate()).padStart(2, '0');
         el("date-display").textContent = `${year}/${month}/${day} 更新`;
     }
-    // ページ読み込み時に日付を表示
     updateDate();
 
     function render(data) {
@@ -297,7 +317,6 @@
             imgTag = `<img src="${item.imageUrl}" class="card-img" alt="" loading="lazy" />`;
           }
 
-          // ★★★ 表示ロジック ★★★
           let headerHtml = ""; 
           let badgeHtml = ""; 
 
@@ -306,7 +325,7 @@
                 badgeHtml = `<span class="badge badge-sotai">${item.grade}</span>`;
              }
           } else {
-             // 「PSA10」を表示
+             // 光るPSAラベル
              headerHtml = `<div class="psa-label">【PSA10】</div>`;
              badgeHtml = "";
           }
