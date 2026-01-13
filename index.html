@@ -18,15 +18,21 @@
       --border: #555555;
     }
 
-    body { 
+   body { 
       font-family: "Helvetica Neue", Arial, sans-serif; 
       margin: 0; padding: 0; 
       color: var(--text-main);
+      
+      /* もし画像が読み込めない時のための予備の色 */
       background-color: var(--bg-dark);
-      background-image: url('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2070&auto=format&fit=crop');
-      background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
+
+      /* ▼▼ ここから背景画像の設定 ▼▼ */
+      background-image: url('./bg-gray.jpg.png');
+      background-size: cover;       /* 画面いっぱいに広げる */
+      background-position: center;  /* 真ん中に合わせる */
+      background-repeat: no-repeat; /* 繰り返さない */
+      background-attachment: fixed; /* スクロールしても固定 */
+      min-height: 100vh;            /* 画面の高さを確保 */
     }
     
     body::before {
@@ -510,3 +516,4 @@
   </script>
 </body>
 </html>
+
