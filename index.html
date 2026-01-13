@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>トレカフォース買取表 v3.0</title>
+  <title>トレカフォース買取表 v3.1</title>
   <style>
     /* ★★★ デザイン設定エリア ★★★ */
     :root {
@@ -22,17 +22,11 @@
       font-family: "Helvetica Neue", Arial, sans-serif; 
       margin: 0; padding: 0; 
       color: var(--text-main);
-      
-      /* もし画像が読み込めない時のための予備の色 */
       background-color: var(--bg-dark);
-
-      /* ▼▼ ここから背景画像の設定 ▼▼ */
-      background-image: url('./bg-gray.jpg.png');
-      background-size: cover;       /* 画面いっぱいに広げる */
-      background-position: center;  /* 真ん中に合わせる */
-      background-repeat: no-repeat; /* 繰り返さない */
-      background-attachment: fixed; /* スクロールしても固定 */
-      min-height: 100vh;            /* 画面の高さを確保 */
+      background-image: url('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2070&auto=format&fit=crop');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
     }
     
     body::before {
@@ -44,7 +38,6 @@
 
     * { box-sizing: border-box; }
 
-    /* ヘッダー */
     header { 
       background: #111; 
       border-bottom: 2px solid var(--accent); 
@@ -80,16 +73,26 @@
       white-space: nowrap;
     }
 
-    /* バージョン表示（更新確認用） */
+    /* ★修正: バージョン表示を目立つ黄色に変更 */
     .version-tag {
-      position: absolute; top: 5px; left: 5px; font-size: 10px; color: #555;
+      position: absolute; 
+      top: 10px; 
+      left: 10px; 
+      font-size: 14px; 
+      color: #ffeb3b; /* 黄色 */
+      font-weight: bold;
+      z-index: 9999;
+      background: rgba(0,0,0,0.6);
+      padding: 2px 8px;
+      border-radius: 4px;
+      border: 1px solid #ffeb3b;
     }
 
-    /* ✅ メニューと検索バーを固定するエリア */
+    /* 固定バー */
     .sticky-container {
       position: sticky;
       top: 0;
-      z-index: 9999; /* 最前面に */
+      z-index: 9999;
       background: rgba(18, 18, 18, 0.95);
       backdrop-filter: blur(5px);
       border-bottom: 1px solid #444;
@@ -153,17 +156,16 @@
       box-shadow: var(--glow-text); 
     }
 
-    /* カードリスト */
     .container { max-width: 1000px; margin: 20px auto 0; padding: 0 12px 60px; }
     .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; }
     
-    /* ✅ 受付終了メッセージ：黄色枠＋白字 */
+    /* 受付終了メッセージ */
     .closed-message-container {
       grid-column: 1 / -1;
       text-align: center;
       padding: 60px 20px;
       margin-top: 40px;
-      border: 3px solid #FBC02D; /* 黄色枠 */
+      border: 3px solid #FBC02D;
       border-radius: 12px;
       background: rgba(255, 235, 59, 0.05);
       box-shadow: 0 0 25px rgba(253, 216, 53, 0.3);
@@ -199,10 +201,10 @@
       box-shadow: 0 0 15px rgba(88, 189, 215, 0.4); 
     }
     
-    /* ✅ 売り切れ（残り0）のスタイル：薄く表示 */
+    /* 売り切れスタイル */
     .card.sold-out {
-      opacity: 0.4; /* 薄くする */
-      filter: grayscale(100%); /* 色を消す */
+      opacity: 0.4; 
+      filter: grayscale(100%); 
       border-color: #333;
       box-shadow: none;
     }
@@ -240,7 +242,6 @@
     }
     .badge-sotai { background: #555; color: #eee; }
     
-    /* ✅ 買取終了バッジ */
     .badge-end {
       background: #d32f2f; color: #fff; border: 1px solid #b71c1c;
       box-shadow: 0 0 5px rgba(211, 47, 47, 0.5);
@@ -294,7 +295,7 @@
 
   <header>
     <h1>トレカフォース買取表</h1>
-    <div class="version-tag">v3.0</div>
+    <div class="version-tag">v3.1</div>
     <div id="date-display"></div>
   </header>
 
@@ -335,9 +336,8 @@
   </div>
 
   <script>
-    // ★★★ GASの新しいデプロイURLをここに貼り付けてください ★★★
-    // 直近で提示されたURLを入れています。もし新しくデプロイしたら書き換えてください。
-    const API = "https://script.google.com/macros/s/AKfycbw0DIO_JOhrUZQPaQ47A4TJSvhViWFLjDUyCQ983Zs7QFL0P52kGseSo2gRqs5FjDZC/exec";
+    // ★★★ GASの新しいURLを入れてください ★★★
+    const API = "https://script.google.com/macros/s/AKfycbz3Ir-AAVg5QTH6UQ5vcyo7Y_9h_Ty7R1Wu4eUoNufIdDQXwYKg_tEy35QshMA4CZAJ/exec";
 
     let currentCategory = "ポケモン";
     let CACHE = {}; 
@@ -358,7 +358,7 @@
         const grid = el("grid");
         el("meta").textContent = "";
 
-        // ★★★ 閉店時の表示（黄色枠＋白字） ★★★
+        // ★受付終了画面（黄色枠白字）
         if (data.isOpen === false) {
            document.querySelector('.sticky-container').style.display = 'none';
            grid.innerHTML = `
@@ -381,7 +381,6 @@
           return;
         }
 
-        // --- 0枚表示の制御 ---
         const showSoldOut = el("showSoldOut").checked;
         let items = data.items.slice();
 
@@ -412,7 +411,6 @@
                 badgeHtml += `<span class="badge badge-sotai">${item.grade}</span>`;
              }
           } else {
-             // 0枚でもPSAラベルは残す（薄くなるのでOK）
              headerHtml = `<div class="psa-label">【PSA10】</div>`;
           }
 
@@ -455,11 +453,9 @@
       if (sort) params.set("sort", sort);
 
       try {
-        // ★キャッシュ回避の &t=... を入れています
         const res = await fetch(`${API}?${params.toString()}&t=${Date.now()}`);
         const data = await res.json();
 
-        // 閉店判定は最優先
         if (data.isOpen === false) {
            CACHE = {}; 
            render(data);
