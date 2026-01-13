@@ -7,15 +7,14 @@
   <style>
     /* ★★★ デザイン設定エリア ★★★ */
     :root {
-      /* ★メインカラー（旧#6396A3 → 新#58BDD7 に変更） */
+      /* メインカラー */
       --accent: #58BDD7; 
       
-      /* ★金額用のカラー（白に変更） */
+      /* 金額用のカラー */
       --price-color: #ffffff;
       
-      /* ネオンの光り方定義（新しい色に合わせてRGB調整: 88, 189, 215） */
+      /* ネオンの光り方定義 */
       --glow-text: 0 0 8px rgba(88, 189, 215, 0.6);
-      /* 金額用の光（白文字に合わせて白く発光） */
       --glow-price: 0 0 10px rgba(255, 255, 255, 0.7); 
       --glow-box: 0 0 12px rgba(88, 189, 215, 0.4);
       
@@ -31,7 +30,7 @@
       margin: 0; padding: 0; 
       color: var(--text-main);
       background-color: var(--bg-dark);
-      background-image: url('https://ja.pngtree.com/free-backgrounds-photos/%E3%83%80%E3%83%BC%E3%82%AF%E3%82%B0%E3%83%AC%E3%83%BC');
+      background-image: url('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2070&auto=format&fit=crop');
       background-size: cover;
       background-position: center;
       background-attachment: fixed;
@@ -53,7 +52,6 @@
       padding: 15px 15px 15px 15px; 
       text-align: center; 
       position: relative;
-      /* 影の色も新カラーに変更 */
       box-shadow: 0 2px 15px rgba(88, 189, 215, 0.2); 
     }
     h1 { 
@@ -76,7 +74,6 @@
       color: #fff;
       font-weight: bold;
       border: 1px solid var(--accent);
-      /* 背景色も新カラーに変更 */
       background: rgba(88, 189, 215, 0.15);
       padding: 5px 12px;
       border-radius: 20px; 
@@ -119,11 +116,7 @@
       outline: none; font-size: 14px; 
       background: rgba(30, 30, 30, 0.8); color: #fff;
     }
-    .search-box input:focus { 
-      border-color: var(--accent); 
-      /* フォーカス時の影も新カラーに */
-      box-shadow: 0 0 5px rgba(88, 189, 215, 0.5); 
-    }
+    .search-box input:focus { border-color: var(--accent); box-shadow: 0 0 5px rgba(88, 189, 215, 0.5); }
     .search-icon { position: absolute; left: 10px; top: 11px; color: #aaa; }
     
     select, button { 
@@ -144,6 +137,30 @@
     .container { max-width: 1000px; margin: 0 auto; padding: 0 12px 60px; }
     .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; }
     
+    /* ★★★ 閉店メッセージのデザイン ★★★ */
+    .closed-message-container {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 60px 20px;
+      margin-top: 20px;
+      border: 2px solid #ff4081; /* 警告色のピンク */
+      border-radius: 10px;
+      background: rgba(40, 0, 10, 0.6);
+      box-shadow: 0 0 20px rgba(255, 64, 129, 0.3);
+    }
+    .closed-title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #ff4081;
+      margin-bottom: 15px;
+      text-shadow: 0 0 10px rgba(255, 64, 129, 0.6);
+    }
+    .closed-text {
+      font-size: 15px;
+      color: #fff;
+      line-height: 1.8;
+    }
+
     /* カードデザイン */
     .card { 
       background: var(--card-bg); 
@@ -157,8 +174,15 @@
     .card:hover { 
       transform: translateY(-4px); 
       border-color: var(--accent); 
-      /* ホバー時の光も新カラーに */
       box-shadow: 0 0 15px rgba(88, 189, 215, 0.4); 
+    }
+    
+    /* 売り切れスタイル */
+    .card.sold-out {
+      opacity: 0.5; filter: grayscale(80%); border-color: #333; box-shadow: none;
+    }
+    .card.sold-out:hover {
+      transform: none; box-shadow: none; border-color: #333;
     }
     
     .card-img { width: 100%; aspect-ratio: 3/4; background: #000; object-fit: contain; border-bottom: 1px solid #333; }
@@ -166,7 +190,6 @@
 
     .card-body { padding: 12px; flex: 1; display: flex; flex-direction: column; }
     
-    /* PSAラベル */
     .psa-label { 
       font-size: 11px; 
       color: var(--accent); 
@@ -176,7 +199,6 @@
       text-shadow: var(--glow-text); 
     }
 
-    /* タイトル */
     .card-title { 
       font-size: 13px; 
       font-weight: bold; 
@@ -186,22 +208,21 @@
       display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 39px; 
     }
     
-    /* バッジ */
     .card-tags { position: absolute; top: 6px; right: 6px; display: flex; flex-direction: column; gap: 2px; align-items: flex-end; }
     .badge { 
       display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold;
       background: #333; color: #fff; border: 1px solid #555;
     }
     .badge-sotai { background: #555; color: #eee; }
+    .badge-end {
+      background: #d32f2f; color: #fff; border: 1px solid #b71c1c;
+      box-shadow: 0 0 5px rgba(211, 47, 47, 0.5);
+    }
 
     .card-footer { margin-top: auto; border-top: 1px solid #444; padding-top: 8px; }
-    
     .price-row { display: flex; align-items: baseline; justify-content: space-between; }
-    
-    /* 買取価格ラベル */
     .price-label { font-size: 10px; color: #e0e0e0; font-weight: normal; }
     
-    /* ★価格（白に変更＋白ネオン） */
     .price-value { 
       color: var(--price-color); 
       font-size: 19px; 
@@ -210,7 +231,6 @@
       text-shadow: var(--glow-price); 
     }
     
-    /* 残りの表示 */
     .limit-container { margin-top: 6px; text-align: right; }
     .limit { 
       display: inline-block;
@@ -221,11 +241,11 @@
       border-radius: 4px;
       border: 1px solid #666;
     }
+    .limit.zero { background: #333; color: #888; border-color: #444; }
     
     .loading { text-align: center; padding: 40px; color: #aaa; grid-column: 1 / -1; }
     .error { background: #330000; color: #ff8a80; padding: 15px; border: 1px solid #ff5252; margin-bottom: 20px; display: none; }
 
-    /* スマホ対応 */
     @media (max-width: 600px) {
       .grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
       .card-title { font-size: 11px; height: 33px; margin-bottom: 4px; }
@@ -238,16 +258,8 @@
       .search-box { width: 100%; order: -1; }
       #reload { display: none; }
       
-      /* スマホでの日付位置 */
       #date-display {
-        position: static;
-        display: block;
-        transform: none;
-        margin-top: 8px;
-        text-align: center;
-        width: fit-content;
-        margin-left: auto;
-        margin-right: auto;
+        position: static; display: block; transform: none; margin-top: 8px; text-align: center; width: fit-content; margin-left: auto; margin-right: auto;
       }
     }
   </style>
@@ -282,7 +294,7 @@
     </select>
 
     <label style="display:flex; align-items:center; font-size:12px; cursor:pointer; gap:6px; margin-left:auto; color: #fff;">
-      <input type="checkbox" id="hideZero" checked> 募集中のみ
+      <input type="checkbox" id="hideZero"> 募集中のみ
     </label>
     <button id="reload">更新</button>
   </div>
@@ -295,7 +307,8 @@
 
   <script>
     // ★★★ ここにデプロイしたURLを貼り付けてください ★★★
-    const API = "https://script.google.com/macros/s/AKfycbynclYCpgfGu4kODPAlPGGLYQfoB601lfxMGG7BMtfnKelA22h87XthNlW76dycOPhR/exec";
+    // ※GASを新しくデプロイした場合、URLが変わる可能性があるので注意してください
+    const API = "https://script.google.com/macros/s/AKfycbw987tsQKh90FPS1aICg81424AQiaxwOGXW-Bq91ZHFZLS7aRnSXWpq_OqTCCdWdwjO/exec";
 
     let currentCategory = "ポケモン";
     const CACHE = {}; 
@@ -303,7 +316,6 @@
     const el = (id) => document.getElementById(id);
     const yen = (n) => "¥" + Number(n).toLocaleString();
 
-    // ★日付自動更新
     function updateDate() {
         const now = new Date();
         const year = now.getFullYear();
@@ -315,6 +327,32 @@
 
     function render(data) {
         const grid = el("grid");
+        el("meta").textContent = "";
+
+        // ★★★ 閉店時の表示処理 ★★★
+        if (data.isOpen === false) {
+           // フィルタ類を隠す
+           document.querySelector('.filters').style.display = 'none';
+           document.querySelector('.nav-scroll').style.display = 'none';
+           
+           // 閉店メッセージを表示
+           grid.innerHTML = `
+             <div class="closed-message-container">
+               <div class="closed-title">受付終了</div>
+               <div class="closed-text">
+                 本日の買取受付は終了いたしました。<br>
+                 また明日以降のご利用を<br>心よりお待ちしております。
+               </div>
+             </div>
+           `;
+           return;
+        }
+
+        // --- 以下は営業中の処理 ---
+        
+        // フィルタ類を表示に戻す（再開時用）
+        document.querySelector('.filters').style.display = 'flex';
+        document.querySelector('.nav-scroll').style.display = 'block';
         el("meta").textContent = `${data.category} (${data.count}件)`;
 
         if (data.items.length === 0) {
@@ -328,20 +366,30 @@
             imgTag = `<img src="${item.imageUrl}" class="card-img" alt="" loading="lazy" />`;
           }
 
+          const isSoldOut = item.remaining <= 0;
+          const cardClass = isSoldOut ? "card sold-out" : "card";
+
           let headerHtml = ""; 
           let badgeHtml = ""; 
 
+          if (isSoldOut) {
+             badgeHtml += `<span class="badge badge-end">買取終了</span>`;
+          }
+
           if (currentCategory === "素体") {
              if (item.grade) {
-                badgeHtml = `<span class="badge badge-sotai">${item.grade}</span>`;
+                badgeHtml += `<span class="badge badge-sotai">${item.grade}</span>`;
              }
           } else {
-             headerHtml = `<div class="psa-label">【PSA10】</div>`;
-             badgeHtml = "";
+             if (!isSoldOut) {
+                headerHtml = `<div class="psa-label">【PSA10】</div>`;
+             } else {
+                headerHtml = `<div style="height:15px;"></div>`; 
+             }
           }
 
           return `
-            <div class="card">
+            <div class="${cardClass}">
               ${imgTag}
               <div class="card-tags">${badgeHtml}</div>
               <div class="card-body">
@@ -353,7 +401,7 @@
                     <span class="price-value">${yen(item.price)}</span>
                   </div>
                   <div class="limit-container">
-                    <span class="limit">残り: ${item.remaining}</span>
+                    <span class="limit ${isSoldOut ? 'zero' : ''}">残り: ${item.remaining}</span>
                   </div>
                 </div>
               </div>
@@ -376,6 +424,7 @@
         return;
       }
 
+      // 読込中はローディング
       grid.innerHTML = '<div class="loading">読み込み中...</div>';
 
       const params = new URLSearchParams();
@@ -395,6 +444,8 @@
           return;
         }
 
+        // キャッシュに保存して描画
+        // ※閉店状態でもキャッシュしてOK（再読込で更新されるため）
         CACHE[cacheKey] = data;
         render(data);
 
@@ -431,4 +482,3 @@
   </script>
 </body>
 </html>
-
