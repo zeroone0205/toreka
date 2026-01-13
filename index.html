@@ -3,7 +3,12 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>トレカフォース買取表　</title>
+  
+  <title>トレカフォース買取表</title>
+  <meta property="og:title" content="トレカフォース買取表" />
+  <meta property="og:description" content="最新の買取価格一覧です。" />
+  <meta property="og:type" content="website" />
+
   <style>
     /* ★★★ デザイン設定エリア ★★★ */
     :root {
@@ -24,7 +29,10 @@
       margin: 0; padding: 0; 
       color: var(--text-main);
       background-color: var(--bg-dark);
+      
+      /* ★修正: 確実に表示される背景画像URLに変更 */
       background-image: url('./bg-gray.jpg.png');
+      
       background-size: cover;
       background-position: center;
       background-attachment: fixed;
@@ -33,7 +41,7 @@
     body::before {
       content: "";
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.8); 
+      background: rgba(0, 0, 0, 0.85); /* 画像が明るすぎる場合に備えて暗くする */
       z-index: -1;
     }
 
@@ -73,7 +81,7 @@
       white-space: nowrap;
     }
 
-    /* バージョン表示 */
+    /* バージョン表示（サイト内のみ表示） */
     .version-tag {
       position: absolute; 
       top: 5px; 
@@ -160,22 +168,22 @@
     .container { max-width: 1000px; margin: 20px auto 0; padding: 0 12px 60px; }
     .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; }
     
-    /* ★修正: 受付終了メッセージもメインカラー（水色）に統一 */
+    /* 受付終了メッセージ */
     .closed-message-container {
       grid-column: 1 / -1;
       text-align: center;
       padding: 60px 20px;
       margin-top: 40px;
-      border: 3px solid var(--accent); /* 水色枠 */
+      border: 3px solid var(--accent);
       border-radius: 12px;
-      background: rgba(88, 189, 215, 0.1); /* 薄い水色背景 */
-      box-shadow: var(--glow-box); /* 水色の光 */
+      background: rgba(88, 189, 215, 0.1);
+      box-shadow: var(--glow-box);
       color: #ffffff;
     }
     .closed-title {
       font-size: 26px;
       font-weight: 900;
-      color: var(--accent); /* 水色文字 */
+      color: var(--accent);
       margin-bottom: 20px;
       text-shadow: var(--glow-text);
     }
@@ -242,8 +250,7 @@
     }
     .badge-sotai { background: #555; color: #eee; }
     
-    /* ★修正: 買取終了バッジもメインカラー（水色）に統一 */
-    /* 赤ではなく水色背景＋白字で統一感を出します */
+    /* 買取終了バッジ（水色統一） */
     .sold-out-badge-style {
       background: rgba(88, 189, 215, 0.9); /* 水色背景 */
       color: #ffffff !important;
@@ -253,10 +260,8 @@
       border-radius: 6px;
       border: 2px solid var(--accent);
       box-shadow: 0 0 15px rgba(88, 189, 215, 0.6);
-      text-shadow: 0 0 5px rgba(0,0,0,0.5); /* 文字が見やすいように影 */
+      text-shadow: 0 0 5px rgba(0,0,0,0.5);
     }
-
-    /* 上記のスタイルをJS内で使います */
 
     .card-footer { margin-top: auto; border-top: 1px solid #444; padding-top: 8px; }
     .price-row { display: flex; align-items: baseline; justify-content: space-between; }
@@ -306,7 +311,7 @@
 
   <header>
     <h1>トレカフォース買取表</h1>
-    <div class="version-tag">v3.4</div>
+    <div class="version-tag">v3.5</div>
     <div id="date-display"></div>
   </header>
 
@@ -347,6 +352,7 @@
   </div>
 
   <script>
+    // ★★★ GASのURL ★★★
     const API = "https://script.google.com/macros/s/AKfycbz3Ir-AAVg5QTH6UQ5vcyo7Y_9h_Ty7R1Wu4eUoNufIdDQXwYKg_tEy35QshMA4CZAJ/exec";
 
     let currentCategory = "ポケモン";
@@ -410,9 +416,7 @@
           
           let overlayHtml = "";
           
-          // ★修正: バージョン表示と同じ水色テーマを適用
           if (isSoldOut) {
-             // ここでCSSクラスを適用したdivを作るのではなく、styleを直接埋め込んで確実に反映させます
              overlayHtml = `
                <div style="
                  position: absolute; top:0; left:0; width:100%; height:100%;
@@ -439,7 +443,6 @@
              headerHtml = `<div class="psa-label">【PSA10】</div>`;
           }
 
-          // 右上の小さいバッジは、0枚の時は中央にデカく出すので消す（重複防止）
           if (isSoldOut) badgeHtml = ""; 
 
           return `
@@ -541,4 +544,3 @@
   </script>
 </body>
 </html>
-
