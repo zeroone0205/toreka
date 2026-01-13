@@ -137,13 +137,13 @@
     .container { max-width: 1000px; margin: 0 auto; padding: 0 12px 60px; }
     .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; }
     
-    /* ★★★ 閉店メッセージのデザイン ★★★ */
+    /* 閉店メッセージ */
     .closed-message-container {
       grid-column: 1 / -1;
       text-align: center;
       padding: 60px 20px;
       margin-top: 20px;
-      border: 2px solid #ff4081; /* 警告色のピンク */
+      border: 2px solid #ff4081; 
       border-radius: 10px;
       background: rgba(40, 0, 10, 0.6);
       box-shadow: 0 0 20px rgba(255, 64, 129, 0.3);
@@ -177,7 +177,6 @@
       box-shadow: 0 0 15px rgba(88, 189, 215, 0.4); 
     }
     
-    /* 売り切れスタイル */
     .card.sold-out {
       opacity: 0.5; filter: grayscale(80%); border-color: #333; box-shadow: none;
     }
@@ -294,7 +293,7 @@
     </select>
 
     <label style="display:flex; align-items:center; font-size:12px; cursor:pointer; gap:6px; margin-left:auto; color: #fff;">
-      <input type="checkbox" id="hideZero"> 募集中のみ
+      <input type="checkbox" id="hideZero" checked> 募集中のみ
     </label>
     <button id="reload">更新</button>
   </div>
@@ -307,8 +306,8 @@
 
   <script>
     // ★★★ ここにデプロイしたURLを貼り付けてください ★★★
-    // ※GASを新しくデプロイした場合、URLが変わる可能性があるので注意してください
-    const API = "https://script.google.com/macros/s/AKfycbwiuRvOgTepjTnp_4y2eaR8S5nA3rJ_ScaS5ZGqUw_zFVF6tpVktt82VM_KsCBZaT22/exec";
+    // 必ず「新しいデプロイ」で発行したURLを使ってください
+    const API = "https://script.google.com/macros/s/AKfycbynclYCpgfGu4kODPAlPGGLYQfoB601lfxMGG7BMtfnKelA22h87XthNlW76dycOPhR/exec";
 
     let currentCategory = "ポケモン";
     const CACHE = {}; 
@@ -329,13 +328,10 @@
         const grid = el("grid");
         el("meta").textContent = "";
 
-        // ★★★ 閉店時の表示処理 ★★★
         if (data.isOpen === false) {
-           // フィルタ類を隠す
            document.querySelector('.filters').style.display = 'none';
            document.querySelector('.nav-scroll').style.display = 'none';
            
-           // 閉店メッセージを表示
            grid.innerHTML = `
              <div class="closed-message-container">
                <div class="closed-title">受付終了</div>
@@ -348,9 +344,6 @@
            return;
         }
 
-        // --- 以下は営業中の処理 ---
-        
-        // フィルタ類を表示に戻す（再開時用）
         document.querySelector('.filters').style.display = 'flex';
         document.querySelector('.nav-scroll').style.display = 'block';
         el("meta").textContent = `${data.category} (${data.count}件)`;
@@ -424,7 +417,6 @@
         return;
       }
 
-      // 読込中はローディング
       grid.innerHTML = '<div class="loading">読み込み中...</div>';
 
       const params = new URLSearchParams();
@@ -444,8 +436,6 @@
           return;
         }
 
-        // キャッシュに保存して描画
-        // ※閉店状態でもキャッシュしてOK（再読込で更新されるため）
         CACHE[cacheKey] = data;
         render(data);
 
@@ -482,8 +472,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
