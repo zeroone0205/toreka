@@ -301,103 +301,96 @@
     <div id="grid" class="grid"></div>
   </div>
 
+  <!-- ✅ JSはこれ1個だけ -->
   <script>
-    // ★★★ ここにデプロイしたURLを貼り付けてください ★★★
-    // 新しいデプロイで発行されたURLを必ず使ってください
-    const API = "https://script.google.com/macros/s/AKfycbx2wlV2f1wc6qSvIz9Ko9b1oFM1f2rxjG1VanMXhDwhfI2JlBOrrmW9fwJY90SKw9CJ/exec";
+    const API = "https://script.google.com/macros/s/AKfycbzJ5s1SO_BtOQ0k3F7VoEjQUmIdbSsoca_oX8yOdBDY0_Qp4EbjEviDJ0u0337OVBYk/exec";
 
     let currentCategory = "ポケモン";
-    const CACHE = {}; 
+    let CACHE = {};
 
     const el = (id) => document.getElementById(id);
     const yen = (n) => "¥" + Number(n).toLocaleString();
 
     function updateDate() {
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const day = String(now.getDate()).padStart(2, '0');
-        el("date-display").textContent = `${year}/${month}/${day} 更新`;
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, "0");
+      const d = String(now.getDate()).padStart(2, "0");
+      el("date-display").textContent = `${y}/${m}/${d} 更新`;
     }
     updateDate();
 
     function render(data) {
-        const grid = el("grid");
-        el("meta").textContent = "";
+      const grid = el("grid");
+      el("meta").textContent = "";
 
-        if (data.isOpen === false) {
-           document.querySelector('.filters').style.display = 'none';
-           document.querySelector('.nav-scroll').style.display = 'none';
-           
-           grid.innerHTML = `
-             <div class="closed-message-container">
-               <div class="closed-title">受付終了</div>
-               <div class="closed-text">
-                 本日の買取受付は終了いたしました。<br>
-                 また明日以降のご利用を<br>心よりお待ちしております。
-               </div>
-             </div>
-           `;
-           return;
+      if (data.isOpen === false) {
+        document.querySelector(".filters").style.display = "none";
+        document.querySelector(".nav-scroll").style.display = "none";
+        grid.innerHTML = `
+          <div class="closed-message-container">
+            <div class="closed-title">受付終了</div>
+            <div class="closed-text">
+              本日の買取受付は終了いたしました。<br>
+              また明日以降のご利用を<br>心よりお待ちしております。
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      document.querySelector(".filters").style.display = "flex";
+      document.querySelector(".nav-scroll").style.display = "block";
+
+      el("meta").textContent = `${data.category} (${data.count}件)`;
+
+      if (!data.items || data.items.length === 0) {
+        grid.innerHTML = '<div class="loading">該当なし</div>';
+        return;
+      }
+
+      grid.innerHTML = data.items.map(item => {
+        let imgTag = `<div class="card-img no-img">No Image</div>`;
+        if (item.imageUrl) {
+          imgTag = `<img src="${item.imageUrl}" class="card-img" alt="" loading="lazy" />`;
         }
 
-        document.querySelector('.filters').style.display = 'flex';
-        document.querySelector('.nav-scroll').style.display = 'block';
-        el("meta").textContent = `${data.category} (${data.count}件)`;
+        const isSoldOut = Number(item.remaining) <= 0;
+        const cardClass = isSoldOut ? "card sold-out" : "card";
 
-        if (data.items.length === 0) {
-          grid.innerHTML = '<div class="loading">該当なし</div>';
-          return;
+        let headerHtml = "";
+        let badgeHtml = "";
+
+        if (isSoldOut) badgeHtml += `<span class="badge badge-end">買取終了</span>`;
+
+        if (currentCategory === "素体") {
+          if (item.grade) badgeHtml += `<span class="badge badge-sotai">${item.grade}</span>`;
+        } else {
+          headerHtml = isSoldOut
+            ? `<div style="height:15px;"></div>`
+            : `<div class="psa-label">【PSA10】</div>`;
         }
 
-        grid.innerHTML = data.items.map(item => {
-          let imgTag = `<div class="card-img no-img">No Image</div>`;
-          if (item.imageUrl) {
-            imgTag = `<img src="${item.imageUrl}" class="card-img" alt="" loading="lazy" />`;
-          }
-
-          const isSoldOut = item.remaining <= 0;
-          const cardClass = isSoldOut ? "card sold-out" : "card";
-
-          let headerHtml = ""; 
-          let badgeHtml = ""; 
-
-          if (isSoldOut) {
-             badgeHtml += `<span class="badge badge-end">買取終了</span>`;
-          }
-
-          if (currentCategory === "素体") {
-             if (item.grade) {
-                badgeHtml += `<span class="badge badge-sotai">${item.grade}</span>`;
-             }
-          } else {
-             if (!isSoldOut) {
-                headerHtml = `<div class="psa-label">【PSA10】</div>`;
-             } else {
-                headerHtml = `<div style="height:15px;"></div>`; 
-             }
-          }
-
-          return `
-            <div class="${cardClass}">
-              ${imgTag}
-              <div class="card-tags">${badgeHtml}</div>
-              <div class="card-body">
-                ${headerHtml}
-                <div class="card-title">${item.name}</div>
-                <div class="card-footer">
-                  <div class="price-row">
-                    <span class="price-label">買取価格</span>
-                    <span class="price-value">${yen(item.price)}</span>
-                  </div>
-                  <div class="limit-container">
-                    <span class="limit ${isSoldOut ? 'zero' : ''}">残り: ${item.remaining}</span>
-                  </div>
+        return `
+          <div class="${cardClass}">
+            ${imgTag}
+            <div class="card-tags">${badgeHtml}</div>
+            <div class="card-body">
+              ${headerHtml}
+              <div class="card-title">${item.name}</div>
+              <div class="card-footer">
+                <div class="price-row">
+                  <span class="price-label">買取価格</span>
+                  <span class="price-value">${yen(item.price)}</span>
+                </div>
+                <div class="limit-container">
+                  <span class="limit ${isSoldOut ? "zero" : ""}">残り: ${item.remaining}</span>
                 </div>
               </div>
             </div>
-          `;
-        }).join("");
+          </div>
+        `;
+      }).join("");
     }
 
     async function load(forceReload = false) {
@@ -409,11 +402,6 @@
       const hideZero = el("hideZero").checked ? "1" : "";
       const cacheKey = `${currentCategory}_${q}_${sort}_${hideZero}`;
 
-      if (!forceReload && CACHE[cacheKey]) {
-        render(CACHE[cacheKey]);
-        return;
-      }
-
       grid.innerHTML = '<div class="loading">読み込み中...</div>';
 
       const params = new URLSearchParams();
@@ -423,9 +411,21 @@
       if (hideZero) params.set("hideZero", hideZero);
 
       try {
-        // ★キャッシュ回避のおまじない（&t=...）を追加しました
         const res = await fetch(`${API}?${params.toString()}&t=${Date.now()}`);
         const data = await res.json();
+
+        // ★閉店は常に最新を優先
+        if (data.isOpen === false) {
+          CACHE = {};
+          render(data);
+          return;
+        }
+
+        // ★営業中のみキャッシュ利用
+        if (!forceReload && CACHE[cacheKey]) {
+          render(CACHE[cacheKey]);
+          return;
+        }
 
         if (data.error) {
           el("err").textContent = data.error;
@@ -449,24 +449,28 @@
         document.querySelectorAll(".nav-item").forEach(t => t.classList.remove("active"));
         e.target.classList.add("active");
         currentCategory = e.target.getAttribute("data-cat");
-        load(); 
+        load(true);
       });
     });
 
     el("sort").addEventListener("change", () => load(true));
     el("hideZero").addEventListener("change", () => load(true));
+
     el("reload").addEventListener("click", () => {
-        CACHE = {}; 
-        load(true);
+      CACHE = {};
+      load(true);
     });
-    
+
     let timer;
     el("q").addEventListener("input", () => {
       clearTimeout(timer);
-      timer = setTimeout(() => load(true), 400); 
+      timer = setTimeout(() => load(true), 400);
     });
 
-    load();
+    load(true);
+
+    // 任意：閉店切替を自動反映したい場合（1分おき）
+    // setInterval(() => load(true), 60 * 1000);
   </script>
 </body>
 </html>
