@@ -5,17 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>トレカフォース買取表</title>
   <style>
-    /* ★★★ デザイン設定エリア ★★★ */
     :root {
-      /* メインカラー */
       --accent: #58BDD7; 
-      /* 金額用のカラー */
       --price-color: #ffffff;
-      /* ネオンの光り方定義 */
+
       --glow-text: 0 0 8px rgba(88, 189, 215, 0.6);
       --glow-price: 0 0 10px rgba(255, 255, 255, 0.7); 
       --glow-box: 0 0 12px rgba(88, 189, 215, 0.4);
-      /* ベースカラー */
+
       --bg-dark: #121212;
       --card-bg: #1e1e1e;
       --text-main: #ffffff;
@@ -42,11 +39,10 @@
 
     * { box-sizing: border-box; }
 
-    /* ヘッダー */
     header { 
       background: #111; 
       border-bottom: 2px solid var(--accent); 
-      padding: 15px 15px 15px 15px; 
+      padding: 15px; 
       text-align: center; 
       position: relative;
       box-shadow: 0 2px 15px rgba(88, 189, 215, 0.2); 
@@ -60,8 +56,7 @@
       text-shadow: var(--glow-text); 
       font-style: italic;
     }
-    
-    /* 日付表示 */
+
     #date-display {
       position: absolute;
       top: 50%;
@@ -78,13 +73,22 @@
       white-space: nowrap;
     }
 
-    /* ナビゲーション */
+    /* ✅ ここが「固定（sticky）」の本体 */
+    .sticky-bars{
+      position: sticky;
+      top: 0;
+      z-index: 2000;
+      background: rgba(18,18,18,0.92);
+      backdrop-filter: blur(6px);
+      border-bottom: 1px solid #444;
+    }
+
     .nav-scroll { 
       overflow-x: auto; 
       background: #1a1a1a; 
-      border-bottom: 1px solid #444; 
       white-space: nowrap; 
       padding: 0 10px; 
+      border-bottom: 1px solid #333;
     }
     .nav-tabs { display: flex; gap: 10px; max-width: 1000px; margin: 0 auto; padding: 0; list-style: none; }
     .nav-item { 
@@ -103,8 +107,15 @@
       text-shadow: var(--glow-text); 
     }
 
-    /* フィルターエリア */
-    .filters { max-width: 1000px; margin: 20px auto; padding: 0 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .filters { 
+      max-width: 1000px; 
+      margin: 0 auto; 
+      padding: 12px 12px; 
+      display: flex; 
+      gap: 8px; 
+      flex-wrap: wrap; 
+      align-items: center;
+    }
     
     .search-box { flex: 1; min-width: 150px; position: relative; }
     .search-box input { 
@@ -130,27 +141,27 @@
       box-shadow: var(--glow-text); 
     }
 
-    /* グリッド */
-    .container { max-width: 1000px; margin: 0 auto; padding: 0 12px 60px; }
+    .container { max-width: 1000px; margin: 12px auto 0; padding: 0 12px 60px; }
     .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; }
-    
-    /* 閉店メッセージ */
+
+    /* ✅ 受付終了：黄色枠＋白字 */
     .closed-message-container {
       grid-column: 1 / -1;
       text-align: center;
       padding: 60px 20px;
       margin-top: 20px;
-      border: 2px solid #ff4081; 
+      border: 2px solid #FFD54F;
       border-radius: 10px;
-      background: rgba(40, 0, 10, 0.6);
-      box-shadow: 0 0 20px rgba(255, 64, 129, 0.3);
+      background: rgba(255, 213, 79, 0.10);
+      box-shadow: 0 0 20px rgba(255, 213, 79, 0.25);
+      color: #fff;
     }
     .closed-title {
       font-size: 24px;
-      font-weight: bold;
-      color: #ff4081;
+      font-weight: 900;
+      color: #fff;
       margin-bottom: 15px;
-      text-shadow: 0 0 10px rgba(255, 64, 129, 0.6);
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.25);
     }
     .closed-text {
       font-size: 15px;
@@ -158,7 +169,6 @@
       line-height: 1.8;
     }
 
-    /* カードデザイン */
     .card { 
       background: var(--card-bg); 
       border-radius: 8px; 
@@ -173,14 +183,20 @@
       border-color: var(--accent); 
       box-shadow: 0 0 15px rgba(88, 189, 215, 0.4); 
     }
-    
+
+    /* ✅ 0枚は薄く残す（さらに薄くしたいなら opacity 0.25 などに） */
     .card.sold-out {
-      opacity: 0.5; filter: grayscale(80%); border-color: #333; box-shadow: none;
+      opacity: 0.35;
+      filter: grayscale(85%);
+      border-color: #333;
+      box-shadow: none;
     }
     .card.sold-out:hover {
-      transform: none; box-shadow: none; border-color: #333;
+      transform: none;
+      box-shadow: none;
+      border-color: #333;
     }
-    
+
     .card-img { width: 100%; aspect-ratio: 3/4; background: #000; object-fit: contain; border-bottom: 1px solid #333; }
     .no-img { display: flex; align-items: center; justify-content: center; color: #555; font-size: 10px; background: #222; }
 
@@ -250,12 +266,10 @@
       .price-label { font-size: 9px; }
       .limit { font-size: 10px; padding: 1px 6px; }
       .card-body { padding: 8px; }
-      .filters { gap: 8px; }
-      .search-box { width: 100%; order: -1; }
-      #reload { display: none; }
-      
+
       #date-display {
-        position: static; display: block; transform: none; margin-top: 8px; text-align: center; width: fit-content; margin-left: auto; margin-right: auto;
+        position: static; display: block; transform: none; margin-top: 8px; text-align: center;
+        width: fit-content; margin-left: auto; margin-right: auto;
       }
     }
   </style>
@@ -267,32 +281,37 @@
     <div id="date-display"></div>
   </header>
 
-  <div class="nav-scroll">
-    <ul class="nav-tabs" id="categoryTabs">
-      <li class="nav-item active" data-cat="ポケモン">ポケモン</li>
-      <li class="nav-item" data-cat="ワンピース">ワンピース</li>
-      <li class="nav-item" data-cat="遊戯王">遊戯王</li>
-      <li class="nav-item" data-cat="ヴァイス">ヴァイス</li>
-      <li class="nav-item" data-cat="素体">素体</li>
-    </ul>
-  </div>
-
-  <div class="filters">
-    <div class="search-box">
-      <span class="search-icon">🔍</span>
-      <input id="q" placeholder="検索" />
+  <!-- ✅ sticky にしたい範囲をまとめて包む -->
+  <div class="sticky-bars">
+    <div class="nav-scroll">
+      <ul class="nav-tabs" id="categoryTabs">
+        <li class="nav-item active" data-cat="ポケモン">ポケモン</li>
+        <li class="nav-item" data-cat="ワンピース">ワンピース</li>
+        <li class="nav-item" data-cat="遊戯王">遊戯王</li>
+        <li class="nav-item" data-cat="ヴァイス">ヴァイス</li>
+        <li class="nav-item" data-cat="素体">素体</li>
+      </ul>
     </div>
-    
-    <select id="sort">
-      <option value="price_desc" selected>高い順</option>
-      <option value="">おすすめ</option>
-      <option value="price_asc">安い順</option>
-    </select>
 
-    <label style="display:flex; align-items:center; font-size:12px; cursor:pointer; gap:6px; margin-left:auto; color: #fff;">
-      <input type="checkbox" id="hideZero" checked> 募集中のみ
-    </label>
-    <button id="reload">更新</button>
+    <div class="filters">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input id="q" placeholder="検索" />
+      </div>
+
+      <select id="sort">
+        <option value="price_desc" selected>高い順</option>
+        <option value="">おすすめ</option>
+        <option value="price_asc">安い順</option>
+      </select>
+
+      <!-- ✅ 0枚も残すので「募集中のみ」はやめて、表示切替に変更 -->
+      <label style="display:flex; align-items:center; font-size:12px; cursor:pointer; gap:6px; margin-left:auto; color:#fff;">
+        <input type="checkbox" id="showSoldOut" checked> 買取終了も表示
+      </label>
+
+      <button id="reload">更新</button>
+    </div>
   </div>
 
   <div class="container">
@@ -301,15 +320,14 @@
     <div id="grid" class="grid"></div>
   </div>
 
-  <!-- ✅ JSはこれ1個だけ -->
   <script>
-    const API = "https://script.google.com/macros/s/AKfycbzKZIXZPk2Ejkxo0XqGaSIZnQ_MtCKMLL04S56_mL0r7qpoX9n7xP4shQ8S5AydM975/exec";
+    const API = "https://script.google.com/macros/s/AKfycbxMki4FLgY9-gtn1bOct7ECtMClH73AL_D-vI_30HYHZSsbEg4rLesXSgwVOo67oDe1/exec";
 
     let currentCategory = "ポケモン";
     let CACHE = {};
 
     const el = (id) => document.getElementById(id);
-    const yen = (n) => "¥" + Number(n).toLocaleString();
+    const yen = (n) => "¥" + Number(n || 0).toLocaleString();
 
     function updateDate() {
       const now = new Date();
@@ -324,9 +342,9 @@
       const grid = el("grid");
       el("meta").textContent = "";
 
+      // ✅ 受付終了
       if (data.isOpen === false) {
-        document.querySelector(".filters").style.display = "none";
-        document.querySelector(".nav-scroll").style.display = "none";
+        document.querySelector(".sticky-bars").style.display = "none";
         grid.innerHTML = `
           <div class="closed-message-container">
             <div class="closed-title">受付終了</div>
@@ -339,17 +357,34 @@
         return;
       }
 
-      document.querySelector(".filters").style.display = "flex";
-      document.querySelector(".nav-scroll").style.display = "block";
+      document.querySelector(".sticky-bars").style.display = "block";
 
-      el("meta").textContent = `${data.category} (${data.count}件)`;
-
+      // データがない
       if (!data.items || data.items.length === 0) {
+        el("meta").textContent = `${data.category} (0件)`;
         grid.innerHTML = '<div class="loading">該当なし</div>';
         return;
       }
 
-      grid.innerHTML = data.items.map(item => {
+      // ✅ 0枚（sold-out）を表示する/しない
+      const showSoldOut = el("showSoldOut").checked;
+
+      let items = data.items.slice();
+
+      if (!showSoldOut) {
+        items = items.filter(x => Number(x.remaining) > 0);
+      }
+
+      // ✅ 0枚を「下」に回す（見た目が良い）
+      items.sort((a, b) => {
+        const as = Number(a.remaining) <= 0 ? 1 : 0;
+        const bs = Number(b.remaining) <= 0 ? 1 : 0;
+        return as - bs;
+      });
+
+      el("meta").textContent = `${data.category} (${items.length}件)`;
+
+      grid.innerHTML = items.map(item => {
         let imgTag = `<div class="card-img no-img">No Image</div>`;
         if (item.imageUrl) {
           imgTag = `<img src="${item.imageUrl}" class="card-img" alt="" loading="lazy" />`;
@@ -366,9 +401,7 @@
         if (currentCategory === "素体") {
           if (item.grade) badgeHtml += `<span class="badge badge-sotai">${item.grade}</span>`;
         } else {
-          headerHtml = isSoldOut
-            ? `<div style="height:15px;"></div>`
-            : `<div class="psa-label">【PSA10】</div>`;
+          headerHtml = isSoldOut ? `<div style="height:15px;"></div>` : `<div class="psa-label">【PSA10】</div>`;
         }
 
         return `
@@ -399,8 +432,8 @@
 
       const q = el("q").value.trim();
       const sort = el("sort").value;
-      const hideZero = el("hideZero").checked ? "1" : "";
-      const cacheKey = `${currentCategory}_${q}_${sort}_${hideZero}`;
+      const showSoldOut = el("showSoldOut").checked ? "1" : "0"; // cacheキーに入れるだけ
+      const cacheKey = `${currentCategory}_${q}_${sort}_${showSoldOut}`;
 
       grid.innerHTML = '<div class="loading">読み込み中...</div>';
 
@@ -408,20 +441,19 @@
       params.set("category", currentCategory);
       if (q) params.set("q", q);
       if (sort) params.set("sort", sort);
-      if (hideZero) params.set("hideZero", hideZero);
 
       try {
+        // ✅ 閉店判定は毎回最新
         const res = await fetch(`${API}?${params.toString()}&t=${Date.now()}`);
         const data = await res.json();
 
-        // ★閉店は常に最新を優先
         if (data.isOpen === false) {
           CACHE = {};
           render(data);
           return;
         }
 
-        // ★営業中のみキャッシュ利用
+        // ✅ 営業中だけキャッシュ利用
         if (!forceReload && CACHE[cacheKey]) {
           render(CACHE[cacheKey]);
           return;
@@ -454,7 +486,7 @@
     });
 
     el("sort").addEventListener("change", () => load(true));
-    el("hideZero").addEventListener("change", () => load(true));
+    el("showSoldOut").addEventListener("change", () => load(true));
 
     el("reload").addEventListener("click", () => {
       CACHE = {};
@@ -474,5 +506,3 @@
   </script>
 </body>
 </html>
-
-
