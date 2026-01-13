@@ -23,7 +23,7 @@
       margin: 0; padding: 0; 
       color: var(--text-main);
       background-color: var(--bg-dark);
-      background-image: url('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2070&auto=format&fit=crop');
+      background-image: url('https://ja.pngtree.com/free-backgrounds-photos/%E9%BB%92%E3%83%AC%E3%83%B3%E3%82%AC%E3%81%AE%E5%A3%81%E3%81%AE%E3%83%8D%E3%82%AA%E3%83%B3');
       background-size: cover;
       background-position: center;
       background-attachment: fixed;
@@ -115,4 +115,290 @@
     }
 
     /* グリッド */
-    .container { max-width: 100
+    .container { max-width: 1000px; margin: 0 auto; padding: 0 12px 60px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; }
+    
+    /* カードデザイン */
+    .card { 
+      background: var(--card-bg); 
+      border-radius: 6px; 
+      overflow: hidden; 
+      border: 1px solid var(--border); 
+      box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+      display: flex; flex-direction: column; position: relative; 
+      transition: transform 0.2s;
+    }
+    .card:hover { 
+      transform: translateY(-2px); 
+      border-color: var(--accent); 
+    }
+    
+    .card-img { width: 100%; aspect-ratio: 3/4; background: #000; object-fit: contain; border-bottom: 1px solid #333; }
+    .no-img { display: flex; align-items: center; justify-content: center; color: #555; font-size: 10px; background: #222; }
+
+    .card-body { padding: 12px; flex: 1; display: flex; flex-direction: column; }
+    
+    /* PSAラベル */
+    .psa-label { 
+      font-size: 11px; 
+      color: var(--accent); 
+      font-weight: bold; 
+      margin-bottom: 4px; 
+      letter-spacing: 0.5px;
+    }
+
+    /* タイトル */
+    .card-title { 
+      font-size: 13px; 
+      font-weight: bold; 
+      line-height: 1.5; 
+      margin-bottom: 8px; 
+      color: #fff; 
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 39px; 
+    }
+    
+    /* バッジ */
+    .card-tags { position: absolute; top: 6px; right: 6px; display: flex; flex-direction: column; gap: 2px; align-items: flex-end; }
+    .badge { 
+      display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold;
+      background: #333; color: #fff; border: 1px solid #555;
+    }
+    .badge-sotai { background: #555; color: #eee; }
+
+    .card-footer { margin-top: auto; border-top: 1px solid #444; padding-top: 8px; }
+    
+    .price-row { display: flex; align-items: baseline; justify-content: space-between; }
+    .price-label { font-size: 10px; color: #aaa; }
+    
+    /* 価格 */
+    .price-value { 
+      color: var(--accent); 
+      font-size: 18px; 
+      font-weight: 800; 
+      letter-spacing: -0.5px; 
+    }
+    
+    /* 残りの表示 */
+    .limit-container {
+      margin-top: 6px;
+      text-align: right;
+    }
+    .limit { 
+      display: inline-block;
+      font-size: 11px; 
+      color: #fff; 
+      background: #444;
+      padding: 2px 8px;
+      border-radius: 4px;
+      border: 1px solid #666;
+    }
+    
+    .loading { text-align: center; padding: 40px; color: #aaa; grid-column: 1 / -1; }
+    .error { background: #330000; color: #ff8a80; padding: 15px; border: 1px solid #ff5252; margin-bottom: 20px; display: none; }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+      .card-title { font-size: 11px; height: 33px; margin-bottom: 4px; }
+      .psa-label { font-size: 10px; margin-bottom: 2px; }
+      .price-value { font-size: 15px; }
+      .price-label { font-size: 9px; }
+      .limit { font-size: 10px; padding: 1px 6px; }
+      .card-body { padding: 8px; }
+      .filters { gap: 8px; }
+      .search-box { width: 100%; order: -1; }
+      #reload { display: none; }
+      
+      /* スマホでの日付表示位置調整 */
+      #date-display {
+        position: static;
+        display: block;
+        transform: none;
+        margin-top: 5px;
+        font-size: 11px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>トレカフォース買取表</h1>
+    <div id="date-display"></div>
+  </header>
+
+  <div class="nav-scroll">
+    <ul class="nav-tabs" id="categoryTabs">
+      <li class="nav-item active" data-cat="ポケモン">ポケモン</li>
+      <li class="nav-item" data-cat="ワンピース">ワンピース</li>
+      <li class="nav-item" data-cat="遊戯王">遊戯王</li>
+      <li class="nav-item" data-cat="ヴァイス">ヴァイス</li>
+      <li class="nav-item" data-cat="素体">素体</li>
+    </ul>
+  </div>
+
+  <div class="filters">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input id="q" placeholder="検索" />
+    </div>
+    
+    <select id="sort">
+      <option value="">おすすめ</option>
+      <option value="price_desc">高い順</option>
+      <option value="price_asc">安い順</option>
+    </select>
+
+    <label style="display:flex; align-items:center; font-size:12px; cursor:pointer; gap:6px; margin-left:auto; color: #fff;">
+      <input type="checkbox" id="hideZero" checked> 募集中のみ
+    </label>
+    <button id="reload">更新</button>
+  </div>
+
+  <div class="container">
+    <div id="err" class="error"></div>
+    <div class="muted" id="meta" style="font-size:12px; margin-bottom:10px; text-align:right; color:#bbb;"></div>
+    <div id="grid" class="grid"></div>
+  </div>
+
+  <script>
+    // ★★★ ここにデプロイしたURLを貼り付けてください ★★★
+    const API = "https://script.google.com/macros/s/AKfycbynclYCpgfGu4kODPAlPGGLYQfoB601lfxMGG7BMtfnKelA22h87XthNlW76dycOPhR/exec";
+
+    let currentCategory = "ポケモン";
+    const CACHE = {}; 
+
+    const el = (id) => document.getElementById(id);
+    const yen = (n) => "¥" + Number(n).toLocaleString();
+
+    // ★日付自動更新関数
+    function updateDate() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        el("date-display").textContent = `${year}/${month}/${day} 更新`;
+    }
+    // ページ読み込み時に日付を表示
+    updateDate();
+
+    function render(data) {
+        const grid = el("grid");
+        el("meta").textContent = `${data.category} (${data.count}件)`;
+
+        if (data.items.length === 0) {
+          grid.innerHTML = '<div class="loading">該当なし</div>';
+          return;
+        }
+
+        grid.innerHTML = data.items.map(item => {
+          let imgTag = `<div class="card-img no-img">No Image</div>`;
+          if (item.imageUrl) {
+            imgTag = `<img src="${item.imageUrl}" class="card-img" alt="" loading="lazy" />`;
+          }
+
+          // ★★★ 表示ロジック ★★★
+          let headerHtml = ""; 
+          let badgeHtml = ""; 
+
+          if (currentCategory === "素体") {
+             if (item.grade) {
+                badgeHtml = `<span class="badge badge-sotai">${item.grade}</span>`;
+             }
+          } else {
+             // 「PSA10」を表示
+             headerHtml = `<div class="psa-label">【PSA10】</div>`;
+             badgeHtml = "";
+          }
+
+          return `
+            <div class="card">
+              ${imgTag}
+              <div class="card-tags">${badgeHtml}</div>
+              <div class="card-body">
+                ${headerHtml}
+                <div class="card-title">${item.name}</div>
+                <div class="card-footer">
+                  <div class="price-row">
+                    <span class="price-label">買取価格</span>
+                    <span class="price-value">${yen(item.price)}</span>
+                  </div>
+                  <div class="limit-container">
+                    <span class="limit">残り: ${item.remaining}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join("");
+    }
+
+    async function load(forceReload = false) {
+      const grid = el("grid");
+      el("err").style.display = "none";
+
+      const q = el("q").value.trim();
+      const sort = el("sort").value;
+      const hideZero = el("hideZero").checked ? "1" : "";
+      const cacheKey = `${currentCategory}_${q}_${sort}_${hideZero}`;
+
+      if (!forceReload && CACHE[cacheKey]) {
+        render(CACHE[cacheKey]);
+        return;
+      }
+
+      grid.innerHTML = '<div class="loading">読み込み中...</div>';
+
+      const params = new URLSearchParams();
+      params.set("category", currentCategory);
+      if (q) params.set("q", q);
+      if (sort) params.set("sort", sort);
+      if (hideZero) params.set("hideZero", hideZero);
+
+      try {
+        const res = await fetch(`${API}?${params.toString()}`);
+        const data = await res.json();
+
+        if (data.error) {
+          el("err").textContent = data.error;
+          el("err").style.display = "block";
+          grid.innerHTML = "";
+          return;
+        }
+
+        CACHE[cacheKey] = data;
+        render(data);
+
+      } catch (e) {
+        grid.innerHTML = "";
+        el("err").textContent = "Error: " + e.message;
+        el("err").style.display = "block";
+      }
+    }
+
+    document.querySelectorAll(".nav-item").forEach(tab => {
+      tab.addEventListener("click", (e) => {
+        document.querySelectorAll(".nav-item").forEach(t => t.classList.remove("active"));
+        e.target.classList.add("active");
+        currentCategory = e.target.getAttribute("data-cat");
+        load(); 
+      });
+    });
+
+    el("sort").addEventListener("change", () => load(true));
+    el("hideZero").addEventListener("change", () => load(true));
+    el("reload").addEventListener("click", () => {
+        CACHE = {}; 
+        load(true);
+    });
+    
+    let timer;
+    el("q").addEventListener("input", () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => load(true), 400); 
+    });
+
+    load();
+  </script>
+</body>
+</html>
