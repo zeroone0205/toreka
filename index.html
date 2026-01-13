@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>トレカフォース買取表 v3.1</title>
+  <title>トレカフォース買取表 v3.2</title>
   <style>
     /* ★★★ デザイン設定エリア ★★★ */
     :root {
@@ -18,7 +18,7 @@
       --border: #555555;
     }
 
-   body { 
+    body { 
       font-family: "Helvetica Neue", Arial, sans-serif; 
       margin: 0; padding: 0; 
       color: var(--text-main);
@@ -62,7 +62,6 @@
       font-style: italic;
     }
     
-    /* 日付表示 */
     #date-display {
       position: absolute;
       top: 50%;
@@ -79,19 +78,19 @@
       white-space: nowrap;
     }
 
-    /* ★修正: バージョン表示を目立つ黄色に変更 */
+    /* ★修正: バージョン表示を白色に変更 */
     .version-tag {
       position: absolute; 
       top: 10px; 
       left: 10px; 
       font-size: 14px; 
-      color: #ffeb3b; /* 黄色 */
+      color: #ffffff; /* 白 */
       font-weight: bold;
       z-index: 9999;
       background: rgba(0,0,0,0.6);
       padding: 2px 8px;
       border-radius: 4px;
-      border: 1px solid #ffeb3b;
+      border: 1px solid #ffffff;
     }
 
     /* 固定バー */
@@ -248,9 +247,13 @@
     }
     .badge-sotai { background: #555; color: #eee; }
     
+    /* ★修正: 買取終了バッジを発光させる */
     .badge-end {
-      background: #d32f2f; color: #fff; border: 1px solid #b71c1c;
-      box-shadow: 0 0 5px rgba(211, 47, 47, 0.5);
+      background: #d32f2f; 
+      color: #fff; 
+      border: 1px solid #ff5252;
+      box-shadow: 0 0 8px rgba(255, 82, 82, 0.8); /* 赤く発光 */
+      text-shadow: 0 0 5px rgba(255, 255, 255, 0.8); /* 文字も少し光らせる */
     }
 
     .card-footer { margin-top: auto; border-top: 1px solid #444; padding-top: 8px; }
@@ -301,7 +304,7 @@
 
   <header>
     <h1>トレカフォース買取表</h1>
-    <div class="version-tag">v3.1</div>
+    <div class="version-tag">v3.2</div>
     <div id="date-display"></div>
   </header>
 
@@ -342,7 +345,7 @@
   </div>
 
   <script>
-    // ★★★ GASの新しいURLを入れてください ★★★
+    // ★★★ GASのURL（最新版） ★★★
     const API = "https://script.google.com/macros/s/AKfycbz3Ir-AAVg5QTH6UQ5vcyo7Y_9h_Ty7R1Wu4eUoNufIdDQXwYKg_tEy35QshMA4CZAJ/exec";
 
     let currentCategory = "ポケモン";
@@ -364,7 +367,7 @@
         const grid = el("grid");
         el("meta").textContent = "";
 
-        // ★受付終了画面（黄色枠白字）
+        // ★受付終了画面
         if (data.isOpen === false) {
            document.querySelector('.sticky-container').style.display = 'none';
            grid.innerHTML = `
@@ -516,4 +519,3 @@
   </script>
 </body>
 </html>
-
