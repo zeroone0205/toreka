@@ -28,7 +28,7 @@
       margin: 0; padding: 0; 
       color: var(--text-main);
       background-color: var(--bg-dark);
-      /* 背景画像（Unsplashを使用。ローカル画像を使いたい場合は書き換えてください） */
+      /* 背景画像 */
       background-image: url('./bg-gray.jpg.png');
       background-size: cover;
       background-position: center;
@@ -38,7 +38,7 @@
     body::before {
       content: "";
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.4); 
+      background: rgba(0, 0, 0, 0.6); 
       z-index: -1;
     }
 
@@ -65,7 +65,7 @@
 
     /* ロゴ画像のスタイル */
     .logo-img {
-      height: 80px; /* PCサイズ: 大きめ */
+      height: 80px; 
       width: auto; 
       max-width: 100%; 
       object-fit: contain;
@@ -115,7 +115,6 @@
       overflow-x: auto; white-space: nowrap; padding: 0 10px; border-bottom: 1px solid #333;
     }
     
-    /* ★修正: タブの並びを上下中央揃えに強制 */
     .nav-tabs { 
       display: flex; 
       gap: 10px; 
@@ -123,7 +122,7 @@
       margin: 0 auto; 
       padding: 0; 
       list-style: none; 
-      align-items: center; /* これでBOXのズレを直す */
+      align-items: center;
     }
     
     .nav-item { 
@@ -134,8 +133,6 @@
       border-bottom: 3px solid transparent; 
       transition: 0.3s; 
       font-size: 14px;
-      
-      /* ★修正: 文字自体も枠の中で上下中央にする */
       display: flex;
       align-items: center;
       height: 100%;
@@ -183,6 +180,7 @@
       background: var(--card-bg); border-radius: 8px; overflow: hidden; 
       border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.6);
       display: flex; flex-direction: column; position: relative; transition: all 0.2s ease;
+      cursor: pointer; /* クリックできることを示す */
     }
     .card:hover { transform: translateY(-4px); border-color: var(--accent); box-shadow: 0 0 15px rgba(88, 189, 215, 0.4); }
     
@@ -238,6 +236,54 @@
     .loading { text-align: center; padding: 40px; color: #aaa; grid-column: 1 / -1; }
     .error { background: #330000; color: #ff8a80; padding: 15px; border: 1px solid #ff5252; margin-bottom: 20px; display: none; }
 
+    /* ★★★ 追加: 詳細モーダルのスタイル ★★★ */
+    .modal-overlay {
+      display: none; /* デフォルト非表示 */
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.85); 
+      z-index: 10000; /* 最前面に */
+      justify-content: center; align-items: center; 
+      padding: 15px;
+      backdrop-filter: blur(4px);
+      opacity: 0; transition: opacity 0.2s ease;
+    }
+    .modal-overlay.active {
+      display: flex; opacity: 1;
+    }
+    .modal-content {
+      background: #1e1e1e; 
+      border: 2px solid var(--accent); 
+      border-radius: 12px;
+      width: 100%; max-width: 400px;
+      max-height: 90vh; overflow-y: auto;
+      position: relative; padding: 20px; 
+      box-shadow: 0 0 30px rgba(88, 189, 215, 0.2);
+      transform: scale(0.95); transition: transform 0.2s ease;
+    }
+    .modal-overlay.active .modal-content { transform: scale(1); }
+
+    .close-modal {
+      position: absolute; top: 10px; right: 15px; 
+      font-size: 32px; color: #888; cursor: pointer; line-height: 1;
+    }
+    .close-modal:hover { color: #fff; }
+
+    .modal-img-wrapper { text-align: center; margin-bottom: 15px; background:#000; padding:10px; border-radius:8px;}
+    .modal-img { max-height: 300px; max-width: 100%; object-fit: contain; }
+    
+    .modal-title {
+      font-size: 18px; font-weight: bold; color: #fff; margin-bottom: 15px;
+      line-height: 1.5; border-bottom: 1px solid #444; padding-bottom: 15px;
+      white-space: normal; /* 全文表示 */
+    }
+    
+    .modal-row { display: flex; justify-content: space-between; align-items: baseline; margin-top:10px;}
+    .modal-price { font-size: 32px; color: var(--accent); font-weight: 900; text-shadow: var(--glow-price); }
+    .modal-label { font-size: 12px; color: #aaa; }
+    
+    .modal-tags { display: flex; gap: 5px; margin-bottom: 10px; justify-content: center;}
+
+
     /* ★★★ スマホ画面の調整 ★★★ */
     @media (max-width: 600px) {
       .grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
@@ -251,32 +297,24 @@
       .search-box { width: 100%; order: -1; }
       #reload { display: none; }
       
-      /* 日付はタイトルの下に配置 */
       #date-display {
         position: static; display: block; transform: none; margin-top: 8px; text-align: center; width: fit-content; margin-left: auto; margin-right: auto;
       }
       
-      /* ヘッダー内調整: 画像と文字の関係を解除 */
       h1 { 
         gap: 0; 
-        justify-content: center; /* 文字を真ん中に */
+        justify-content: center; 
       }
-
-      /* ロゴを右上に絶対配置 */
       .logo-img { 
         position: absolute;
-        top: 10px; /* 少し上に配置 */
+        top: 10px; 
         right: 15px;
-        height: 50px; /* スマホサイズ（小さすぎず） */
+        height: 50px; 
       }
-
-      /* 文字を真ん中に */
       .title-text { 
         font-size: 24px; 
         width: 100%;
         text-align: center;
-        /* 右にロゴがあるので、少し左にずらしてバランスを取るか、
-           あるいは完全に真ん中でロゴと重ならないようにマージンを取る */
         margin-right: 0; 
       }
     }
@@ -290,7 +328,7 @@
       <span class="title-text">買取表</span>
     </h1>
     
-    <div class="version-tag">v4.1</div>
+    <div class="version-tag">v4.2</div>
     <div id="date-display"></div>
   </header>
 
@@ -331,6 +369,29 @@
     <div id="grid" class="grid"></div>
   </div>
 
+  <div id="modal" class="modal-overlay">
+    <div class="modal-content">
+      <span class="close-modal" id="closeModalBtn">&times;</span>
+      
+      <div class="modal-tags" id="modalTags"></div>
+      
+      <div class="modal-img-wrapper">
+        <img id="modalImg" src="" class="modal-img" />
+      </div>
+
+      <div class="modal-title" id="modalTitle"></div>
+
+      <div class="modal-row">
+        <span class="modal-label">買取価格</span>
+        <span class="modal-price" id="modalPrice"></span>
+      </div>
+      
+      <div style="text-align:right; margin-top:5px;">
+        <span class="limit" id="modalLimit" style="font-size:14px; padding:4px 10px;"></span>
+      </div>
+    </div>
+  </div>
+
   <script>
     const API = "https://script.google.com/macros/s/AKfycbxwdofXC7dKIviYUYkvHbrlStUWKh6N3wVV6xcvmFMbFY69cZyOaU8sHD-pYIKd9PQT/exec";
 
@@ -346,6 +407,7 @@
 
     let ALL_DATA = {};
     let IS_LOADING = false;
+    let CURRENT_ITEMS = []; // ★追加: 表示中のデータを保持
 
     const el = (id) => document.getElementById(id);
     const yen = (n) => "¥" + Number(n).toLocaleString();
@@ -414,6 +476,9 @@
           items.sort((a, b) => a.price - b.price);
         }
 
+        // ★追加: 現在のデータを保存
+        CURRENT_ITEMS = items;
+
         el("meta").textContent = `${currentCategory} (${items.length}件)`;
 
         if (items.length === 0) {
@@ -421,7 +486,8 @@
           return;
         }
 
-        grid.innerHTML = items.map(item => {
+        // ★変更: indexをdata属性に付与して、クリック時に特定できるようにする
+        grid.innerHTML = items.map((item, index) => {
           let imgTag = `<div class="card-img no-img">No Image</div>`;
           if (item.imageUrl) {
             imgTag = `<img src="${item.imageUrl}" class="card-img" alt="" loading="lazy" />`;
@@ -444,7 +510,6 @@
              `;
           }
 
-          const cardClass = isSoldOut ? "card sold-out" : "card";
           let headerHtml = ""; 
           let badgeHtml = ""; 
 
@@ -461,7 +526,7 @@
           if (isSoldOut) badgeHtml = ""; 
 
           return `
-            <div class="card" style="position:relative;">
+            <div class="card ${isSoldOut ? 'sold-out' : ''}" data-index="${index}" style="position:relative; cursor:pointer;">
               ${overlayHtml}
               <div style="${isSoldOut ? 'opacity:0.5; filter:grayscale(100%);' : ''}">
                 ${imgTag}
@@ -548,6 +613,64 @@
     el("q").addEventListener("input", () => {
       clearTimeout(timer);
       timer = setTimeout(() => render(), 300); 
+    });
+
+    // ★★★ 追加: モーダル操作ロジック ★★★
+    const modal = el("modal");
+    const closeModalBtn = el("closeModalBtn");
+
+    el("grid").addEventListener("click", (e) => {
+      const card = e.target.closest(".card");
+      if (card) {
+        const index = card.getAttribute("data-index");
+        const item = CURRENT_ITEMS[index];
+        if (item) {
+          openModal(item);
+        }
+      }
+    });
+
+    function openModal(item) {
+      const modalImg = el("modalImg");
+      if (item.imageUrl) {
+        modalImg.src = item.imageUrl;
+        modalImg.style.display = "inline-block";
+      } else {
+        modalImg.style.display = "none";
+      }
+
+      el("modalTitle").textContent = item.name;
+      el("modalPrice").textContent = yen(item.price);
+      
+      const limitEl = el("modalLimit");
+      limitEl.textContent = "残り: " + item.remaining;
+      if (Number(item.remaining) <= 0) {
+         limitEl.textContent = "買取終了";
+         limitEl.classList.add("zero");
+      } else {
+         limitEl.classList.remove("zero");
+      }
+
+      const tagsEl = el("modalTags");
+      tagsEl.innerHTML = "";
+      if (currentCategory === "素体" && item.grade) {
+         tagsEl.innerHTML += `<span class="badge badge-sotai" style="font-size:14px; padding:4px 8px;">${item.grade}</span>`;
+      } else if (currentCategory !== "BOX") {
+         tagsEl.innerHTML += `<span class="psa-label" style="font-size:14px;">【PSA10】</span>`;
+      }
+
+      modal.classList.add("active");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeModal() {
+      modal.classList.remove("active");
+      document.body.style.overflow = "";
+    }
+
+    closeModalBtn.addEventListener("click", closeModal);
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) closeModal();
     });
 
     loadData(currentCategory);
