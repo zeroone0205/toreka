@@ -47,40 +47,47 @@
     header { 
       background: #111; 
       border-bottom: 2px solid var(--accent); 
-      padding: 15px; 
+      padding: 10px 15px; 
       text-align: center; 
       position: relative;
       z-index: 10;
+      /* スマホでロゴを絶対配置するための基準 */
+      min-height: 60px; 
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
     }
 
-    /* タイトルエリア（画像と文字を横並び・中央寄せ） */
+    /* タイトルエリア */
     h1 { 
       margin: 0; 
       line-height: 1;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 15px; /* 画像と文字の間隔 */
+      gap: 15px; 
+      width: 100%;
     }
 
-    /* ロゴ画像のスタイル */
+    /* ロゴ画像のスタイル（PC用） */
     .logo-img {
-      height: 80px; /* PCでの高さ */
+      height: 80px; 
       width: auto; 
       max-width: 100%; 
       object-fit: contain;
       filter: drop-shadow(0 0 8px rgba(88, 189, 215, 0.5)); 
     }
 
-    /* ★修正: 「買取表」の文字色を水色に変更 */
+    /* 「買取表」の文字スタイル */
     .title-text {
-      font-size: 32px;
+      font-size: 32px; 
       font-weight: 800;
-      color: var(--accent); /* ★ここを白から水色に変更しました */
-      text-shadow: var(--glow-text);
+      color: var(--accent);
+      text-shadow: var(--glow-text); 
       font-style: italic; 
       letter-spacing: 2px;
-      white-space: nowrap;
+      white-space: nowrap; 
     }
     
     #date-display {
@@ -302,6 +309,7 @@
     .loading { text-align: center; padding: 40px; color: #aaa; grid-column: 1 / -1; }
     .error { background: #330000; color: #ff8a80; padding: 15px; border: 1px solid #ff5252; margin-bottom: 20px; display: none; }
 
+    /* ★★★ スマホ画面の調整 ★★★ */
     @media (max-width: 600px) {
       .grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
       .card-title { font-size: 11px; height: 33px; margin-bottom: 4px; }
@@ -313,13 +321,34 @@
       .filters { gap: 8px; }
       .search-box { width: 100%; order: -1; }
       #reload { display: none; }
+      
+      /* 日付はタイトルの下に配置 */
       #date-display {
         position: static; display: block; transform: none; margin-top: 8px; text-align: center; width: fit-content; margin-left: auto; margin-right: auto;
       }
       
-      /* スマホでのロゴ調整 */
-      .logo-img { height: 50px; } 
-      .title-text { font-size: 20px; }
+      /* ヘッダー内調整: 画像と文字の関係を解除 */
+      h1 { 
+        gap: 0; 
+        justify-content: center; /* 文字を真ん中に */
+      }
+
+      /* ロゴを右上に絶対配置 */
+      .logo-img { 
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        right: 15px;
+        height: 40px; /* スマホでのロゴサイズ */
+      }
+
+      /* 文字を真ん中に */
+      .title-text { 
+        font-size: 24px; 
+        width: 100%;
+        text-align: center;
+        /* ロゴと被らないように少し右余白を調整する場合もあるが、真ん中重視ならこれ */
+      }
     }
   </style>
 </head>
@@ -331,7 +360,7 @@
       <span class="title-text">買取表</span>
     </h1>
     
-    <div class="version-tag">v4.0</div>
+    <div class="version-tag">v4.1</div>
     <div id="date-display"></div>
   </header>
 
@@ -373,13 +402,12 @@
   </div>
 
   <script>
+    // ★★★ GASを更新した後のURLを必ず貼ってください ★★★
     const API = "https://script.google.com/macros/s/AKfycbxwdofXC7dKIviYUYkvHbrlStUWKh6N3wVV6xcvmFMbFY69cZyOaU8sHD-pYIKd9PQT/exec";
 
-    // 1. URLからカテゴリを取得
     const urlParams = new URLSearchParams(window.location.search);
     let currentCategory = urlParams.get('cat') || "ポケモン";
 
-    // タブの見た目をURLに合わせる
     document.querySelectorAll(".nav-item").forEach(t => {
       t.classList.remove("active");
       if(t.getAttribute("data-cat") === currentCategory) {
@@ -402,14 +430,12 @@
     }
     updateDate();
 
-    // 描画関数
     function render() {
         const grid = el("grid");
         el("meta").textContent = "";
 
         const categoryData = ALL_DATA[currentCategory];
         
-        // 閉店判定
         if (categoryData && categoryData.isOpen === false) {
            document.querySelector('.sticky-container').style.display = 'none';
            grid.innerHTML = `
