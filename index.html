@@ -38,7 +38,7 @@
     body::before {
       content: "";
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.7); 
+      background: rgba(0, 0, 0, 0.4); 
       z-index: -1;
     }
 
@@ -47,26 +47,38 @@
     header { 
       background: #111; 
       border-bottom: 2px solid var(--accent); 
-      padding: 10px 15px; /* 上下の余白を少し調整 */
+      padding: 15px; 
       text-align: center; 
       position: relative;
       z-index: 10;
     }
 
-    /* タイトルエリア（画像の入れ物） */
+    /* タイトルエリア（ロゴと文字を横並びにする） */
     h1 { 
       margin: 0; 
-      line-height: 1; /* 高さを画像に合わせる */
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px; /* 画像と文字の間隔 */
     }
 
-    /* ★修正: ロゴ画像のスタイル */
+    /* ロゴ画像のスタイル */
     .logo-img {
-      max-height: 200px; /* 高さを制限（ヘッダーが巨大になるのを防ぐ） */
-      width: auto;      /* 横幅は自動 */
-      max-width: 100%;  /* スマホではみ出さないように */
-      vertical-align: middle;
-      /* 画像自体をネオンのように少し光らせる（透過PNGの場合に有効） */
+      max-height: 80px;  /* ロゴの高さ */
+      width: auto; 
+      max-width: 100%; 
       filter: drop-shadow(0 0 5px rgba(88, 189, 215, 0.6)); 
+    }
+
+    /* ★追加: 「買取表」の文字スタイル */
+    .title-text {
+      font-size: 24px; /* 文字サイズ */
+      font-weight: 800;
+      color: var(--accent); /* 水色 */
+      text-shadow: var(--glow-text); /* ネオン風に光らせる */
+      font-style: italic; /* 斜体でカッコよく */
+      letter-spacing: 2px;
     }
     
     #date-display {
@@ -302,15 +314,21 @@
       #date-display {
         position: static; display: block; transform: none; margin-top: 8px; text-align: center; width: fit-content; margin-left: auto; margin-right: auto;
       }
+      /* スマホでは文字を少し小さくしてバランス調整 */
+      .logo-img { max-height: 40px; }
+      .title-text { font-size: 18px; }
     }
   </style>
 </head>
 <body>
 
   <header>
-    <h1><img src="./logo.png.png" alt="トレカフォース買取表" class="logo-img" /></h1>
+    <h1>
+      <img src="./logo.png" alt="トレカフォース" class="logo-img" />
+      <span class="title-text">買取表</span>
+    </h1>
     
-    <div class="version-tag">v3.7</div>
+    <div class="version-tag">v3.8</div>
     <div id="date-display"></div>
   </header>
 
@@ -578,5 +596,3 @@
   </script>
 </body>
 </html>
-
-
