@@ -11,8 +11,633 @@
 
   <style>
     /* ★★★ デザイン設定エリア ★★★ */
+    :root {<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
+  <title>トレカフォース買取表</title>
+  <meta property="og:title" content="トレカフォース買取表" />
+  <meta property="og:description" content="最新の買取価格一覧です。" />
+  <meta property="og:type" content="website" />
+
+  <style>
+    /* ★★★ デザイン設定エリア ★★★ */
     :root {
       /* メインカラー（水色） */
+      --accent: #58BDD7; 
+      --price-color: #ffffff;
+      --glow-text: 0 0 8px rgba(88, 189, 215, 0.6);
+      --glow-price: 0 0 10px rgba(255, 255, 255, 0.7); 
+      --glow-box: 0 0 12px rgba(88, 189, 215, 0.4);
+      --bg-dark: #121212;
+      --card-bg: #1e1e1e;
+      --text-main: #ffffff;
+      --border: #555555;
+    }
+
+    body { 
+      font-family: "Helvetica Neue", Arial, sans-serif; 
+      margin: 0; padding: 0; 
+      color: var(--text-main);
+      background-color: var(--bg-dark);
+      background-image: url('./bg-gray.jpg.png');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+    
+    body::before {
+      content: "";
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.4); 
+      z-index: -1;
+    }
+
+    * { box-sizing: border-box; }
+
+    header { 
+      background: #111; 
+      border-bottom: 2px solid var(--accent); 
+      padding: 10px 15px; 
+      text-align: center; 
+      position: relative;
+      z-index: 10;
+      /* スマホでロゴを絶対配置するための基準 */
+      min-height: 60px; 
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    /* タイトルエリア */
+    h1 { 
+      margin: 0; 
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px; 
+      width: 100%;
+    }
+
+    /* ロゴ画像のスタイル（PC用） */
+    .logo-img {
+      height: 80px; 
+      width: auto; 
+      max-width: 100%; 
+      object-fit: contain;
+      filter: drop-shadow(0 0 8px rgba(88, 189, 215, 0.5)); 
+    }
+
+    /* 「買取表」の文字スタイル */
+    .title-text {
+      font-size: 32px; 
+      font-weight: 800;
+      color: var(--accent);
+      text-shadow: var(--glow-text); 
+      font-style: italic; 
+      letter-spacing: 2px;
+      white-space: nowrap; 
+    }
+    
+    #date-display {
+      position: absolute;
+      top: 50%;
+      right: 20px;
+      transform: translateY(-50%);
+      font-size: 11px;
+      color: #fff;
+      font-weight: bold;
+      border: 1px solid var(--accent);
+      background: rgba(88, 189, 215, 0.15);
+      padding: 5px 12px;
+      border-radius: 20px; 
+      box-shadow: var(--glow-box); 
+      white-space: nowrap;
+    }
+
+    /* バージョン表示 */
+    .version-tag {
+      position: absolute; 
+      top: 5px; 
+      left: 5px; 
+      font-size: 10px; 
+      color: #ffffff; 
+      font-weight: normal;
+      z-index: 9999;
+      background: rgba(0,0,0,0.6);
+      padding: 1px 5px;
+      border-radius: 3px;
+      border: 1px solid #ffffff;
+      opacity: 0.7;
+    }
+
+    /* 固定バー */
+    .sticky-container {
+      position: sticky;
+      top: 0;
+      z-index: 9999;
+      background: rgba(18, 18, 18, 0.95);
+      backdrop-filter: blur(5px);
+      border-bottom: 1px solid #444;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+
+    .nav-scroll { 
+      overflow-x: auto; 
+      white-space: nowrap; 
+      padding: 0 10px; 
+      border-bottom: 1px solid #333;
+    }
+    .nav-tabs { display: flex; gap: 10px; max-width: 1000px; margin: 0 auto; padding: 0; list-style: none; }
+    .nav-item { 
+      cursor: pointer; 
+      padding: 14px 12px; 
+      font-weight: bold; 
+      color: #888; 
+      border-bottom: 3px solid transparent; 
+      transition: 0.3s; 
+      font-size: 14px; 
+    }
+    .nav-item:hover { color: #fff; text-shadow: 0 0 5px #fff; }
+    .nav-item.active { 
+      color: var(--accent); 
+      border-bottom-color: var(--accent);
+      text-shadow: var(--glow-text); 
+    }
+
+    .filters { 
+      max-width: 1000px; 
+      margin: 0 auto; 
+      padding: 10px 12px; 
+      display: flex; 
+      gap: 8px; 
+      flex-wrap: wrap; 
+      align-items: center;
+    }
+    
+    .search-box { flex: 1; min-width: 150px; position: relative; }
+    .search-box input { 
+      width: 100%; padding: 10px 10px 10px 36px; 
+      border: 1px solid #555; border-radius: 4px; 
+      outline: none; font-size: 14px; 
+      background: rgba(30, 30, 30, 0.8); color: #fff;
+    }
+    .search-box input:focus { border-color: var(--accent); box-shadow: 0 0 5px rgba(88, 189, 215, 0.5); }
+    .search-icon { position: absolute; left: 10px; top: 11px; color: #aaa; }
+    
+    select, button { 
+      padding: 10px; 
+      border: 1px solid #555; border-radius: 4px; 
+      background: rgba(30, 30, 30, 0.8); color: #fff; 
+      cursor: pointer; font-size: 13px; 
+    }
+    button { 
+      background: var(--accent); 
+      color: #fff; 
+      border: none; 
+      font-weight: bold; 
+      box-shadow: var(--glow-text); 
+    }
+
+    .container { max-width: 1000px; margin: 20px auto 0; padding: 0 12px 60px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; }
+    
+    /* 受付終了メッセージ */
+    .closed-message-container {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 60px 20px;
+      margin-top: 40px;
+      border: 3px solid var(--accent);
+      border-radius: 12px;
+      background: rgba(88, 189, 215, 0.1);
+      box-shadow: var(--glow-box);
+      color: #ffffff;
+    }
+    .closed-title {
+      font-size: 26px;
+      font-weight: 900;
+      color: var(--accent);
+      margin-bottom: 20px;
+      text-shadow: var(--glow-text);
+    }
+    .closed-text {
+      font-size: 16px;
+      color: #ffffff;
+      line-height: 2.0;
+      font-weight: bold;
+    }
+
+    /* カード */
+    .card { 
+      background: var(--card-bg); 
+      border-radius: 8px; 
+      overflow: hidden; 
+      border: 1px solid var(--border); 
+      box-shadow: 0 4px 6px rgba(0,0,0,0.6);
+      display: flex; flex-direction: column; position: relative; 
+      transition: all 0.2s ease;
+    }
+    .card:hover { 
+      transform: translateY(-4px); 
+      border-color: var(--accent); 
+      box-shadow: 0 0 15px rgba(88, 189, 215, 0.4); 
+    }
+    
+    /* 売り切れスタイル */
+    .card.sold-out {
+      filter: grayscale(100%) brightness(60%);
+      border-color: #333;
+      box-shadow: none;
+    }
+    .card.sold-out:hover {
+      transform: none; border-color: #333; box-shadow: none;
+    }
+    
+    .card-img { width: 100%; aspect-ratio: 3/4; background: #000; object-fit: contain; border-bottom: 1px solid #333; }
+    .no-img { display: flex; align-items: center; justify-content: center; color: #555; font-size: 10px; background: #222; }
+
+    .card-body { padding: 12px; flex: 1; display: flex; flex-direction: column; }
+    
+    .psa-label { 
+      font-size: 11px; 
+      color: var(--accent); 
+      font-weight: 900; 
+      margin-bottom: 4px; 
+      letter-spacing: 0.5px;
+      text-shadow: var(--glow-text); 
+    }
+
+    .card-title { 
+      font-size: 13px; 
+      font-weight: bold; 
+      line-height: 1.5; 
+      margin-bottom: 8px; 
+      color: #fff; 
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 39px; 
+    }
+    
+    .card-tags { position: absolute; top: 6px; right: 6px; display: flex; flex-direction: column; gap: 2px; align-items: flex-end; }
+    .badge { 
+      display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold;
+      background: #333; color: #fff; border: 1px solid #555;
+    }
+    .badge-sotai { background: #555; color: #eee; }
+    
+    /* 買取終了バッジ（水色統一） */
+    .sold-out-badge-style {
+      background: rgba(88, 189, 215, 0.9); /* 水色背景 */
+      color: #ffffff !important;
+      font-weight: 900;
+      font-size: 14px;
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: 2px solid var(--accent);
+      box-shadow: 0 0 15px rgba(88, 189, 215, 0.6);
+      text-shadow: 0 0 5px rgba(0,0,0,0.5);
+    }
+
+    .card-footer { margin-top: auto; border-top: 1px solid #444; padding-top: 8px; }
+    
+    .price-row { 
+      display: flex; align-items: baseline; justify-content: space-between; flex-wrap: nowrap; gap: 4px; 
+    }
+    .price-label { font-size: 10px; color: #e0e0e0; font-weight: normal; white-space: nowrap; }
+    .price-value { 
+      color: var(--price-color); font-size: 18px; font-weight: 800; 
+      letter-spacing: -0.5px; text-shadow: var(--glow-price); white-space: nowrap; 
+    }
+    
+    .limit-container { margin-top: 6px; text-align: right; }
+    .limit { 
+      display: inline-block; font-size: 11px; color: #fff; background: #444;
+      padding: 2px 8px; border-radius: 4px; border: 1px solid #666;
+    }
+    .limit.zero { background: #333; color: #888; border-color: #444; }
+    
+    .loading { text-align: center; padding: 40px; color: #aaa; grid-column: 1 / -1; }
+    .error { background: #330000; color: #ff8a80; padding: 15px; border: 1px solid #ff5252; margin-bottom: 20px; display: none; }
+
+    /* ★★★ スマホ画面の調整 ★★★ */
+    @media (max-width: 600px) {
+      .grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .card-title { font-size: 11px; height: 33px; margin-bottom: 4px; }
+      .psa-label { font-size: 10px; margin-bottom: 2px; }
+      .price-value { font-size: 14px; }
+      .price-label { font-size: 9px; }
+      .limit { font-size: 10px; padding: 1px 6px; }
+      .card-body { padding: 8px; }
+      .filters { gap: 8px; }
+      .search-box { width: 100%; order: -1; }
+      #reload { display: none; }
+      
+      /* 日付はタイトルの下に配置 */
+      #date-display {
+        position: static; display: block; transform: none; margin-top: 8px; text-align: center; width: fit-content; margin-left: auto; margin-right: auto;
+      }
+      
+      /* ヘッダー内調整: 画像と文字の関係を解除 */
+      h1 { 
+        gap: 0; 
+        justify-content: center; /* 文字を真ん中に */
+      }
+
+      /* ロゴを右上に絶対配置 */
+      .logo-img { 
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        right: 15px;
+        height: 40px; /* スマホでのロゴサイズ */
+      }
+
+      /* 文字を真ん中に */
+      .title-text { 
+        font-size: 24px; 
+        width: 100%;
+        text-align: center;
+        /* ロゴと被らないように少し右余白を調整する場合もあるが、真ん中重視ならこれ */
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>
+      <img src="./logo.png" alt="トレカフォース" class="logo-img" />
+      <span class="title-text">買取表</span>
+    </h1>
+    
+    <div class="version-tag">v4.1</div>
+    <div id="date-display"></div>
+  </header>
+
+  <div class="sticky-container">
+    <div class="nav-scroll">
+      <ul class="nav-tabs" id="categoryTabs">
+        <li class="nav-item active" data-cat="ポケモン">ポケモン</li>
+        <li class="nav-item" data-cat="ワンピース">ワンピース</li>
+        <li class="nav-item" data-cat="遊戯王">遊戯王</li>
+        <li class="nav-item" data-cat="ヴァイス">ヴァイス</li>
+        <li class="nav-item" data-cat="素体">素体</li>
+        <li class="nav-item" data-cat="BOX">BOX</li>
+      </ul>
+    </div>
+
+    <div class="filters">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input id="q" placeholder="検索" />
+      </div>
+      
+      <select id="sort">
+        <option value="price_desc" selected>高い順</option>
+        <option value="">おすすめ</option>
+        <option value="price_asc">安い順</option>
+      </select>
+
+      <label style="display:flex; align-items:center; font-size:12px; cursor:pointer; gap:6px; margin-left:auto; color: #fff;">
+        <input type="checkbox" id="showSoldOut" checked> 買取終了も表示
+      </label>
+      <button id="reload">更新</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div id="err" class="error"></div>
+    <div class="muted" id="meta" style="font-size:12px; margin-bottom:10px; text-align:right; color:#bbb;"></div>
+    <div id="grid" class="grid"></div>
+  </div>
+
+  <script>
+    // ★★★ GASを更新した後のURLを必ず貼ってください ★★★
+    const API = "https://script.google.com/macros/s/AKfycbxwdofXC7dKIviYUYkvHbrlStUWKh6N3wVV6xcvmFMbFY69cZyOaU8sHD-pYIKd9PQT/exec";
+
+    const urlParams = new URLSearchParams(window.location.search);
+    let currentCategory = urlParams.get('cat') || "ポケモン";
+
+    document.querySelectorAll(".nav-item").forEach(t => {
+      t.classList.remove("active");
+      if(t.getAttribute("data-cat") === currentCategory) {
+        t.classList.add("active");
+      }
+    });
+
+    let ALL_DATA = {};
+    let IS_LOADING = false;
+
+    const el = (id) => document.getElementById(id);
+    const yen = (n) => "¥" + Number(n).toLocaleString();
+
+    function updateDate() {
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = String(now.getMonth() + 1).padStart(2, '0');
+        const d = String(now.getDate()).padStart(2, '0');
+        el("date-display").textContent = `${y}/${m}/${d} 更新`;
+    }
+    updateDate();
+
+    function render() {
+        const grid = el("grid");
+        el("meta").textContent = "";
+
+        const categoryData = ALL_DATA[currentCategory];
+        
+        if (categoryData && categoryData.isOpen === false) {
+           document.querySelector('.sticky-container').style.display = 'none';
+           grid.innerHTML = `
+             <div class="closed-message-container">
+               <div class="closed-title">受付終了</div>
+               <div class="closed-text">
+                 本日の買取受付は終了いたしました。<br>
+                 また明日以降のご利用を<br>心よりお待ちしております。
+               </div>
+             </div>
+           `;
+           return;
+        }
+
+        document.querySelector('.sticky-container').style.display = 'block';
+
+        if (!categoryData || !categoryData.items || categoryData.items.length === 0) {
+          if(!IS_LOADING) {
+             el("meta").textContent = `${currentCategory} (0件)`;
+             grid.innerHTML = '<div class="loading">該当なし</div>';
+          } else {
+             grid.innerHTML = '<div class="loading">読み込み中...</div>';
+          }
+          return;
+        }
+
+        const q = el("q").value.trim().toLowerCase();
+        const sort = el("sort").value;
+        const showSoldOut = el("showSoldOut").checked;
+
+        let items = categoryData.items.slice(); 
+
+        if (q) {
+          items = items.filter(item => 
+            (item.name && item.name.toLowerCase().includes(q)) || 
+            (item.series && item.series.toLowerCase().includes(q))
+          );
+        }
+
+        if (!showSoldOut) {
+           items = items.filter(x => Number(x.remaining) > 0);
+        }
+
+        if (sort === "price_desc") {
+          items.sort((a, b) => b.price - a.price);
+        } else if (sort === "price_asc") {
+          items.sort((a, b) => a.price - b.price);
+        }
+
+        el("meta").textContent = `${currentCategory} (${items.length}件)`;
+
+        if (items.length === 0) {
+          grid.innerHTML = '<div class="loading">該当なし</div>';
+          return;
+        }
+
+        grid.innerHTML = items.map(item => {
+          let imgTag = `<div class="card-img no-img">No Image</div>`;
+          if (item.imageUrl) {
+            imgTag = `<img src="${item.imageUrl}" class="card-img" alt="" loading="lazy" />`;
+          }
+
+          const isSoldOut = Number(item.remaining) <= 0;
+          let overlayHtml = "";
+          
+          if (isSoldOut) {
+             overlayHtml = `
+               <div style="
+                 position: absolute; top:0; left:0; width:100%; height:100%;
+                 background: rgba(0,0,0,0.6); z-index: 50;
+                 display: flex; align-items: center; justify-content: center;
+               ">
+                 <div class="sold-out-badge-style">
+                   買取終了
+                 </div>
+               </div>
+             `;
+          }
+
+          const cardClass = isSoldOut ? "card sold-out" : "card";
+          let headerHtml = ""; 
+          let badgeHtml = ""; 
+
+          if (currentCategory === "素体") {
+             if (item.grade) {
+                badgeHtml += `<span class="badge badge-sotai">${item.grade}</span>`;
+             }
+          } else {
+             if (currentCategory !== "BOX") {
+                headerHtml = `<div class="psa-label">【PSA10】</div>`;
+             }
+          }
+
+          if (isSoldOut) badgeHtml = ""; 
+
+          return `
+            <div class="card" style="position:relative;">
+              ${overlayHtml}
+              <div style="${isSoldOut ? 'opacity:0.5; filter:grayscale(100%);' : ''}">
+                ${imgTag}
+                <div class="card-tags">${badgeHtml}</div>
+                <div class="card-body">
+                  ${headerHtml}
+                  <div class="card-title">${item.name}</div>
+                  <div class="card-footer">
+                    <div class="price-row">
+                      <span class="price-label">買取価格</span>
+                      <span class="price-value">${yen(item.price)}</span>
+                    </div>
+                    <div class="limit-container">
+                      <span class="limit ${isSoldOut ? 'zero' : ''}">残り: ${item.remaining}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join("");
+    }
+
+    async function loadData(category) {
+      if (ALL_DATA[category]) {
+        render(); 
+        return; 
+      }
+
+      IS_LOADING = true;
+      el("grid").innerHTML = '<div class="loading">読み込み中...</div>';
+      el("err").style.display = "none";
+
+      const params = new URLSearchParams();
+      params.set("category", category);
+
+      try {
+        const res = await fetch(`${API}?${params.toString()}&t=${Date.now()}`);
+        const data = await res.json();
+
+        if (data.error) {
+          el("err").textContent = data.error;
+          el("err").style.display = "block";
+          el("grid").innerHTML = "";
+          return;
+        }
+
+        ALL_DATA[category] = data;
+        render();
+
+      } catch (e) {
+        el("grid").innerHTML = "";
+        el("err").textContent = "Error: " + e.message;
+        el("err").style.display = "block";
+      } finally {
+        IS_LOADING = false;
+      }
+    }
+
+    document.querySelectorAll(".nav-item").forEach(tab => {
+      tab.addEventListener("click", (e) => {
+        document.querySelectorAll(".nav-item").forEach(t => t.classList.remove("active"));
+        e.target.classList.add("active");
+        
+        const newCat = e.target.getAttribute("data-cat");
+        currentCategory = newCat;
+
+        const newUrl = new URL(window.location);
+        newUrl.searchParams.set('cat', newCat);
+        window.history.pushState({}, '', newUrl);
+
+        loadData(newCat);
+      });
+    });
+
+    el("sort").addEventListener("change", () => render());
+    el("showSoldOut").addEventListener("change", () => render());
+    el("reload").addEventListener("click", () => {
+        ALL_DATA = {}; 
+        loadData(currentCategory);
+    });
+    
+    let timer;
+    el("q").addEventListener("input", () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => render(), 300); 
+    });
+
+    loadData(currentCategory);
+  </script>
+</body>
+</html>
       --accent: #58BDD7; 
       --price-color: #ffffff;
       --glow-text: 0 0 8px rgba(88, 189, 215, 0.6);
@@ -597,4 +1222,5 @@
   </script>
 </body>
 </html>
+
 
