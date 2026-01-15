@@ -38,7 +38,7 @@
     body::before {
       content: "";
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.6); 
+      background: rgba(0, 0, 0, 0.7); 
       z-index: -1;
     }
 
@@ -192,7 +192,8 @@
 
     .card-body { padding: 12px; flex: 1; display: flex; flex-direction: column; }
     
-    .psa-label { 
+    /* ★タイプ表示（PSA10, 素体, BOX）用スタイル */
+    .type-label { 
       font-size: 11px; color: var(--accent); font-weight: 900; margin-bottom: 4px; letter-spacing: 0.5px; text-shadow: var(--glow-text); 
     }
 
@@ -236,7 +237,7 @@
     .loading { text-align: center; padding: 40px; color: #aaa; grid-column: 1 / -1; }
     .error { background: #330000; color: #ff8a80; padding: 15px; border: 1px solid #ff5252; margin-bottom: 20px; display: none; }
 
-    /* ★★★ 追加: 詳細モーダルのスタイル ★★★ */
+    /* ★★★ 詳細モーダルのスタイル ★★★ */
     .modal-overlay {
       display: none; /* デフォルト非表示 */
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -288,7 +289,7 @@
     @media (max-width: 600px) {
       .grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
       .card-title { font-size: 11px; height: 33px; margin-bottom: 4px; }
-      .psa-label { font-size: 10px; margin-bottom: 2px; }
+      .type-label { font-size: 10px; margin-bottom: 2px; }
       .price-value { font-size: 14px; }
       .price-label { font-size: 9px; }
       .limit { font-size: 10px; padding: 1px 6px; }
@@ -328,7 +329,7 @@
       <span class="title-text">買取表</span>
     </h1>
     
-    <div class="version-tag">v4.2</div>
+    <div class="version-tag">v4.4</div>
     <div id="date-display"></div>
   </header>
 
@@ -352,8 +353,10 @@
       
       <select id="sort">
         <option value="price_desc" selected>高い順</option>
-        <option value="">おすすめ</option>
         <option value="price_asc">安い順</option>
+        <option value="type_psa10">PSA10</option>
+        <option value="type_sotai">素体</option>
+        <option value="type_box">BOX</option>
       </select>
 
       <label style="display:flex; align-items:center; font-size:12px; cursor:pointer; gap:6px; margin-left:auto; color: #fff;">
@@ -393,7 +396,8 @@
   </div>
 
   <script>
-    const API = "https://script.google.com/macros/s/AKfycbxwdofXC7dKIviYUYkvHbrlStUWKh6N3wVV6xcvmFMbFY69cZyOaU8sHD-pYIKd9PQT/exec";
+    // ★ GASのデプロイURLをここに設定してください
+    const API = "https://script.google.com/macros/s/AKfycbz18UKH1Z148Q7q2wAMaa5hJQLwyf-DrQElyWJbbc9rdUVcYmT-wCKw_crsqdEDCuZh/exec";
 
     const urlParams = new URLSearchParams(window.location.search);
     let currentCategory = urlParams.get('cat') || "ポケモン";
@@ -407,7 +411,7 @@
 
     let ALL_DATA = {};
     let IS_LOADING = false;
-    let CURRENT_ITEMS = []; // ★追加: 表示中のデータを保持
+    let CURRENT_ITEMS = []; // 表示中のデータを保持
 
     const el = (id) => document.getElementById(id);
     const yen = (n) => "¥" + Number(n).toLocaleString();
@@ -420,6 +424,10 @@
         el("date-display").textContent = `${y}/${m}/${d} 更新`;
     }
     updateDate();
+
+    // ★ 並び替えロジック定義 (PSA10 -> 素体 -> BOX)
+    const typePriority = { "PSA10": 1, "素体": 2, "BOX": 3 };
+    const getPrio = (t) => typePriority[t] || 99; // 登録外は最後
 
     function render() {
         const grid = el("grid");
@@ -470,13 +478,32 @@
            items = items.filter(x => Number(x.remaining) > 0);
         }
 
-        if (sort === "price_desc") {
-          items.sort((a, b) => b.price - a.price);
-        } else if (sort === "price_asc") {
-          items.sort((a, b) => a.price - b.price);
+        // ★★★ 追加: 特定のタイプを選択した場合の絞り込み ★★★
+        if (sort === "type_psa10") {
+            items = items.filter(x => (x.type || "PSA10") === "PSA10");
+        } else if (sort === "type_sotai") {
+            items = items.filter(x => x.type === "素体");
+        } else if (sort === "type_box") {
+            items = items.filter(x => x.type === "BOX");
         }
 
-        // ★追加: 現在のデータを保存
+        // ★ ソート処理
+        items.sort((a, b) => {
+          // 1. タイプ優先 (PSA10 > 素体 > BOX)
+          const pA = getPrio(a.type);
+          const pB = getPrio(b.type);
+          if (pA !== pB) return pA - pB;
+
+          // 2. 価格順
+          if (sort === "price_asc") {
+            return a.price - b.price;
+          } else {
+            // price_desc または type_psa10などの絞り込み時は、高い順をデフォルトとする
+            return b.price - a.price;
+          }
+        });
+
+        // 現在のデータを保存
         CURRENT_ITEMS = items;
 
         el("meta").textContent = `${currentCategory} (${items.length}件)`;
@@ -486,7 +513,6 @@
           return;
         }
 
-        // ★変更: indexをdata属性に付与して、クリック時に特定できるようにする
         grid.innerHTML = items.map((item, index) => {
           let imgTag = `<div class="card-img no-img">No Image</div>`;
           if (item.imageUrl) {
@@ -510,17 +536,14 @@
              `;
           }
 
-          let headerHtml = ""; 
-          let badgeHtml = ""; 
-
-          if (currentCategory === "素体") {
-             if (item.grade) {
-                badgeHtml += `<span class="badge badge-sotai">${item.grade}</span>`;
-             }
-          } else {
-             if (currentCategory !== "BOX") {
-                headerHtml = `<div class="psa-label">【PSA10】</div>`;
-             }
+          // ★スプレッドシートのtypeを使ってラベルを表示（PSA10, 素体, BOX）
+          const displayType = item.type || "PSA10";
+          const headerHtml = `<div class="type-label">【${displayType}】</div>`;
+          
+          let badgeHtml = "";
+          // 素体かつグレードがある場合のみバッジ表示
+          if (displayType === "素体" && item.grade) {
+             badgeHtml = `<span class="badge badge-sotai">${item.grade}</span>`;
           }
 
           if (isSoldOut) badgeHtml = ""; 
@@ -615,7 +638,7 @@
       timer = setTimeout(() => render(), 300); 
     });
 
-    // ★★★ 追加: モーダル操作ロジック ★★★
+    // ★★★ モーダル操作ロジック ★★★
     const modal = el("modal");
     const closeModalBtn = el("closeModalBtn");
 
@@ -653,10 +676,13 @@
 
       const tagsEl = el("modalTags");
       tagsEl.innerHTML = "";
-      if (currentCategory === "素体" && item.grade) {
+      
+      // ★モーダル内のタグ表示ロジックもType基準に更新
+      const displayType = item.type || "PSA10";
+      tagsEl.innerHTML += `<span class="type-label" style="font-size:14px; margin-right:5px;">【${displayType}】</span>`;
+
+      if (displayType === "素体" && item.grade) {
          tagsEl.innerHTML += `<span class="badge badge-sotai" style="font-size:14px; padding:4px 8px;">${item.grade}</span>`;
-      } else if (currentCategory !== "BOX") {
-         tagsEl.innerHTML += `<span class="psa-label" style="font-size:14px;">【PSA10】</span>`;
       }
 
       modal.classList.add("active");
