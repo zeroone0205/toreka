@@ -38,7 +38,7 @@
     body::before {
       content: "";
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.7); 
+      background: rgba(0, 0, 0, 0.4); 
       z-index: -1;
     }
 
@@ -396,7 +396,7 @@
 
   <script>
     // ★ GASのデプロイURLをここに設定してください
-    const API = "https://script.google.com/macros/s/AKfycbw6nRTxBoc5I30GyTXL3zVTLW5wqMt_CzsyAAj8lJIBMLeifP-cc_c_vucFyqmmzQXi/exec";
+    const API = "https://script.google.com/macros/s/AKfycbwW4N3QNDRUv12FnlOctrokH_vU6cwjTgfLyMdbxDxVy6Kj6KSQflIw1pRvi8GdTUDC/exec";
 
     const urlParams = new URLSearchParams(window.location.search);
     let currentCategory = urlParams.get('cat') || "ポケモン";
@@ -539,5 +539,166 @@
           const displayType = item.type || "PSA10";
           const headerHtml = `<div class="type-label">【${displayType}】</div>`;
           
-          let
+          let badgeHtml = "";
+          // 素体かつグレードがある場合のみバッジ表示
+          if (displayType === "素体" && item.grade) {
+             badgeHtml = `<span class="badge badge-sotai">${item.grade}</span>`;
+          }
 
+          if (isSoldOut) badgeHtml = ""; 
+
+          return `
+            <div class="card ${isSoldOut ? 'sold-out' : ''}" data-index="${index}" style="position:relative; cursor:pointer;">
+              ${overlayHtml}
+              <div style="${isSoldOut ? 'opacity:0.5; filter:grayscale(100%);' : ''}">
+                ${imgTag}
+                <div class="card-tags">${badgeHtml}</div>
+                <div class="card-body">
+                  ${headerHtml}
+                  <div class="card-title">${item.name}</div>
+                  <div class="card-footer">
+                    <div class="price-row">
+                      <span class="price-label">買取価格</span>
+                      <span class="price-value">${yen(item.price)}</span>
+                    </div>
+                    <div class="limit-container">
+                      <span class="limit ${isSoldOut ? 'zero' : ''}">残り: ${item.remaining}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join("");
+    }
+
+    async function loadData(category) {
+      if (ALL_DATA[category]) {
+        render(); 
+        return; 
+      }
+
+      IS_LOADING = true;
+      el("grid").innerHTML = '<div class="loading">読み込み中...</div>';
+      el("err").style.display = "none";
+
+      const params = new URLSearchParams();
+      params.set("category", category);
+
+      try {
+        const res = await fetch(`${API}?${params.toString()}&t=${Date.now()}`);
+        const data = await res.json();
+
+        if (data.error) {
+          el("err").textContent = data.error;
+          el("err").style.display = "block";
+          el("grid").innerHTML = "";
+          return;
+        }
+
+        ALL_DATA[category] = data;
+        render();
+
+      } catch (e) {
+        el("grid").innerHTML = "";
+        el("err").textContent = "Error: " + e.message;
+        el("err").style.display = "block";
+      } finally {
+        IS_LOADING = false;
+      }
+    }
+
+    document.querySelectorAll(".nav-item").forEach(tab => {
+      tab.addEventListener("click", (e) => {
+        document.querySelectorAll(".nav-item").forEach(t => t.classList.remove("active"));
+        e.target.classList.add("active");
+        
+        const newCat = e.target.getAttribute("data-cat");
+        currentCategory = newCat;
+
+        const newUrl = new URL(window.location);
+        newUrl.searchParams.set('cat', newCat);
+        window.history.pushState({}, '', newUrl);
+
+        loadData(newCat);
+      });
+    });
+
+    el("sort").addEventListener("change", () => render());
+    el("showSoldOut").addEventListener("change", () => render());
+    el("reload").addEventListener("click", () => {
+        ALL_DATA = {}; 
+        loadData(currentCategory);
+    });
+    
+    let timer;
+    el("q").addEventListener("input", () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => render(), 300); 
+    });
+
+    // ★★★ モーダル操作ロジック ★★★
+    const modal = el("modal");
+    const closeModalBtn = el("closeModalBtn");
+
+    el("grid").addEventListener("click", (e) => {
+      const card = e.target.closest(".card");
+      if (card) {
+        const index = card.getAttribute("data-index");
+        const item = CURRENT_ITEMS[index];
+        if (item) {
+          openModal(item);
+        }
+      }
+    });
+
+    function openModal(item) {
+      const modalImg = el("modalImg");
+      if (item.imageUrl) {
+        modalImg.src = item.imageUrl;
+        modalImg.style.display = "inline-block";
+      } else {
+        modalImg.style.display = "none";
+      }
+
+      el("modalTitle").textContent = item.name;
+      el("modalPrice").textContent = yen(item.price);
+      
+      const limitEl = el("modalLimit");
+      limitEl.textContent = "残り: " + item.remaining;
+      if (Number(item.remaining) <= 0) {
+         limitEl.textContent = "買取終了";
+         limitEl.classList.add("zero");
+      } else {
+         limitEl.classList.remove("zero");
+      }
+
+      const tagsEl = el("modalTags");
+      tagsEl.innerHTML = "";
+      
+      // ★モーダル内のタグ表示ロジックもType基準に更新
+      const displayType = item.type || "PSA10";
+      tagsEl.innerHTML += `<span class="type-label" style="font-size:14px; margin-right:5px;">【${displayType}】</span>`;
+
+      if (displayType === "素体" && item.grade) {
+         tagsEl.innerHTML += `<span class="badge badge-sotai" style="font-size:14px; padding:4px 8px;">${item.grade}</span>`;
+      }
+
+      modal.classList.add("active");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeModal() {
+      modal.classList.remove("active");
+      document.body.style.overflow = "";
+    }
+
+    closeModalBtn.addEventListener("click", closeModal);
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) closeModal();
+    });
+
+    loadData(currentCategory);
+  </script>
+</body>
+</html>
