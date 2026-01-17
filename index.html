@@ -184,7 +184,11 @@
     }
     .card:hover { transform: translateY(-4px); border-color: var(--accent); box-shadow: 0 0 15px rgba(88, 189, 215, 0.4); }
     
-    .card.sold-out { filter: grayscale(100%) brightness(60%); border-color: #333; box-shadow: none; }
+    /* ★修正: 親要素には grayscale をかけず、中身にかけるように変更するため、ここはシンプルに */
+    .card.sold-out { 
+      border-color: #333; 
+      box-shadow: none; 
+    }
     .card.sold-out:hover { transform: none; border-color: #333; box-shadow: none; }
     
     .card-img { width: 100%; aspect-ratio: 3/4; background: #000; object-fit: contain; border-bottom: 1px solid #333; }
@@ -209,6 +213,7 @@
     }
     .badge-sotai { background: #555; color: #eee; }
     
+    /* 青いバッジのスタイル */
     .sold-out-badge-style {
       background: rgba(88, 189, 215, 0.9); color: #ffffff !important;
       font-weight: 900; font-size: 14px; padding: 8px 16px; border-radius: 6px;
@@ -329,7 +334,7 @@
       <span class="title-text">買取表</span>
     </h1>
     
-    <div class="version-tag">v4.5</div>
+    <div class="version-tag">v4.6</div>
     <div id="date-display"></div>
   </header>
 
@@ -354,7 +359,7 @@
         <option value="price_desc" selected>高い順</option>
         <option value="price_asc">安い順</option>
         <option value="type_psa10">PSA10</option>
-        <option value="type_sotai">素体</option>
+        <option value="type_mikaifu">未開封</option> <option value="type_sotai">素体</option>
         <option value="type_box">BOX</option>
       </select>
 
@@ -395,7 +400,7 @@
   </div>
 
   <script>
-    // ★ GASのデプロイURLをここに設定してください
+    // ★ GASのデプロイURL
     const API = "https://script.google.com/macros/s/AKfycbwW4N3QNDRUv12FnlOctrokH_vU6cwjTgfLyMdbxDxVy6Kj6KSQflIw1pRvi8GdTUDC/exec";
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -424,8 +429,8 @@
     }
     updateDate();
 
-    // ★ 並び替えロジック定義 (PSA10 -> 素体 -> BOX)
-    const typePriority = { "PSA10": 1, "素体": 2, "BOX": 3 };
+    // ★ 並び替えロジック定義 (PSA10 -> 未開封 -> 素体 -> BOX)
+    const typePriority = { "PSA10": 1, "未開封": 2, "素体": 3, "BOX": 4 };
     const getPrio = (t) => typePriority[t] || 99; // 登録外は最後
 
     function render() {
@@ -477,18 +482,20 @@
            items = items.filter(x => Number(x.remaining) > 0);
         }
 
-        // ★★★ 特定のタイプを選択した場合の絞り込み ★★★
+        // ★★★ 特定のタイプを選択した場合の絞り込み (未開封を追加) ★★★
         if (sort === "type_psa10") {
-            items = items.filter(x => (x.type || "PSA10") === "PSA10");
+             items = items.filter(x => (x.type || "PSA10") === "PSA10");
+        } else if (sort === "type_mikaifu") {
+             items = items.filter(x => x.type === "未開封");
         } else if (sort === "type_sotai") {
-            items = items.filter(x => x.type === "素体");
+             items = items.filter(x => x.type === "素体");
         } else if (sort === "type_box") {
-            items = items.filter(x => x.type === "BOX");
+             items = items.filter(x => x.type === "BOX");
         }
 
         // ★ ソート処理
         items.sort((a, b) => {
-          // 1. タイプ優先 (PSA10 > 素体 > BOX)
+          // 1. タイプ優先
           const pA = getPrio(a.type);
           const pB = getPrio(b.type);
           if (pA !== pB) return pA - pB;
@@ -497,7 +504,6 @@
           if (sort === "price_asc") {
             return a.price - b.price;
           } else {
-            // price_desc または type_psa10などの絞り込み時は、高い順をデフォルトとする
             return b.price - a.price;
           }
         });
@@ -535,12 +541,10 @@
              `;
           }
 
-          // ★スプレッドシートのtypeを使ってラベルを表示（PSA10, 素体, BOX）
           const displayType = item.type || "PSA10";
           const headerHtml = `<div class="type-label">【${displayType}】</div>`;
           
           let badgeHtml = "";
-          // 素体かつグレードがある場合のみバッジ表示
           if (displayType === "素体" && item.grade) {
              badgeHtml = `<span class="badge badge-sotai">${item.grade}</span>`;
           }
@@ -676,7 +680,6 @@
       const tagsEl = el("modalTags");
       tagsEl.innerHTML = "";
       
-      // ★モーダル内のタグ表示ロジックもType基準に更新
       const displayType = item.type || "PSA10";
       tagsEl.innerHTML += `<span class="type-label" style="font-size:14px; margin-right:5px;">【${displayType}】</span>`;
 
@@ -702,4 +705,3 @@
   </script>
 </body>
 </html>
-
