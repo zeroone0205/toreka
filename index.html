@@ -77,7 +77,8 @@
       width: auto; 
       max-width: 100%; 
       object-fit: contain;
-      filter: drop-shadow(0 0 8px rgba(88, 189, 215, 0.5)); 
+      /* ★修正：ネオン（ドロップシャドウ）を削除しました */
+      filter: none; 
     }
 
     /* 文字スタイル */
@@ -395,7 +396,6 @@
     
     .modal-row { display: flex; justify-content: space-between; align-items: baseline; margin-top:10px;}
     
-    /* ★ここを変更：モーダルの金額を白(#ffffff)に固定しました */
     .modal-price { 
       font-size: 32px; 
       color: #ffffff; /* 白に変更 */
@@ -455,10 +455,10 @@
     <header>
       <h1>
         <span class="title-text">買取表</span>
-        <img src="./logo.png.png.png.png" alt="ロゴ" class="logo-img" />
+        <img src="./logo.png.png.png" alt="ロゴ" class="logo-img" />
       </h1>
       
-      <div class="version-tag">v5.3</div>
+      <div class="version-tag">v5.4</div>
       <div id="date-display"></div>
     </header>
 
@@ -1201,4 +1201,3 @@
   </script>
 </body>
 </html>
-
