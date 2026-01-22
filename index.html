@@ -1,124 +1,1191 @@
 <!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>買取表</title>
-  <style>
-    :root {
-      --accent: #58BDD7; 
-      --price-color: #ffffff;
-      --bg-dark: #121212;
-      --card-bg: #1e1e1e;
-      --text-main: #ffffff;
-    }
-    body { 
-      font-family: sans-serif; 
-      margin: 0; padding: 0; 
-      color: var(--text-main);
-      background-color: var(--bg-dark); /* 画像なし、黒背景 */
-      display: flex; flex-direction: column; min-height: 100vh;
-    }
-    header { 
-      background: #111; 
-      border-bottom: 2px solid var(--accent); 
-      padding: 15px; 
-      text-align: center; 
-    }
-    h1 { margin: 0; font-size: 24px; color: var(--accent); }
-    
-    .nav-scroll { overflow-x: auto; white-space: nowrap; padding: 10px; border-bottom: 1px solid #333; background: #181818; }
-    .nav-tabs { display: flex; gap: 15px; list-style: none; padding: 0; margin: 0; }
-    .nav-item { cursor: pointer; color: #888; font-weight: bold; }
-    .nav-item.active { color: var(--accent); border-bottom: 2px solid var(--accent); }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
+  <title>買取表</title>
+  <meta property="og:title" content="買取表" />
+  <meta property="og:description" content="最新の買取価格一覧です。" />
+  <meta property="og:type" content="website" />
 
-    .container { max-width: 1000px; margin: 20px auto; padding: 0 10px; flex: 1; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
-    
-    .card { 
-      background: var(--card-bg); border: 1px solid #444; border-radius: 8px; overflow: hidden; 
-      display: flex; flex-direction: column;
-    }
-    .card-body { padding: 10px; }
-    .card-title { font-size: 12px; font-weight: bold; height: 35px; overflow: hidden; }
-    .price-value { font-size: 18px; font-weight: bold; color: var(--accent); text-align: right; display: block; margin-top: 5px; }
-    .loading { text-align: center; padding: 20px; color: #aaa; }
-    .error { color: #ff5555; text-align: center; padding: 20px; border: 1px solid #ff5555; display: none;}
-  </style>
+  <style>
+    /* ★★★ デザイン設定エリア ★★★ */
+    :root {
+      --accent: #58BDD7; 
+      --price-color: #ffffff;
+      --glow-text: 0 0 8px rgba(88, 189, 215, 0.6);
+      --glow-price: 0 0 10px rgba(255, 255, 255, 0.7); 
+      --glow-box: 0 0 12px rgba(88, 189, 215, 0.4);
+      --bg-dark: #121212;
+      --card-bg: #1e1e1e;
+      --text-main: #ffffff;
+      --border: #555555;
+    }
+
+    body { 
+      font-family: "Helvetica Neue", Arial, sans-serif; 
+      margin: 0; padding: 0; 
+      color: var(--text-main);
+      background-color: var(--bg-dark);
+      /* 背景画像 */
+      background-image: url('./bg-gray.jpg.png');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    
+    body::before {
+      content: "";
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.7); 
+      z-index: -1;
+    }
+
+    * { box-sizing: border-box; }
+
+    header { 
+      background: #111; 
+      border-bottom: 2px solid var(--accent); 
+      padding: 10px 15px; 
+      text-align: center; 
+      position: relative;
+      z-index: 10;
+    }
+
+    /* タイトルエリア */
+    h1 { 
+      margin: 0; 
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px; 
+    }
+
+    /* ロゴ画像のスタイル */
+    .logo-img {
+      height: 80px; 
+      width: auto; 
+      max-width: 100%; 
+      object-fit: contain;
+      filter: drop-shadow(0 0 8px rgba(88, 189, 215, 0.5)); 
+    }
+
+    /* 文字スタイル */
+    .title-text {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--accent);
+      text-shadow: var(--glow-text);
+      font-style: italic; 
+      letter-spacing: 2px;
+      white-space: nowrap;
+    }
+    
+    #date-display {
+      position: absolute;
+      top: 50%;
+      right: 20px;
+      transform: translateY(-50%);
+      font-size: 11px;
+      color: #fff;
+      font-weight: bold;
+      border: 1px solid var(--accent);
+      background: rgba(88, 189, 215, 0.15);
+      padding: 5px 12px;
+      border-radius: 20px; 
+      box-shadow: var(--glow-box); 
+      white-space: nowrap;
+    }
+
+    .version-tag {
+      position: absolute; top: 5px; left: 5px; font-size: 10px; 
+      color: #ffffff; font-weight: normal; z-index: 9999;
+      background: rgba(0,0,0,0.6); padding: 1px 5px; border-radius: 3px; border: 1px solid #ffffff; opacity: 0.7;
+    }
+
+    .sticky-container {
+      position: sticky; top: 0; z-index: 9999;
+      background: rgba(18, 18, 18, 0.95); backdrop-filter: blur(5px);
+      border-bottom: 1px solid #444; box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+
+    .nav-scroll { 
+      overflow-x: auto; white-space: nowrap; padding: 0 10px; border-bottom: 1px solid #333;
+    }
+    
+    .nav-tabs { 
+      display: flex; 
+      gap: 10px; 
+      max-width: 1000px; 
+      margin: 0 auto; 
+      padding: 0; 
+      list-style: none; 
+      align-items: center;
+    }
+    
+    .nav-item { 
+      cursor: pointer; 
+      padding: 14px 12px; 
+      font-weight: bold; 
+      color: #888; 
+      border-bottom: 3px solid transparent; 
+      transition: 0.3s; 
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      height: 100%;
+    }
+    .nav-item:hover { color: #fff; text-shadow: 0 0 5px #fff; }
+    .nav-item.active { 
+      color: var(--accent); border-bottom-color: var(--accent); text-shadow: var(--glow-text); 
+    }
+
+    .filters { 
+      max-width: 1000px; margin: 0 auto; padding: 10px 12px; 
+      display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+    }
+    
+    .search-box { flex: 1; min-width: 150px; position: relative; }
+    .search-box input { 
+      width: 100%; padding: 10px 10px 10px 36px; border: 1px solid #555; border-radius: 4px; 
+      outline: none; font-size: 14px; background: rgba(30, 30, 30, 0.8); color: #fff;
+    }
+    .search-box input:focus { border-color: var(--accent); box-shadow: 0 0 5px rgba(88, 189, 215, 0.5); }
+    .search-icon { position: absolute; left: 10px; top: 11px; color: #aaa; }
+    
+    select, button { 
+      padding: 10px; border: 1px solid #555; border-radius: 4px; 
+      background: rgba(30, 30, 30, 0.8); color: #fff; cursor: pointer; font-size: 13px; 
+    }
+    button { 
+      background: var(--accent); color: #fff; border: none; font-weight: bold; box-shadow: var(--glow-text); 
+    }
+
+    .container { max-width: 1000px; margin: 20px auto 0; padding: 0 12px 60px; flex: 1; width: 100%; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; }
+    
+    .closed-message-container {
+      grid-column: 1 / -1; text-align: center; padding: 60px 20px; margin-top: 40px;
+      border: 3px solid var(--accent); border-radius: 12px;
+      background: rgba(88, 189, 215, 0.1); box-shadow: var(--glow-box); color: #ffffff;
+    }
+    .closed-title {
+      font-size: 26px; font-weight: 900; color: var(--accent); margin-bottom: 20px; text-shadow: var(--glow-text);
+    }
+    .closed-text { font-size: 16px; color: #ffffff; line-height: 2.0; font-weight: bold; }
+
+    .card { 
+      background: var(--card-bg); border-radius: 8px; overflow: hidden; 
+      border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.6);
+      display: flex; flex-direction: column; position: relative; transition: all 0.2s ease;
+      cursor: pointer; 
+    }
+    .card:hover { transform: translateY(-4px); border-color: var(--accent); box-shadow: 0 0 15px rgba(88, 189, 215, 0.4); }
+    
+    .card.sold-out { 
+      border-color: #333; 
+      box-shadow: none; 
+    }
+    .card.sold-out:hover { transform: none; border-color: #333; box-shadow: none; }
+    
+    .card-img { width: 100%; aspect-ratio: 3/4; background: #000; object-fit: contain; border-bottom: 1px solid #333; }
+    .no-img { display: flex; align-items: center; justify-content: center; color: #555; font-size: 10px; background: #222; }
+
+    .card-body { padding: 12px; flex: 1; display: flex; flex-direction: column; }
+    
+    .type-label { 
+      font-size: 11px; color: var(--accent); font-weight: 900; margin-bottom: 4px; letter-spacing: 0.5px; text-shadow: var(--glow-text); 
+    }
+
+    .card-title { 
+      font-size: 13px; font-weight: bold; line-height: 1.5; margin-bottom: 8px; color: #fff; 
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 39px; 
+    }
+    
+    .card-tags { position: absolute; top: 6px; right: 6px; display: flex; flex-direction: column; gap: 2px; align-items: flex-end; }
+    .badge { 
+      display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold;
+      background: #333; color: #fff; border: 1px solid #555;
+    }
+    .badge-sotai { background: #555; color: #eee; }
+    
+    .sold-out-badge-style {
+      background: rgba(88, 189, 215, 0.9); color: #ffffff !important;
+      font-weight: 900; font-size: 14px; padding: 8px 16px; border-radius: 6px;
+      border: 2px solid var(--accent); box-shadow: 0 0 15px rgba(88, 189, 215, 0.6);
+      text-shadow: 0 0 5px rgba(0,0,0,0.5);
+    }
+
+    .card-footer { margin-top: auto; border-top: 1px solid #444; padding-top: 8px; }
+    
+    .price-row { 
+      display: flex; align-items: baseline; justify-content: space-between; flex-wrap: nowrap; gap: 4px; 
+    }
+    .price-label { font-size: 10px; color: #e0e0e0; font-weight: normal; white-space: nowrap; }
+    .price-value { 
+      color: var(--price-color); font-size: 18px; font-weight: 800; 
+      letter-spacing: -0.5px; text-shadow: var(--glow-price); white-space: nowrap; 
+    }
+    
+    .limit-container { margin-top: 6px; text-align: right; }
+    .limit { 
+      display: inline-block; font-size: 11px; color: #fff; background: #444;
+      padding: 2px 8px; border-radius: 4px; border: 1px solid #666;
+    }
+    .limit.zero { background: #333; color: #888; border-color: #444; }
+    
+    .loading { text-align: center; padding: 40px; color: #aaa; grid-column: 1 / -1; }
+    .error { background: #330000; color: #ff8a80; padding: 15px; border: 1px solid #ff5252; margin-bottom: 20px; display: none; }
+
+    /* ★★★ ページネーション ★★★ */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid #333;
+    }
+    .page-btn {
+      padding: 8px 16px;
+      background: #333;
+      border: 1px solid #555;
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .page-btn:hover:not(:disabled) {
+      background: var(--accent);
+      border-color: var(--accent);
+      box-shadow: var(--glow-text);
+    }
+    .page-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .page-info {
+      font-size: 14px;
+      font-weight: bold;
+      color: #aaa;
+    }
+
+    /* ★★★ フッターと規約表示エリア ★★★ */
+    footer {
+      background: #0f0f0f;
+      border-top: 1px solid #333;
+      padding: 20px;
+      text-align: center;
+      margin-top: auto;
+    }
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 10px;
+    }
+    .footer-link {
+      color: #888;
+      font-size: 12px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .footer-link:hover {
+      color: var(--accent);
+      text-decoration: underline;
+    }
+    .copyright {
+      color: #555;
+      font-size: 10px;
+    }
+
+    /* 規約表示用の全画面コンテナ */
+    #legalView {
+      display: none;
+      padding: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+      color: #ddd;
+      line-height: 1.8;
+      font-size: 14px;
+      text-align: left; /* ★ 左寄せ */
+    }
+    #legalView h2 {
+      color: var(--accent);
+      border-bottom: 1px solid var(--accent);
+      padding-bottom: 10px;
+      margin-top: 30px;
+      text-align: left;
+    }
+    #legalView h3 {
+      color: #fff;
+      margin-top: 25px;
+      font-size: 16px;
+      text-align: left;
+    }
+    #legalView p, #legalView li {
+      margin-bottom: 10px;
+      text-align: left;
+    }
+    #legalView ol {
+      padding-left: 20px;
+      text-align: left;
+    }
+    #legalView ul {
+      padding-left: 20px;
+      text-align: left;
+    }
+    .back-btn-container {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    /* ★★★ 詳細モーダルのスタイル ★★★ */
+    .modal-overlay {
+      display: none; 
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.85); 
+      z-index: 10000; 
+      justify-content: center; align-items: center; 
+      padding: 15px;
+      backdrop-filter: blur(4px);
+      opacity: 0; transition: opacity 0.2s ease;
+    }
+    .modal-overlay.active {
+      display: flex; opacity: 1;
+    }
+    .modal-content {
+      background: #1e1e1e; 
+      border: 2px solid var(--accent); 
+      border-radius: 12px;
+      width: 100%; max-width: 400px;
+      max-height: 90vh; overflow-y: auto;
+      position: relative; padding: 20px; 
+      box-shadow: 0 0 30px rgba(88, 189, 215, 0.2);
+      transform: scale(0.95); transition: transform 0.2s ease;
+    }
+    .modal-overlay.active .modal-content { transform: scale(1); }
+
+    .close-modal {
+      position: absolute; top: 10px; right: 15px; 
+      font-size: 32px; color: #888; cursor: pointer; line-height: 1;
+    }
+    .close-modal:hover { color: #fff; }
+
+    .modal-img-wrapper { text-align: center; margin-bottom: 15px; background:#000; padding:10px; border-radius:8px;}
+    .modal-img { max-height: 300px; max-width: 100%; object-fit: contain; }
+    
+    .modal-title {
+      font-size: 18px; font-weight: bold; color: #fff; margin-bottom: 15px;
+      line-height: 1.5; border-bottom: 1px solid #444; padding-bottom: 15px;
+      white-space: normal; 
+    }
+    
+    .modal-row { display: flex; justify-content: space-between; align-items: baseline; margin-top:10px;}
+    .modal-price { font-size: 32px; color: var(--accent); font-weight: 900; text-shadow: var(--glow-price); }
+    .modal-label { font-size: 12px; color: #aaa; }
+    
+    .modal-tags { display: flex; gap: 5px; margin-bottom: 10px; justify-content: center;}
+
+
+    /* ★★★ スマホ画面の調整 ★★★ */
+    @media (max-width: 600px) {
+      .grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .card-title { font-size: 11px; height: 33px; margin-bottom: 4px; }
+      .type-label { font-size: 10px; margin-bottom: 2px; }
+      .price-value { font-size: 14px; }
+      .price-label { font-size: 9px; }
+      .limit { font-size: 10px; padding: 1px 6px; }
+      .card-body { padding: 8px; }
+      .filters { gap: 8px; }
+      .search-box { width: 100%; order: -1; }
+      #reload { display: none; }
+      
+      #date-display {
+        position: static; display: block; transform: none; margin-top: 8px; text-align: center; width: fit-content; margin-left: auto; margin-right: auto;
+      }
+      
+      h1 { 
+        gap: 0; 
+        justify-content: center; 
+      }
+      .logo-img { 
+        position: absolute;
+        top: 10px; 
+        right: 15px;
+        height: 50px; 
+      }
+      .title-text { 
+        font-size: 24px; 
+        width: 100%;
+        text-align: center;
+        margin-right: 0; 
+      }
+    }
+  </style>
 </head>
 <body>
 
-  <header>
-    <h1>買取表</h1>
-  </header>
+  <div id="mainView">
+    <header>
+      <h1>
+        <img src="./logo.png.png.png" alt="ロゴ" class="logo-img" />
+        <span class="title-text">買取表</span>
+      </h1>
+      
+      <div class="version-tag">v4.8</div>
+      <div id="date-display"></div>
+    </header>
 
-  <div class="nav-scroll">
-    <ul class="nav-tabs">
-      <li class="nav-item active" onclick="changeCat('ポケモン', this)">ポケモン</li>
-      <li class="nav-item" onclick="changeCat('ワンピース', this)">ワンピース</li>
-      <li class="nav-item" onclick="changeCat('遊戯王', this)">遊戯王</li>
-      <li class="nav-item" onclick="changeCat('ヴァイス', this)">ヴァイス</li>
-      <li class="nav-item" onclick="changeCat('その他', this)">その他</li>
-    </ul>
-  </div>
+    <div class="sticky-container">
+      <div class="nav-scroll">
+        <ul class="nav-tabs" id="categoryTabs">
+          <li class="nav-item active" data-cat="ポケモン">ポケモン</li>
+          <li class="nav-item" data-cat="ワンピース">ワンピース</li>
+          <li class="nav-item" data-cat="遊戯王">遊戯王</li>
+          <li class="nav-item" data-cat="ヴァイス">ヴァイス</li>
+          <li class="nav-item" data-cat="その他">その他</li>
+        </ul>
+      </div>
 
-  <div class="container">
-    <div id="err" class="error"></div>
-    <div id="grid" class="grid"></div>
-  </div>
+      <div class="filters">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input id="q" placeholder="検索" />
+        </div>
+        
+        <select id="sort">
+          <option value="price_desc" selected>高い順</option>
+          <option value="price_asc">安い順</option>
+          <option value="type_psa10">PSA10</option>
+          <option value="type_mikaifu">未開封</option> <option value="type_sotai">素体</option>
+          <option value="type_box">BOX</option>
+        </select>
 
-  <script>
-    // ★ここにコピーしたURLを入れてください（前後のスペース無しで！）
-    const API = "https://script.google.com/macros/s/AKfycbzZY7Z643rRESI2SYDwrmasCMS07y7WCesaX1VRHwPUONyl4GEBhU2K6CLoQKeBR0ac/exec";
+        <label style="display:flex; align-items:center; font-size:12px; cursor:pointer; gap:6px; margin-left:auto; color: #fff;">
+          <input type="checkbox" id="showSoldOut" checked> 買取終了も表示
+        </label>
+        <button id="reload">更新</button>
+      </div>
+    </div>
 
-    async function loadData(category) {
-      const grid = document.getElementById("grid");
-      const err = document.getElementById("err");
-      
-      grid.innerHTML = '<div class="loading">読み込み中...</div>';
-      err.style.display = "none";
+    <div class="container">
+      <div id="err" class="error"></div>
+      <div class="muted" id="meta" style="font-size:12px; margin-bottom:10px; text-align:right; color:#bbb;"></div>
+      
+      <div id="grid" class="grid"></div>
 
-      try {
-        // パラメータ付きでリクエスト
-        const res = await fetch(`${API}?category=${category}&t=${Date.now()}`);
-        
-        // ★ここで404になるならURLミス、中身がおかしいならJSONパースエラーになる
-        if (!res.ok) throw new Error(`通信エラー: ${res.status}`);
-        
-        const data = await res.json();
+      <div id="paginationCtrl" class="pagination" style="display:none;">
+        <button id="prevBtn" class="page-btn">前へ</button>
+        <span id="pageInfo" class="page-info">1 / 1</span>
+        <button id="nextBtn" class="page-btn">次へ</button>
+      </div>
+    </div>
+  </div>
 
-        if (data.error) throw new Error(data.error);
-        if (!data.items || data.items.length === 0) {
-          grid.innerHTML = '<div class="loading">データがありません</div>';
-          return;
-        }
+  <div id="legalView">
+    <div class="back-btn-container">
+      <button onclick="closeLegal()" style="padding:10px 30px; font-size:16px;">一覧に戻る</button>
+    </div>
+    <div id="legalContent"></div>
+    <div class="back-btn-container" style="margin-top:40px;">
+      <button onclick="closeLegal()" style="padding:10px 30px; font-size:16px;">一覧に戻る</button>
+    </div>
+  </div>
 
-        // カード描画
-        grid.innerHTML = data.items.map(item => `
-          <div class="card">
-            <div class="card-body">
-              <div style="font-size:10px; color:#888;">【${item.type||'-'}】</div>
-              <div class="card-title">${item.name}</div>
-              <span class="price-value">¥${Number(item.price).toLocaleString()}</span>
-            </div>
-          </div>
-        `).join("");
+  <footer>
+    <div class="footer-links">
+      <a class="footer-link" onclick="openLegal('privacy')">プライバシーポリシー</a>
+      <span style="color:#333">|</span>
+      <a class="footer-link" onclick="openLegal('terms')">利用規約</a>
+    </div>
+    <div class="copyright">© 2026 トレカフォース</div>
+  </footer>
 
-      } catch (e) {
-        grid.innerHTML = "";
-        err.textContent = "エラーが発生しました: " + e.message;
-        err.style.display = "block";
-      }
-    }
+  <div id="modal" class="modal-overlay">
+    <div class="modal-content">
+      <span class="close-modal" id="closeModalBtn">&times;</span>
+      
+      <div class="modal-tags" id="modalTags"></div>
+      
+      <div class="modal-img-wrapper">
+        <img id="modalImg" src="" class="modal-img" />
+      </div>
 
-    function changeCat(cat, el) {
-      document.querySelectorAll(".nav-item").forEach(t => t.classList.remove("active"));
-      el.classList.add("active");
-      loadData(cat);
-    }
+      <div class="modal-title" id="modalTitle"></div>
 
-    // 初回読み込み
-    loadData("ポケモン");
-  </script>
+      <div class="modal-row">
+        <span class="modal-label">買取価格</span>
+        <span class="modal-price" id="modalPrice"></span>
+      </div>
+      
+      <div style="text-align:right; margin-top:5px;">
+        <span class="limit" id="modalLimit" style="font-size:14px; padding:4px 10px;"></span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ★ GASのデプロイURL
+    const API = "https://script.google.com/macros/s/AKfycbzZY7Z643rRESI2SYDwrmasCMS07y7WCesaX1VRHwPUONyl4GEBhU2K6CLoQKeBR0ac/exec";
+
+    const urlParams = new URLSearchParams(window.location.search);
+    let currentCategory = urlParams.get('cat') || "ポケモン";
+
+    document.querySelectorAll(".nav-item").forEach(t => {
+      t.classList.remove("active");
+      if(t.getAttribute("data-cat") === currentCategory) {
+        t.classList.add("active");
+      }
+    });
+
+    let ALL_DATA = {};
+    let IS_LOADING = false;
+    let CURRENT_ITEMS = []; // フィルタリング・ソート済みの全データ
+    let CUR_PAGE = 1;
+    const ITEMS_per_PAGE = 60; // 60枚ごとにページ区切り
+
+    const el = (id) => document.getElementById(id);
+    const yen = (n) => "¥" + Number(n).toLocaleString();
+
+    // ★ 日付更新関数（30分単位の切り捨て）
+    function updateDate(dateObj) {
+        if (!dateObj) dateObj = new Date(); // 引数がなければ現在時刻
+        
+        const currentMinutes = dateObj.getMinutes();
+        const displayMinutes = currentMinutes < 30 ? "00" : "30";
+
+        const y = dateObj.getFullYear();
+        const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const d = String(dateObj.getDate()).padStart(2, '0');
+        const h = String(dateObj.getHours()).padStart(2, '0');
+        
+        // 24時間表記 HH:00 or HH:30
+        el("date-display").textContent = `${y}/${m}/${d} ${h}:${displayMinutes} 更新`;
+    }
+    // 初期表示用
+    updateDate();
+
+    // ★ 並び替えロジック定義
+    const typePriority = { "PSA10": 1, "未開封": 2, "素体": 3, "BOX": 4 };
+    const getPrio = (t) => typePriority[t] || 99; 
+
+    // ★ 描画メイン関数（ページ制御を含む）
+    function render() {
+        const categoryData = ALL_DATA[currentCategory];
+        const grid = el("grid");
+        const meta = el("meta");
+        const stickyContainer = document.querySelector('.sticky-container');
+        const pagCtrl = el("paginationCtrl");
+
+        meta.textContent = "";
+        
+        if (categoryData && categoryData.isOpen === false) {
+           stickyContainer.style.display = 'none';
+           pagCtrl.style.display = 'none';
+           grid.innerHTML = `
+             <div class="closed-message-container">
+               <div class="closed-title">受付終了</div>
+               <div class="closed-text">
+                 本日の買取受付は終了いたしました。<br>
+                 また明日以降のご利用を<br>心よりお待ちしております。
+               </div>
+             </div>
+           `;
+           return;
+        }
+
+        stickyContainer.style.display = 'block';
+
+        if (!categoryData || !categoryData.items || categoryData.items.length === 0) {
+          pagCtrl.style.display = 'none';
+          if(!IS_LOADING) {
+             meta.textContent = `${currentCategory} (0件)`;
+             grid.innerHTML = '<div class="loading">該当なし</div>';
+          } else {
+             grid.innerHTML = '<div class="loading">読み込み中...</div>';
+          }
+          return;
+        }
+
+        const q = el("q").value.trim().toLowerCase();
+        const sort = el("sort").value;
+        const showSoldOut = el("showSoldOut").checked;
+
+        let items = categoryData.items.slice(); 
+
+        if (q) {
+          items = items.filter(item => 
+            (item.name && item.name.toLowerCase().includes(q)) || 
+            (item.series && item.series.toLowerCase().includes(q))
+          );
+        }
+
+        if (!showSoldOut) {
+           items = items.filter(x => Number(x.remaining) > 0);
+        }
+
+        // タイプ絞り込み
+        if (sort === "type_psa10") {
+             items = items.filter(x => (x.type || "PSA10") === "PSA10");
+        } else if (sort === "type_mikaifu") {
+             items = items.filter(x => x.type === "未開封");
+        } else if (sort === "type_sotai") {
+             items = items.filter(x => x.type === "素体");
+        } else if (sort === "type_box") {
+             items = items.filter(x => x.type === "BOX");
+        }
+
+        // ソート処理
+        items.sort((a, b) => {
+          const pA = getPrio(a.type);
+          const pB = getPrio(b.type);
+          if (pA !== pB) return pA - pB;
+          if (sort === "price_asc") {
+            return a.price - b.price;
+          } else {
+            return b.price - a.price;
+          }
+        });
+
+        CURRENT_ITEMS = items; // 全結果を保存
+        meta.textContent = `${currentCategory} (${items.length}件)`;
+
+        if (items.length === 0) {
+          grid.innerHTML = '<div class="loading">該当なし</div>';
+          pagCtrl.style.display = 'none';
+          return;
+        }
+
+        // ページを1に戻して描画
+        CUR_PAGE = 1;
+        renderPage(CUR_PAGE);
+    }
+
+    // ★ 指定ページのアイテムを描画する関数
+    function renderPage(page) {
+        const grid = el("grid");
+        const start = (page - 1) * ITEMS_per_PAGE;
+        const end = start + ITEMS_per_PAGE;
+        const pageItems = CURRENT_ITEMS.slice(start, end);
+        const totalPages = Math.ceil(CURRENT_ITEMS.length / ITEMS_per_PAGE);
+
+        // グリッド生成
+        grid.innerHTML = pageItems.map((item, index) => {
+          // data-index は CURRENT_ITEMS 全体の中でのインデックスにする必要がある
+          const globalIndex = start + index;
+
+          let imgTag = `<div class="card-img no-img">No Image</div>`;
+          if (item.imageUrl) {
+            imgTag = `<img src="${item.imageUrl}" class="card-img" alt="" loading="lazy" />`;
+          }
+
+          const isSoldOut = Number(item.remaining) <= 0;
+          let overlayHtml = "";
+          
+          if (isSoldOut) {
+             overlayHtml = `
+               <div style="
+                 position: absolute; top:0; left:0; width:100%; height:100%;
+                 background: rgba(0,0,0,0.6); z-index: 50;
+                 display: flex; align-items: center; justify-content: center;
+               ">
+                 <div class="sold-out-badge-style">買取終了</div>
+               </div>
+             `;
+          }
+
+          const displayType = item.type || "PSA10";
+          const headerHtml = `<div class="type-label">【${displayType}】</div>`;
+          
+          let badgeHtml = "";
+          if (displayType === "素体" && item.grade) {
+             badgeHtml = `<span class="badge badge-sotai">${item.grade}</span>`;
+          }
+          if (isSoldOut) badgeHtml = ""; 
+
+          return `
+            <div class="card ${isSoldOut ? 'sold-out' : ''}" data-index="${globalIndex}" style="position:relative; cursor:pointer;">
+              ${overlayHtml}
+              <div style="${isSoldOut ? 'opacity:0.5; filter:grayscale(100%);' : ''}">
+                ${imgTag}
+                <div class="card-tags">${badgeHtml}</div>
+                <div class="card-body">
+                  ${headerHtml}
+                  <div class="card-title">${item.name}</div>
+                  <div class="card-footer">
+                    <div class="price-row">
+                      <span class="price-label">買取価格</span>
+                      <span class="price-value">${yen(item.price)}</span>
+                    </div>
+                    <div class="limit-container">
+                      <span class="limit ${isSoldOut ? 'zero' : ''}">残り: ${item.remaining}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join("");
+
+        // ページネーション更新
+        const pagCtrl = el("paginationCtrl");
+        if (totalPages > 1) {
+            pagCtrl.style.display = "flex";
+            el("pageInfo").textContent = `${page} / ${totalPages}`;
+            el("prevBtn").disabled = (page === 1);
+            el("nextBtn").disabled = (page === totalPages);
+        } else {
+            pagCtrl.style.display = "none";
+        }
+        
+        // ページトップへスクロール（オプション）
+        // window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ページネーションイベント
+    el("prevBtn").addEventListener("click", () => {
+        if (CUR_PAGE > 1) {
+            CUR_PAGE--;
+            renderPage(CUR_PAGE);
+            document.querySelector(".container").scrollIntoView({behavior:"smooth"});
+        }
+    });
+    el("nextBtn").addEventListener("click", () => {
+        const totalPages = Math.ceil(CURRENT_ITEMS.length / ITEMS_per_PAGE);
+        if (CUR_PAGE < totalPages) {
+            CUR_PAGE++;
+            renderPage(CUR_PAGE);
+            document.querySelector(".container").scrollIntoView({behavior:"smooth"});
+        }
+    });
+
+
+    async function loadData(category) {
+      if (ALL_DATA[category]) {
+        render(); 
+        return; 
+      }
+
+      IS_LOADING = true;
+      el("grid").innerHTML = '<div class="loading">読み込み中...</div>';
+      el("paginationCtrl").style.display = "none";
+      el("err").style.display = "none";
+
+      const params = new URLSearchParams();
+      params.set("category", category);
+
+      try {
+        const res = await fetch(`${API}?${params.toString()}&t=${Date.now()}`);
+        const data = await res.json();
+
+        // ★ データ取得成功時に日付を更新（分秒カット）
+        updateDate(new Date());
+
+        if (data.error) {
+          el("err").textContent = data.error;
+          el("err").style.display = "block";
+          el("grid").innerHTML = "";
+          return;
+        }
+
+        ALL_DATA[category] = data;
+        render();
+
+      } catch (e) {
+        el("grid").innerHTML = "";
+        el("err").textContent = "Error: " + e.message;
+        el("err").style.display = "block";
+      } finally {
+        IS_LOADING = false;
+      }
+    }
+
+    document.querySelectorAll(".nav-item").forEach(tab => {
+      tab.addEventListener("click", (e) => {
+        document.querySelectorAll(".nav-item").forEach(t => t.classList.remove("active"));
+        e.target.classList.add("active");
+        
+        const newCat = e.target.getAttribute("data-cat");
+        currentCategory = newCat;
+
+        const newUrl = new URL(window.location);
+        newUrl.searchParams.set('cat', newCat);
+        window.history.pushState({}, '', newUrl);
+
+        loadData(newCat);
+      });
+    });
+
+    el("sort").addEventListener("change", () => render());
+    el("showSoldOut").addEventListener("change", () => render());
+    el("reload").addEventListener("click", () => {
+        ALL_DATA = {}; 
+        loadData(currentCategory);
+    });
+    
+    let timer;
+    el("q").addEventListener("input", () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => render(), 300); 
+    });
+
+    // ★★★ モーダル操作ロジック ★★★
+    const modal = el("modal");
+    const closeModalBtn = el("closeModalBtn");
+
+    el("grid").addEventListener("click", (e) => {
+      const card = e.target.closest(".card");
+      if (card) {
+        const index = card.getAttribute("data-index");
+        const item = CURRENT_ITEMS[index];
+        if (item) {
+          openModal(item);
+        }
+      }
+    });
+
+    function openModal(item) {
+      const modalImg = el("modalImg");
+      if (item.imageUrl) {
+        modalImg.src = item.imageUrl;
+        modalImg.style.display = "inline-block";
+      } else {
+        modalImg.style.display = "none";
+      }
+
+      el("modalTitle").textContent = item.name;
+      el("modalPrice").textContent = yen(item.price);
+      
+      const limitEl = el("modalLimit");
+      limitEl.textContent = "残り: " + item.remaining;
+      if (Number(item.remaining) <= 0) {
+         limitEl.textContent = "買取終了";
+         limitEl.classList.add("zero");
+      } else {
+         limitEl.classList.remove("zero");
+      }
+
+      const tagsEl = el("modalTags");
+      tagsEl.innerHTML = "";
+      
+      const displayType = item.type || "PSA10";
+      tagsEl.innerHTML += `<span class="type-label" style="font-size:14px; margin-right:5px;">【${displayType}】</span>`;
+
+      if (displayType === "素体" && item.grade) {
+         tagsEl.innerHTML += `<span class="badge badge-sotai" style="font-size:14px; padding:4px 8px;">${item.grade}</span>`;
+      }
+
+      modal.classList.add("active");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeModal() {
+      modal.classList.remove("active");
+      document.body.style.overflow = "";
+    }
+
+    closeModalBtn.addEventListener("click", closeModal);
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) closeModal();
+    });
+
+    // ★★★ 規約・ポリシー表示ロジック ★★★
+    const privacyText = `
+      <h2>プライバシーポリシー</h2>
+      <p>Niutiny株式会社（以下「当社」といいます。）は、当社が本ウェブサイト上で提供する各種サービス（以下「本サービス」といいます。）において取得するユーザーの個人情報について、以下のとおりプライバシーポリシー（以下「本ポリシー」といいます。）を定め、適切に取り扱います。</p>
+
+      <h3>第1条（個人情報の定義）</h3>
+      <p>本ポリシーにおける「個人情報」とは、個人情報の保護に関する法律（個人情報保護法）に定める「個人情報」を指し、氏名、生年月日、住所、電話番号、連絡先その他の記述等により特定の個人を識別できる情報をいいます。<br>また、容貌、指紋、声紋等のデータ、健康保険証の保険者番号その他の情報単体で個人を識別できる情報（個人識別符号）もこれに含まれます。</p>
+
+      <h3>第2条（個人情報の取得方法）</h3>
+      <p>当社は、ユーザーが本サービスの利用登録等を行う際に、メールアドレス等の個人情報の提供を求める場合があります。</p>
+
+      <h3>第3条（利用目的）</h3>
+      <p>当社が個人情報を取得・利用する目的は、次のとおりです。</p>
+      <ol>
+        <li>本サービスの提供および運営のため</li>
+        <li>お問い合わせへの対応（本人確認を含みます。）のため</li>
+        <li>ユーザーが利用中のサービスに関する新機能、更新、キャンペーン等、ならびに当社が提供する他サービスの案内をメール等で送付するため</li>
+        <li>メンテナンス情報や重要なお知らせ等、必要な連絡を行うため</li>
+        <li>利用規約に違反するユーザー、または不正・不当な目的で利用しようとするユーザーを特定し、利用をお断りするため</li>
+        <li>登録情報の閲覧・変更・削除および利用状況の確認等を行っていただくため</li>
+        <li>上記各目的に付随する目的のため</li>
+      </ol>
+
+      <h3>第4条（利用目的の変更）</h3>
+      <ol>
+        <li>当社は、変更後の利用目的が変更前の目的と関連性を有すると合理的に判断できる場合に限り、個人情報の利用目的を変更することがあります。</li>
+        <li>利用目的を変更した場合、当社所定の方法によりユーザーへ通知する、または本ウェブサイト上で公表します。</li>
+      </ol>
+
+      <h3>第5条（第三者提供）</h3>
+      <ol>
+        <li>当社は、次の場合を除き、あらかじめユーザーの同意を得ることなく個人情報を第三者に提供しません。なお、個人情報保護法その他法令により認められる場合を除きます。
+          <ol>
+            <li>人の生命、身体または財産の保護のために必要で、本人の同意を得ることが困難な場合</li>
+            <li>公衆衛生の向上または児童の健全育成の推進のために特に必要で、本人の同意を得ることが困難な場合</li>
+            <li>国の機関、地方公共団体またはこれらの委託先が法令に基づく事務を遂行するうえで協力が必要であり、同意取得により事務遂行に支障が生じるおそれがある場合</li>
+            <li>事前に次の事項を告知または公表し、かつ当社が個人情報保護委員会へ届出を行った場合
+              <ul>
+                <li>利用目的に第三者提供が含まれること</li>
+                <li>提供されるデータ項目</li>
+                <li>提供手段または方法</li>
+                <li>本人の求めにより第三者提供を停止できること</li>
+                <li>その申出の受付方法</li>
+              </ul>
+            </li>
+          </ol>
+        </li>
+        <li>前項にかかわらず、次の各号に該当する場合、提供先は「第三者」に該当しないものとします。
+          <ol>
+            <li>利用目的の達成に必要な範囲で、個人情報の取扱いを全部または一部委託する場合</li>
+            <li>合併その他の事由による事業承継に伴い個人情報が引き継がれる場合</li>
+            <li>個人情報を特定の者と共同利用する場合で、共同利用する情報の項目、共同利用者の範囲、利用目的、および管理責任者の氏名または名称について、あらかじめ本人へ通知するか、または本人が容易に知り得る状態に置いた場合</li>
+          </ol>
+        </li>
+      </ol>
+
+      <h3>第6条（開示）</h3>
+      <ol>
+        <li>当社は、本人から個人情報の開示を求められた場合、本人に対し遅滞なく開示します。ただし、開示により次のいずれかに該当する場合、全部または一部を開示しないことがあり、その場合は遅滞なく通知します。
+          <ol>
+            <li>本人または第三者の生命、身体、財産その他の権利利益を害するおそれがある場合</li>
+            <li>当社の業務の適正な実施に著しい支障を及ぼすおそれがある場合</li>
+            <li>その他法令に違反することとなる場合</li>
+          </ol>
+        </li>
+        <li>履歴情報・特性情報等、個人情報に該当しない情報については、原則として開示しません。</li>
+      </ol>
+
+      <h3>第7条（訂正・追加・削除）</h3>
+      <ol>
+        <li>ユーザーは、当社が保有する自己の個人情報が事実と異なる場合、当社所定の手続により、訂正、追加または削除（以下「訂正等」といいます。）を請求できます。</li>
+        <li>当社は、請求内容を確認し、対応が必要と判断した場合、遅滞なく訂正等を行います。</li>
+        <li>当社は、訂正等を行った場合、または行わない旨を決定した場合、遅滞なくユーザーへ通知します。</li>
+      </ol>
+
+      <h3>第8条（利用停止・消去）</h3>
+      <ol>
+        <li>当社は、本人から「利用目的の範囲を超えた取扱い」または「不正な手段による取得」を理由として、利用停止または消去（以下「利用停止等」といいます。）の申出があった場合、必要な調査を速やかに行います。</li>
+        <li>調査の結果、対応が必要と判断した場合、遅滞なく利用停止等を実施します。</li>
+        <li>当社は、利用停止等を行った場合、または行わない旨を決定した場合、遅滞なく通知します。</li>
+        <li>利用停止等に多額の費用を要する場合など、実施が困難であっても、ユーザーの権利利益を保護するために必要な代替措置が可能な場合は、当該代替措置を講じます。</li>
+      </ol>
+
+      <h3>第9条（本ポリシーの改定）</h3>
+      <ol>
+        <li>当社は、法令その他本ポリシーに別段の定めがある事項を除き、ユーザーへ事前通知することなく本ポリシーを変更できるものとします。</li>
+        <li>変更後の本ポリシーは、当社ウェブサイトに掲載した時点から効力を生じます（当社が別途定める場合を除きます）。</li>
+      </ol>
+
+      <h3>第10条（お問い合わせ窓口）</h3>
+      <p>本ポリシーに関するご質問・ご相談は、以下までご連絡ください。<br>
+      社名：Niutiny株式会社<br>
+      Eメール：tttcgforce [@] gmail.com</p>
+    `;
+
+    const termsText = `
+      <h2>利用規約</h2>
+      <p>この利用規約（以下「本規約」といいます。）は、Niutiny株式会社（以下「当社」といいます。）が運営するウェブサイトおよび実店舗等を通じて提供するサービス（以下「本サービス」といいます。）の利用条件を定めるものです。登録ユーザー（以下「ユーザー」といいます。）は、本規約に同意のうえ、本サービスを利用するものとします。</p>
+
+      <h3>第1条（適用）</h3>
+      <ol>
+        <li>本規約は、本サービスの利用に関し、ユーザーと当社との間の一切の関係に適用されます。</li>
+        <li>当社は、本規約のほか、本サービスの利用に関するルール、ガイドライン、注意事項等（以下「個別規定」といいます。）を定めることがあります。個別規定は名称のいかんを問わず本規約の一部を構成します。</li>
+        <li>本規約と個別規定が抵触する場合、個別規定に特段の定めがない限り、個別規定が優先します。</li>
+      </ol>
+
+      <h3>第2条（定義）</h3>
+      <p>本規約において、次の用語は以下の意味で使用します。</p>
+      <ol>
+        <li>「本サービス」：当社ウェブサイト、当社が運営する実店舗（屋号を含みます。例：トレカフォース）その他当社が指定する媒体で提供する、商品販売、買取、査定、情報提供、会員機能等の総称</li>
+        <li>「商品」：当社が販売または買取対象とするトレーディングカード、関連商品、周辺機器等</li>
+        <li>「買取」：ユーザーが当社に対し商品を売却する取引（店頭・宅配等の方式を含みます。）</li>
+      </ol>
+
+      <h3>第3条（利用登録）</h3>
+      <ol>
+        <li>利用登録を希望する者は、本規約に同意のうえ、当社所定の方法で申請し、当社が承認した時点で利用登録が完了します。</li>
+        <li>当社は、申請者に以下の事由があると判断した場合、申請を承認しないことがあり、その理由の開示義務を負いません。
+          <ol>
+            <li>申請内容に虚偽、誤記、記入漏れがある場合</li>
+            <li>過去に本規約等に違反した者からの申請である場合</li>
+            <li>その他、当社が登録を相当でないと判断した場合</li>
+          </ol>
+        </li>
+      </ol>
+
+      <h3>第4条（ユーザーID・パスワードの管理）</h3>
+      <ol>
+        <li>ユーザーは、自己の責任でユーザーIDおよびパスワードを適切に管理するものとします。</li>
+        <li>ユーザーは、ユーザーID・パスワードを第三者に譲渡、貸与、共有してはなりません。</li>
+        <li>当社は、登録情報と一致するユーザーID・パスワードでログインが行われた場合、当該ユーザー本人による利用とみなします。</li>
+        <li>第三者による不正使用により損害が生じても、当社に故意または重大な過失がある場合を除き、当社は責任を負いません。</li>
+      </ol>
+
+      <h3>第5条（利用料金・商品代金等）</h3>
+      <ol>
+        <li>本サービスの閲覧・情報利用等（当社が別途有料と定めるものを除きます。）は原則無料とします。</li>
+        <li>ユーザーが当社から商品を購入する場合、ユーザーは当社が別途表示する商品代金、送料、決済手数料その他費用を支払うものとします。</li>
+        <li>ユーザーが当社に商品を売却する場合（買取）、当社は当社所定の査定基準に基づき買取価格を提示し、買取が成立したときに当社所定の方法で代金を支払います。</li>
+        <li>本規約に定めのない支払方法・条件は、当社が別途定める表示または個別規定に従うものとします。</li>
+      </ol>
+
+      <h3>第6条（売買契約の成立・変更・キャンセル）</h3>
+      <ol>
+        <li>ユーザーが商品購入を申し込み、当社が当該申込みを承諾した時点で、当社とユーザー間の売買契約が成立します（承諾の方法は当社所定とします）。</li>
+        <li>当社は、在庫状況、表示の誤り、システム障害、その他合理的な理由がある場合、申込みを承諾しないこと、または承諾後であっても取消しを行うことがあります。</li>
+        <li>商品価格、在庫、仕様、掲載内容は予告なく変更されることがあります。</li>
+        <li>売買契約成立後のキャンセル、変更、返品は、当社が別途定める条件（第12条を含みます。）に従うものとします。</li>
+      </ol>
+
+      <h3>第7条（買取に関する特則）</h3>
+      <ol>
+        <li>買取は、当社が提示する買取条件（買取価格、対象、状態基準、本人確認等）にユーザーが同意し、当社が買取を承諾した時点で成立します。</li>
+        <li>当社は、商品の状態、真贋、相場変動、在庫状況、申告内容の相違等により、査定額の変更、買取の拒否、または取引の中止を行うことがあります。</li>
+        <li>査定は当社所定の基準で行い、傷・欠け・反り・日焼け・湿気痕・臭気・改造・欠品等がある場合は減額または買取不可となる場合があります。</li>
+        <li>買取成立後は、法令上許される場合を除き、ユーザー都合によるキャンセル・返品・返金はできません。</li>
+        <li>買取代金の支払方法（現金、振込等）、支払時期、手数料負担の有無は当社所定とします。</li>
+      </ol>
+
+      <h3>第8条（本人確認・年齢等）</h3>
+      <ol>
+        <li>当社は、販売・買取その他取引に際し、法令（古物営業法等）または当社方針に基づき、本人確認書類の提示、情報の記録・保管を求める場合があります。ユーザーはこれに協力するものとします。</li>
+        <li>未成年者が本サービスにより取引を行う場合、当社は親権者等の同意・同伴・同意書提出等を求め、または取引をお断りすることがあります。</li>
+        <li>本人確認・年齢確認ができない場合、または当社が不適切と判断した場合、当社は取引を拒否または中止できます。</li>
+        <li>当社の古物商許可に関する表示は、店頭または当社が指定する方法で掲示します。</li>
+      </ol>
+
+      <h3>第9条（禁止事項）</h3>
+      <p>ユーザーは、本サービスの利用にあたり、以下の行為をしてはなりません。</p>
+      <ol>
+        <li>法令または公序良俗に反する行為</li>
+        <li>犯罪行為に関連する行為、またはこれを助長する行為</li>
+        <li>当社または第三者の知的財産権（著作権、商標権等）を侵害する行為</li>
+        <li>当社または第三者のサーバー・ネットワークの機能を破壊・妨害する行為</li>
+        <li>当社の許諾なく、本サービスで得た情報を商業利用する行為</li>
+        <li>本サービスの運営を妨げるおそれのある行為</li>
+        <li>不正アクセスまたはその試行</li>
+        <li>他ユーザーの個人情報等を収集・蓄積する行為</li>
+        <li>不正・不当な目的で本サービスを利用する行為</li>
+        <li>他者に不利益、損害、不快感を与える行為</li>
+        <li>なりすまし行為</li>
+        <li>当社が許諾しない広告・宣伝・勧誘・営業行為</li>
+        <li>盗品、偽造品、模造品、権利侵害品、出所不明品等を販売・買取に持ち込む、またはその疑いがある行為</li>
+        <li>反社会的勢力への利益供与（直接・間接を問わず）</li>
+        <li>その他、当社が不適切と判断する行為</li>
+      </ol>
+
+      <h3>第10条（本サービスの停止・中断）</h3>
+      <ol>
+        <li>当社は、以下の場合、事前通知なく本サービスの全部または一部を停止・中断できます。
+          <ol>
+            <li>システム保守点検・更新を行う場合</li>
+            <li>天災地変、停電、火災、通信障害等の不可抗力により提供が困難な場合</li>
+            <li>その他、当社が停止・中断が必要と判断した場合</li>
+          </ol>
+        </li>
+        <li>当社は、停止・中断により生じた不利益・損害について責任を負いません。</li>
+      </ol>
+
+      <h3>第11条（利用制限・登録抹消）</h3>
+      <ol>
+        <li>当社は、ユーザーが次のいずれかに該当する場合、事前通知なく利用制限または登録抹消等の措置を講じることができます。
+          <ol>
+            <li>本規約に違反した場合</li>
+            <li>登録事項に虚偽が判明した場合</li>
+            <li>取引上の支払債務がある場合に履行されない場合</li>
+            <li>当社からの連絡に一定期間応答がない場合</li>
+            <li>一定期間利用がない場合</li>
+            <li>その他、当社が不適当と判断した場合</li>
+          </ol>
+        </li>
+        <li>当社は本条に基づく措置により生じた損害について責任を負いません。</li>
+      </ol>
+
+      <h3>第12条（返品・返金・交換）</h3>
+      <ol>
+        <li>商品の性質上、ユーザー都合による返品・交換は原則として受け付けません（当社が別途認める場合を除きます）。</li>
+        <li>初期不良、誤配送等当社責に帰すべき事由がある場合、当社所定の期間・手続により、返品・交換または返金に応じます。</li>
+        <li>買取成立後の返品・返金は、法令上許される場合を除き行いません。</li>
+      </ol>
+
+      <h3>第13条（保証の否認・免責）</h3>
+      <ol>
+        <li>当社は、本サービスに瑕疵（安全性、正確性、完全性、特定目的適合性、セキュリティ上の欠陥、エラー、バグ、権利侵害等を含みます。）がないことを保証しません。</li>
+        <li>当社は、本サービスに起因してユーザーに生じた損害について、当社の故意または重過失による場合を除き責任を負いません。</li>
+        <li>消費者契約法が適用される場合、前項の免責が制限されることがあります。</li>
+        <li>当社は、ユーザーと第三者間の取引・連絡・紛争等について関与せず責任を負いません。</li>
+      </ol>
+
+      <h3>第14条（サービス内容の変更・終了）</h3>
+      <p>当社は、ユーザーへの事前通知なく、本サービスの内容、提供条件等を変更し、または本サービスを停止・終了することがあります。これによりユーザーに不利益・損害が生じても、当社は責任を負いません。</p>
+
+      <h3>第15条（規約の変更）</h3>
+      <ol>
+        <li>当社は、(1)変更がユーザー一般の利益に適合する場合、または(2)変更が契約目的に反せず合理的である場合、ユーザーの個別同意なく本規約を変更できるものとします。</li>
+        <li>当社は、変更する場合、変更後の内容および効力発生日を、当社所定の方法で事前に通知または公表します。</li>
+      </ol>
+
+      <h3>第16条（個人情報の取扱い）</h3>
+      <p>当社は、本サービスにより取得する個人情報を、別途定めるプライバシーポリシーに従い取り扱います。</p>
+
+      <h3>第17条（通知・連絡）</h3>
+      <ol>
+        <li>ユーザーと当社間の通知・連絡は当社所定の方法で行います。</li>
+        <li>当社は、登録された連絡先に通知・連絡を行い、発信時に到達したものとみなします（変更届出がない場合）。</li>
+      </ol>
+
+      <h3>第18条（権利義務の譲渡禁止）</h3>
+      <p>ユーザーは、当社の書面による事前承諾なく、利用契約上の地位または本規約に基づく権利義務を第三者に譲渡し、または担保に供することはできません。</p>
+
+      <h3>第19条（準拠法・管轄）</h3>
+      <ol>
+        <li>本規約は日本法に準拠します。</li>
+        <li>本サービスに関して紛争が生じた場合、当社本店所在地を管轄する裁判所を第一審の専属的合意管轄裁判所とします。</li>
+      </ol>
+    `;
+
+    function openLegal(type) {
+      const mainView = el("mainView");
+      const legalView = el("legalView");
+      const content = el("legalContent");
+
+      if (type === 'privacy') {
+        content.innerHTML = privacyText;
+      } else {
+        content.innerHTML = termsText;
+      }
+
+      mainView.style.display = "none";
+      legalView.style.display = "block";
+      window.scrollTo(0, 0);
+    }
+
+    function closeLegal() {
+      const mainView = el("mainView");
+      const legalView = el("legalView");
+      
+      legalView.style.display = "none";
+      mainView.style.display = "block";
+      window.scrollTo(0, 0);
+    }
+
+    loadData(currentCategory);
+  </script>
 </body>
 </html>
+
+
+変えたよ
+けどまだ404出る
+ラグかな？
+ISOPENではあったから
