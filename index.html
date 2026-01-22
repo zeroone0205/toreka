@@ -29,7 +29,11 @@
       margin: 0; padding: 0; 
       color: var(--text-main);
       background-color: var(--bg-dark);
-      /* ★エラーの原因だった背景画像を削除し、シンプルな黒背景にしました */
+      /* ★背景画像を復活させました */
+      background-image: url('./bg-gray.jpg.png');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
       display: flex;
       flex-direction: column;
       min-height: 100vh;
@@ -61,6 +65,15 @@
       align-items: center;
       justify-content: center;
       gap: 15px; 
+    }
+
+    /* ★ロゴ画像のスタイル復活 */
+    .logo-img {
+      height: 80px; 
+      width: auto; 
+      max-width: 100%; 
+      object-fit: contain;
+      filter: drop-shadow(0 0 8px rgba(88, 189, 215, 0.5)); 
     }
 
     /* 文字スタイル */
@@ -404,7 +417,12 @@
         gap: 0; 
         justify-content: center; 
       }
-      /* ロゴ画像を削除したので調整 */
+      .logo-img { 
+        position: absolute;
+        top: 10px; 
+        right: 15px;
+        height: 50px; 
+      }
       .title-text { 
         font-size: 24px; 
         width: 100%;
@@ -419,10 +437,11 @@
   <div id="mainView">
     <header>
       <h1>
+        <img src="./logo.png.png.png" alt="ロゴ" class="logo-img" />
         <span class="title-text">買取表</span>
       </h1>
       
-      <div class="version-tag">v4.9</div>
+      <div class="version-tag">v5.0</div>
       <div id="date-display"></div>
     </header>
 
@@ -515,7 +534,7 @@
   </div>
 
   <script>
-    // ★ GASのデプロイURL (正常に動いているもの)
+    // ★ GASのデプロイURL
     const API = "https://script.google.com/macros/s/AKfycbwnv0wOAHixDsmJB6ToJVYZh8980RaowBXPcmyBrXvHJNXzkP5dWj_2olEgyo2GnQlj/exec";
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -1165,5 +1184,3 @@
   </script>
 </body>
 </html>
-
-
