@@ -451,6 +451,14 @@
       .hamburger {
         left: 10px; 
       }
+
+      /* ★★★ スマホでのバージョン表記位置の修正 ★★★ */
+      .version-tag {
+        top: auto; 
+        bottom: 5px; 
+        left: 5px;
+        right: auto;
+      }
     }
   </style>
 </head>
@@ -460,10 +468,10 @@
   <div id="drawerMenu" class="drawer">
     <div class="drawer-header">MENU</div>
     <ul class="drawer-list">
-      <li class="drawer-item" id="menuStore">🏬 店頭買取表を表示</li>
-      <li class="drawer-item" id="menuMail">📦 郵送買取表を表示</li>
-      <li class="drawer-item" onclick="openLegal('privacy')">📝 プライバシーポリシー</li>
-      <li class="drawer-item" onclick="openLegal('terms')">📜 利用規約</li>
+      <li class="drawer-item" id="menuStore">店頭買取表</li>
+      <li class="drawer-item" id="menuMail">郵送買取表</li>
+      <li class="drawer-item" onclick="openLegal('privacy')">プライバシーポリシー</li>
+      <li class="drawer-item" onclick="openLegal('terms')">利用規約</li>
     </ul>
   </div>
 
@@ -571,7 +579,7 @@
 
   <script>
     // ★ GASのデプロイURL (新しくデプロイしたURLに書き換えてください)
-    const API = "https://script.google.com/macros/s/AKfycbzzOZTr0LXWMMtxpT80KtWe9TzIinoRnS-kGXP5EWpioDc-2YRC2j08EhXpCndruFOn/exec";
+    const API = "https://script.google.com/macros/s/AKfycbw08oFxfH6FsxcJ77mgNLeticvOFaq2rknNBK3emZgwmhsM5-sB_ltBhbuKamoXHkV8/exec";
 
     const urlParams = new URLSearchParams(window.location.search);
     let currentCategory = urlParams.get('cat') || "ポケモン";
