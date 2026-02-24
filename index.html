@@ -62,21 +62,11 @@
 
     /* Pull to Refresh */
     #ptr-indicator {
-      position: fixed;
-      top: -60px; /* 初期位置は隠す */
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(20, 20, 20, 0.9);
-      border: 1px solid var(--accent);
-      color: var(--accent);
-      padding: 12px 24px;
-      border-radius: 30px;
-      font-weight: bold;
-      z-index: 11000;
-      opacity: 0;
-      transition: top 0.3s ease, opacity 0.3s ease;
-      pointer-events: none;
-      display: flex; align-items: center; gap: 10px;
+      position: fixed; top: -60px; left: 50%; transform: translateX(-50%);
+      background: rgba(20, 20, 20, 0.9); border: 1px solid var(--accent); color: var(--accent);
+      padding: 12px 24px; border-radius: 30px; font-weight: bold; z-index: 11000;
+      opacity: 0; transition: top 0.3s ease, opacity 0.3s ease;
+      pointer-events: none; display: flex; align-items: center; gap: 10px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.5);
     }
     #ptr-indicator.visible { opacity: 1; top: 90px; }
@@ -150,7 +140,6 @@
       background: #2a2a2a; color: var(--accent); 
       text-shadow: var(--glow-text);
     }
-    
     .drawer-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.7); backdrop-filter: blur(2px); z-index: 99998;
@@ -301,7 +290,8 @@
     .delete-btn { background: #ff5252; color: #fff; padding: 5px 10px; font-size: 11px; border-radius: 4px; border: none; cursor: pointer; }
 
     #infoView { display: none; padding: 20px; max-width: 800px; margin: 0 auto; color: #ddd; line-height: 1.8; font-size: 14px; text-align: left; }
-    /* ★修正：会社概要ボタンのスタイル */
+    
+    /* 会社概要ボタンのスタイル */
     .company-links { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 40px; }
     .company-btn {
       padding: 15px 0; background: #1a1a1a; border: 2px solid var(--accent); 
@@ -311,6 +301,23 @@
     }
     .company-btn:hover { background: var(--accent); color: #fff; box-shadow: var(--glow-text); }
     
+    /* 情報画面の「一覧に戻る」ボタン */
+    .back-btn-container { text-align: left; margin-bottom: 20px; }
+    .back-btn-container button {
+       padding: 8px 16px; background: #333; color: #fff; border: 1px solid #555;
+       border-radius: 4px; cursor: pointer; font-size: 13px;
+    }
+    .back-btn-container button:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* 買取の流れ（デザイン復旧用クラス） */
+    .flow-step { background: #252525; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid var(--accent); }
+    .flow-title { font-size: 16px; font-weight: bold; color: var(--accent); margin-bottom: 10px; text-shadow: var(--glow-text); }
+    .note-box { background: rgba(255, 50, 50, 0.1); border: 1px solid #ff5252; padding: 15px; border-radius: 8px; margin-top: 30px; }
+    .note-title { color: #ff5252; font-weight: bold; margin-bottom: 10px; font-size: 16px; }
+    .faq-item { margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+    .faq-q { color: var(--accent); font-weight: bold; margin-bottom: 5px; }
+    .faq-a { margin-left: 10px; color: #ddd; font-size: 13px; }
+
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 10000; justify-content: center; align-items: center; padding: 15px; backdrop-filter: blur(4px); }
     .modal-overlay.active { display: flex; }
     .modal-content { background: #1e1e1e; border: 2px solid var(--accent); border-radius: 12px; width: 100%; max-width: 400px; max-height: 90vh; overflow-y: auto; position: relative; padding: 20px; box-shadow: 0 0 30px rgba(88, 189, 215, 0.2); }
@@ -464,9 +471,13 @@
   </div>
 
   <div id="infoView">
-    <div class="back-btn-container"><button onclick="closeInfo()" style="padding:10px 30px;">一覧に戻る</button></div>
+    <div class="back-btn-container" id="infoBackBtnTop" style="display:none;">
+      <button onclick="closeInfo()">一覧に戻る</button>
+    </div>
     <div id="infoContent"></div>
-    <div class="back-btn-container" style="margin-top:40px;"><button onclick="closeInfo()" style="padding:10px 30px;">一覧に戻る</button></div>
+    <div class="back-btn-container" id="infoBackBtnBottom" style="display:none; margin-top:30px;">
+      <button onclick="closeInfo()">一覧に戻る</button>
+    </div>
   </div>
 
   <div id="modal" class="modal-overlay">
@@ -499,7 +510,7 @@
       <a class="footer-link" onclick="openInfo('terms')">利用規約</a>
     </div>
     <div class="copyright">© 2026 トレカフォース</div>
-    <div class="footer-version">v22.0</div>
+    <div class="footer-version">v24.0</div>
   </footer>
 
   <script>
@@ -949,35 +960,38 @@
         </table>
       `,
       flow: `
-        <h2>郵送買取の流れ</h2>
         <div class="flow-step"><div class="flow-title">STEP 1｜商品をカートへ入れて申し込み</div><p>買取一覧にある商品は、そのままカートへ追加して申込手続きをしてください。<br>一覧に見当たらない商品は、<strong>「まとめて買取」</strong>をカートに入れてお申し込みください。</p></div>
         <div class="flow-step"><div class="flow-title">STEP 2｜受付完了メール確認後に発送</div><p>お申し込み内容の確認が完了すると、受付（承認）メールをお送りします。<br>メールを確認してから商品を発送してください。</p></div>
         <div class="flow-step"><div class="flow-title">STEP 3｜査定結果の確認・承諾</div><p>商品到着後に査定を行い、結果を取引ページのメッセージでご案内します。<br>内容をご確認のうえ、取引画面から承諾／キャンセルのお手続きを行ってください。<br><small>※すべて満額査定の場合は、承諾操作が不要となる場合があります。</small></p></div>
         <div class="note-box"><div class="note-title">注意事項</div><p>発送期限と価格の取り扱い...</p></div>
       `,
-      rules: `<h2>買取基準</h2><p>（準備中）</p>`
+      rules: `<p>（準備中）</p>`
     };
 
     function openInfo(t) {
       el("mainView").style.display="none"; el("cartView").style.display="none"; el("infoView").style.display="block";
       
-      // ★修正: ページに合わせてタイトル変更 & 日時非表示
+      // タイトル変更 & 日時非表示
       if(t === 'company') el("mainTitle").textContent = "会社概要";
       else if(t === 'privacy') el("mainTitle").textContent = "プライバシーポリシー";
       else if(t === 'terms') el("mainTitle").textContent = "利用規約";
       else if(t === 'flow') el("mainTitle").textContent = "買取の流れ";
       else if(t === 'rules') el("mainTitle").textContent = "買取基準";
       
-      el("date-display").style.display = "none"; // 日時を隠す
+      el("date-display").style.display = "none"; 
       
       el("infoContent").innerHTML = contentData[t] || "準備中";
       
+      // ★修正: 買取の流れ・買取基準の時だけ「一覧に戻る」ボタンを表示
+      const showBack = (t === 'flow' || t === 'rules') ? 'block' : 'none';
+      el('infoBackBtnTop').style.display = showBack;
+      el('infoBackBtnBottom').style.display = showBack;
+
       if(drawer.classList.contains("open")) toggleDrawer();
       window.scrollTo(0,0);
     }
     
     function closeInfo() {
-      // 戻る時は元のタイトルに戻す（switchModeで再設定されるのでここは最低限でOK）
       el("infoView").style.display="none"; el("mainView").style.display="block"; 
       window.scrollTo(0,0);
     }
