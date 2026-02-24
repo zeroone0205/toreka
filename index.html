@@ -128,10 +128,19 @@
       border-bottom: 1px solid #333; background: #111; text-shadow: var(--glow-text);
     }
     .drawer-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; }
+    
+    /* ★修正: メニュー項目にほんのりネオン感を追加 */
     .drawer-item {
-      padding: 15px 20px; border-bottom: 1px solid #2a2a2a; cursor: pointer; color: #eee; font-weight: bold; font-size:15px;
+      padding: 15px 20px; border-bottom: 1px solid #2a2a2a; 
+      cursor: pointer; color: #eee; font-weight: bold; font-size:15px;
+      text-shadow: 0 0 5px rgba(255, 255, 255, 0.3); /* ほんのり発光 */
+      transition: all 0.3s;
     }
-    .drawer-item:hover { background: #2a2a2a; color: var(--accent); }
+    .drawer-item:hover { 
+      background: #2a2a2a; color: var(--accent); 
+      text-shadow: var(--glow-text); /* ホバー時は強く発光 */
+    }
+    
     .drawer-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.7); backdrop-filter: blur(2px); z-index: 99998;
@@ -152,7 +161,7 @@
     .slider-dot { width: 8px; height: 8px; background: rgba(255,255,255,0.5); border-radius: 50%; cursor: pointer; }
     .slider-dot.active { background: #fff; transform: scale(1.2); box-shadow: 0 0 5px #fff; }
 
-    /* ★★★ 到着期限案内ボックス (改行位置修正版) ★★★ */
+    /* 到着期限案内ボックス */
     .mail-deadline-box {
       display: none;
       max-width: 1000px; margin: 15px auto 5px; padding: 12px;
@@ -163,14 +172,10 @@
     body.mail-mode .mail-deadline-box { display: block; }
     .deadline-highlight { color: #FFD700; text-shadow: 0 0 5px rgba(255, 215, 0, 0.5); font-size:13px;}
     
-    /* PCでは改行タグを無効化 */
-    @media (min-width: 601px) {
-      .br-sp { display: none; }
-    }
-    /* スマホでは改行タグを有効化 */
+    @media (min-width: 601px) { .br-sp { display: none; } }
     @media (max-width: 600px) {
       .br-sp { display: block; }
-      .mail-deadline-box { font-size: 11px; line-height: 1.5; }
+      .mail-deadline-box { font-size: 11px; line-height: 1.5; padding: 10px 12px; }
     }
 
     /* ナビ・フィルタ */
@@ -206,6 +211,7 @@
       display: flex; align-items: center; gap: 5px; box-shadow: none;
       padding: 8px 8px; font-size: 11px; justify-self: end; border-radius: 4px; cursor: pointer;
       width: 100px; justify-content: center;
+      white-space: nowrap;
     }
     .header-action-btn:hover { background: rgba(88, 189, 215, 0.1); }
     body.mail-mode .header-action-btn:hover { background: rgba(180, 114, 255, 0.1); }
@@ -223,7 +229,6 @@
       display: flex; align-items: center; font-size: 12px; color: #fff; 
       cursor: pointer; gap: 6px; white-space: nowrap;
     }
-    body.mail-mode #showSoldOutLabel { display: none; }
     #reload { display: none; }
 
     /* カードリスト */
@@ -271,11 +276,11 @@
     .cart-bar.visible { transform: translateY(0); }
     .cart-total-info { font-size: 14px; font-weight: bold; color: #fff; }
     .cart-total-price { font-size: 20px; color: var(--accent); margin-right: 10px; font-weight: bold; text-shadow: var(--glow-text); }
-    .check-cart-btn { padding: 10px 20px; background: var(--accent); color: #fff; font-weight: bold; border-radius: 4px; border:none; }
+    .check-cart-btn { padding: 10px 20px; background: var(--accent); color: #fff; font-weight: bold; border-radius: 4px; border:none; cursor: pointer; }
 
     #cartView { display: none; padding: 20px; max-width: 800px; margin: 0 auto; color: #fff; }
     .cart-header { font-size: 20px; font-weight: bold; border-bottom: 1px solid #444; padding-bottom: 10px; margin-bottom: 20px; }
-    .cart-item { display: flex; gap: 15px; padding: 15px 0; border-bottom: 1px solid #333; }
+    .cart-item { display: flex; gap: 15px; padding: 15px 0; border-bottom: 1px solid #333; align-items: flex-start; }
     .cart-item-img { width: 60px; height: 80px; background: #000; object-fit: contain; border: 1px solid #444; }
     .cart-item-info { flex: 1; }
     .cart-item-title { font-size: 14px; font-weight: bold; margin-bottom: 5px; }
@@ -328,6 +333,10 @@
       #sort { width: auto; min-width: 100px; flex: 1; max-width: 150px; }
       #showSoldOutLabel { white-space: nowrap; margin-left: 0; }
       #reload { display: none; }
+      
+      /* 郵送期限スマホ用改行クラス */
+      .br-sp { display: inline; }
+      .mail-deadline-box { font-size: 11px; line-height: 1.5; padding: 10px 12px; }
     }
   </style>
 </head>
@@ -358,7 +367,7 @@
     <ul class="drawer-list">
       <li class="drawer-item" id="menuStore">店頭買取表</li>
       <li class="drawer-item" id="menuMail">郵送買取表</li>
-      <li class="drawer-item" onclick="openInfo('company')">会社概要（ホームページ）</li>
+      <li class="drawer-item" onclick="openInfo('company')">会社概要</li>
       <li class="drawer-item" onclick="openInfo('privacy')">プライバシーポリシー</li>
       <li class="drawer-item" onclick="openInfo('terms')">利用規約</li>
     </ul>
@@ -472,7 +481,7 @@
       <a class="footer-link" onclick="openInfo('terms')">利用規約</a>
     </div>
     <div class="copyright">© 2026 トレカフォース</div>
-    <div class="footer-version">v18.0</div>
+    <div class="footer-version">v20.0</div>
   </footer>
 
   <script>
@@ -504,7 +513,6 @@
       const w = days[now.getDay()];
       const deadlineText = `${m}月${d}日（${w}）`;
       
-      // スマホでは指定の位置で改行
       el("mailDeadline").innerHTML = `
         サイトよりご予約いただいた場合、${deadlineText}17時までに<br class="br-sp">
         商品が到着すれば、お申込時の金額を満額にて買取査定いたします。<br>
