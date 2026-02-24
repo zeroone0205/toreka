@@ -139,8 +139,6 @@
       border-bottom: 1px solid #333; background: #111; text-shadow: var(--glow-text);
     }
     .drawer-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; }
-    
-    /* メニュー項目のネオン感 */
     .drawer-item {
       padding: 15px 20px; border-bottom: 1px solid #2a2a2a; 
       cursor: pointer; color: #eee; font-weight: bold; font-size:15px;
@@ -151,7 +149,6 @@
       background: #2a2a2a; color: var(--accent); 
       text-shadow: var(--glow-text);
     }
-    
     .drawer-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.7); backdrop-filter: blur(2px); z-index: 99998;
@@ -301,13 +298,49 @@
     .cart-item-actions { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
     .delete-btn { background: #ff5252; color: #fff; padding: 5px 10px; font-size: 11px; border-radius: 4px; border: none; cursor: pointer; }
 
-    #infoView { display: none; padding: 20px; max-width: 800px; margin: 0 auto; color: #ddd; line-height: 1.8; font-size: 14px; text-align: left; }
+    /* 情報ビュー */
+    #infoView { display: none; padding: 20px 20px 80px; max-width: 800px; margin: 0 auto; color: #ddd; line-height: 1.8; font-size: 14px; text-align: left; }
     #infoView h2 { color: var(--accent); border-bottom: 1px solid var(--accent); padding-bottom: 10px; margin-top: 30px; }
     #infoView h3 { color: #fff; margin-top: 25px; font-size: 16px; }
+    .flow-step { background: #252525; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid var(--accent); }
+    .flow-title { font-size: 16px; font-weight: bold; color: var(--accent); margin-bottom: 10px; }
+    .note-box { background: rgba(255, 50, 50, 0.1); border: 1px solid #ff5252; padding: 15px; border-radius: 8px; margin-top: 30px; }
+    .note-title { color: #ff5252; font-weight: bold; margin-bottom: 10px; font-size: 16px; }
+    .faq-q { color: var(--accent); font-weight: bold; }
+    .faq-a { margin-left: 10px; margin-bottom: 20px; }
     
-    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 10000; justify-content: center; align-items: center; padding: 15px; backdrop-filter: blur(4px); }
+    /* 会社概要のリンクボタン */
+    .company-links { display: flex; justify-content: center; gap: 20px; margin-bottom: 30px; }
+    .company-btn {
+      padding: 10px 20px; background: transparent; border: 2px solid var(--accent); 
+      color: var(--accent); font-weight: bold; border-radius: 30px; cursor: pointer;
+      text-decoration: none; display: inline-block; transition: all 0.3s;
+    }
+    .company-btn:hover { background: var(--accent); color: #fff; box-shadow: var(--glow-text); }
+
+    /* メッセージ・ローディング */
+    .closed-message-container {
+      grid-column: 1 / -1; text-align: center; padding: 60px 20px; margin-top: 40px;
+      border: 3px solid var(--accent); border-radius: 12px;
+      background: rgba(88, 189, 215, 0.1); box-shadow: var(--glow-box); color: #ffffff;
+    }
+    .closed-title { font-size: 26px; font-weight: 900; color: var(--accent); margin-bottom: 20px; text-shadow: var(--glow-text); }
+    .closed-text { font-size: 16px; line-height: 2.0; font-weight: bold; }
+    .loading { text-align: center; padding: 40px; color: #aaa; grid-column: 1 / -1; }
+    .error { background: #330000; color: #ff8a80; padding: 15px; border: 1px solid #ff5252; margin-bottom: 20px; display: none; }
+
+    /* モーダル */
+    .modal-overlay {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.85); z-index: 10000; justify-content: center; align-items: center; 
+      padding: 15px; backdrop-filter: blur(4px);
+    }
     .modal-overlay.active { display: flex; }
-    .modal-content { background: #1e1e1e; border: 2px solid var(--accent); border-radius: 12px; width: 100%; max-width: 400px; max-height: 90vh; overflow-y: auto; position: relative; padding: 20px; box-shadow: 0 0 30px rgba(88, 189, 215, 0.2); }
+    .modal-content {
+      background: #1e1e1e; border: 2px solid var(--accent); border-radius: 12px;
+      width: 100%; max-width: 400px; max-height: 90vh; overflow-y: auto;
+      position: relative; padding: 20px; box-shadow: 0 0 30px rgba(88, 189, 215, 0.2);
+    }
     body.mail-mode .modal-content { box-shadow: 0 0 30px rgba(180, 114, 255, 0.2); }
     .close-modal { position: absolute; top: 10px; right: 15px; font-size: 32px; color: #888; cursor: pointer; }
     .modal-img-wrapper { text-align: center; margin-bottom: 15px; background:#000; padding:10px; border-radius:8px;}
@@ -316,7 +349,7 @@
     .modal-row { display: flex; justify-content: space-between; align-items: baseline; margin-top:10px;}
     .modal-price { font-size: 32px; color: #ffffff; font-weight: 900; text-shadow: var(--glow-price); }
     .modal-label { font-size: 12px; color: #aaa; }
-    /* モーダル内カートアクション */
+    
     .modal-cart-actions { margin-top: 15px; border-top: 1px solid #444; padding-top: 15px; display: none; align-items: center; gap: 10px; }
     body.mail-mode .modal-cart-actions { display: flex; }
     .modal-qty-group { display: flex; align-items: center; border: 1px solid #555; border-radius: 4px; background: #fff; height: 36px; overflow: hidden; }
@@ -458,9 +491,7 @@
   </div>
 
   <div id="infoView">
-    <div class="back-btn-container"><button onclick="closeInfo()" style="padding:10px 30px;">一覧に戻る</button></div>
     <div id="infoContent"></div>
-    <div class="back-btn-container" style="margin-top:40px;"><button onclick="closeInfo()" style="padding:10px 30px;">一覧に戻る</button></div>
   </div>
 
   <div id="modal" class="modal-overlay">
@@ -514,6 +545,7 @@
       if(!d) d = new Date();
       const min = String(d.getMinutes()).padStart(2, '0');
       el("date-display").textContent = `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${min} 更新`;
+      el("date-display").style.display = "block"; // 日時を表示
     }
 
     function updateDeadline() {
@@ -820,8 +852,19 @@
     function toggleDrawer() { drawer.classList.toggle("open"); overlay.classList.toggle("open"); }
     el("hamburgerBtn").onclick = toggleDrawer; overlay.onclick = toggleDrawer;
 
-    el("menuStore").onclick = () => { isMailMode=false; switchMode(); toggleDrawer(); };
-    el("menuMail").onclick = () => { isMailMode=true; switchMode(); toggleDrawer(); };
+    // ★修正: メニューからモード選択時、情報画面を閉じてリセットする
+    el("menuStore").onclick = () => { 
+      isMailMode=false; 
+      switchMode(); 
+      toggleDrawer(); 
+      closeInfo(); // ←追加：情報画面を閉じる
+    };
+    el("menuMail").onclick = () => { 
+      isMailMode=true; 
+      switchMode(); 
+      toggleDrawer(); 
+      closeInfo(); // ←追加：情報画面を閉じる
+    };
 
     function switchMode() {
       const url = new URL(location);
@@ -829,10 +872,7 @@
       if(isMailMode) url.searchParams.set("mode","mail"); else url.searchParams.delete("mode");
       history.pushState({},"",url);
       
-      // ★修正: メニューから切り替えた時に画面表示をリセット
-      closeInfo();
       closeCart();
-
       updateModeUI(); loadData();
     }
 
@@ -925,14 +965,17 @@
         <ol><li>本規約は日本法に準拠します。</li><li>本サービスに関して紛争が生じた場合、当社本店所在地を管轄する裁判所を第一審の専属的合意管轄裁判所とします。</li></ol>
       `,
       company: `
+        <div class="company-links">
+          <button class="company-btn" onclick="isMailMode=false; switchMode();">店頭買取</button>
+          <button class="company-btn" onclick="isMailMode=true; switchMode();">郵送買取</button>
+        </div>
         <h2>会社概要</h2>
         <table style="width:100%; border-collapse: collapse; margin-top:20px; font-size:14px;">
           <tr><th style="border:1px solid #555; padding:10px; text-align:left; width:30%; background:#222;">会社名</th><td style="border:1px solid #555; padding:10px;">株式会社Niutiny</td></tr>
-          <tr><th style="border:1px solid #555; padding:10px; text-align:left; background:#222;">所在地</th><td style="border:1px solid #555; padding:10px;">〒000-0000 東京都〇〇区〇〇 1-2-3</td></tr>
-          <tr><th style="border:1px solid #555; padding:10px; text-align:left; background:#222;">設立</th><td style="border:1px solid #555; padding:10px;">2024年 X月 X日</td></tr>
-          <tr><th style="border:1px solid #555; padding:10px; text-align:left; background:#222;">代表者</th><td style="border:1px solid #555; padding:10px;">代表取締役 〇〇 〇〇</td></tr>
-          <tr><th style="border:1px solid #555; padding:10px; text-align:left; background:#222;">事業内容</th><td style="border:1px solid #555; padding:10px;">トレーディングカードの販売・買取<br>ECサイト運営</td></tr>
-          <tr><th style="border:1px solid #555; padding:10px; text-align:left; background:#222;">古物商許可</th><td style="border:1px solid #555; padding:10px;">東京都公安委員会 第000000000000号</td></tr>
+          <tr><th style="border:1px solid #555; padding:10px; text-align:left; background:#222;">所在地</th><td style="border:1px solid #555; padding:10px;">〒252-1113<br>神奈川県綾瀬市上土棚中四丁目1番5-606号</td></tr>
+          <tr><th style="border:1px solid #555; padding:10px; text-align:left; background:#222;">設立</th><td style="border:1px solid #555; padding:10px;">2025年11月28日</td></tr>
+          <tr><th style="border:1px solid #555; padding:10px; text-align:left; background:#222;">代表者</th><td style="border:1px solid #555; padding:10px;">代表取締役 大八木 航輝</td></tr>
+          <tr><th style="border:1px solid #555; padding:10px; text-align:left; background:#222;">古物商許可</th><td style="border:1px solid #555; padding:10px;">神奈川県公安委員会<br>第452750022658号</td></tr>
         </table>
       `,
       flow: `
@@ -947,13 +990,26 @@
 
     function openInfo(t) {
       el("mainView").style.display="none"; el("cartView").style.display="none"; el("infoView").style.display="block";
+      
+      // ★修正: ページに合わせてタイトル変更 & 日時非表示
+      if(t === 'company') el("mainTitle").textContent = "会社概要";
+      else if(t === 'privacy') el("mainTitle").textContent = "プライバシーポリシー";
+      else if(t === 'terms') el("mainTitle").textContent = "利用規約";
+      else if(t === 'flow') el("mainTitle").textContent = "買取の流れ";
+      else if(t === 'rules') el("mainTitle").textContent = "買取基準";
+      
+      el("date-display").style.display = "none"; // 日時を隠す
+      
       el("infoContent").innerHTML = contentData[t] || "準備中";
       
       if(drawer.classList.contains("open")) toggleDrawer();
       window.scrollTo(0,0);
     }
+    
     function closeInfo() {
-      el("infoView").style.display="none"; el("mainView").style.display="block"; window.scrollTo(0,0);
+      // 戻る時は元のタイトルに戻す（switchModeで再設定されるのでここは最低限でOK）
+      el("infoView").style.display="none"; el("mainView").style.display="block"; 
+      window.scrollTo(0,0);
     }
 
     // モーダル
