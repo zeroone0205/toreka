@@ -152,18 +152,26 @@
     .slider-dot { width: 8px; height: 8px; background: rgba(255,255,255,0.5); border-radius: 50%; cursor: pointer; }
     .slider-dot.active { background: #fff; transform: scale(1.2); box-shadow: 0 0 5px #fff; }
 
-    /* ★★★ 到着期限案内ボックス (PC:2行 / スマホ:4行) ★★★ */
+    /* ★★★ 到着期限案内ボックス (改行位置修正版) ★★★ */
     .mail-deadline-box {
       display: none;
-      max-width: 1000px; margin: 15px auto 5px; padding: 15px;
+      max-width: 1000px; margin: 15px auto 5px; padding: 12px;
       border: 2px solid #FFD700; background: rgba(212, 175, 55, 0.15); 
-      color: #ffffff; font-size: 13px; font-weight: bold; line-height: 1.6;
+      color: #ffffff; font-size: 12px; font-weight: bold; line-height: 1.6;
       border-radius: 6px; text-align: left;
-      word-wrap: break-word; overflow-wrap: break-word;
     }
     body.mail-mode .mail-deadline-box { display: block; }
-    .deadline-highlight { color: #FFD700; text-shadow: 0 0 5px rgba(255, 215, 0, 0.5); font-size:14px;}
-    .br-sp { display: none; } /* PCでは改行しない */
+    .deadline-highlight { color: #FFD700; text-shadow: 0 0 5px rgba(255, 215, 0, 0.5); font-size:13px;}
+    
+    /* PCでは改行タグを無効化 */
+    @media (min-width: 601px) {
+      .br-sp { display: none; }
+    }
+    /* スマホでは改行タグを有効化 */
+    @media (max-width: 600px) {
+      .br-sp { display: block; }
+      .mail-deadline-box { font-size: 11px; line-height: 1.5; }
+    }
 
     /* ナビ・フィルタ */
     .sticky-container {
@@ -249,7 +257,7 @@
     .cart-actions { display: none; margin-top: 8px; gap: 4px; align-items: center; }
     body.mail-mode .cart-actions { display: flex; }
     .qty-group { display: flex; align-items: center; border: 1px solid #555; border-radius: 4px; background: #fff; height: 28px; overflow: hidden; }
-    .qty-btn { width: 24px; height: 100%; background: #eee; border: none; color: #333; font-weight: bold; padding: 0; display:flex; align-items:center; justify-content:center; cursor: pointer; }
+    .qty-btn { width: 24px; height: 100%; background: #eee; border: none; color: #333; font-weight: bold; padding: 0; display:flex; align-items:center; justify-content:center; }
     .qty-btn:active { background: #ccc; }
     .qty-input { width: 24px; height: 100%; border: none; text-align: center; font-size: 12px; color: #333; font-weight: bold; padding: 0; background: #fff; }
     .add-btn { flex: 1; height: 28px; font-size: 11px; background: var(--accent); color: #fff; border-radius: 4px; border:none; cursor: pointer; }
@@ -263,11 +271,11 @@
     .cart-bar.visible { transform: translateY(0); }
     .cart-total-info { font-size: 14px; font-weight: bold; color: #fff; }
     .cart-total-price { font-size: 20px; color: var(--accent); margin-right: 10px; font-weight: bold; text-shadow: var(--glow-text); }
-    .check-cart-btn { padding: 10px 20px; background: var(--accent); color: #fff; font-weight: bold; border-radius: 4px; border:none; cursor: pointer; }
+    .check-cart-btn { padding: 10px 20px; background: var(--accent); color: #fff; font-weight: bold; border-radius: 4px; border:none; }
 
     #cartView { display: none; padding: 20px; max-width: 800px; margin: 0 auto; color: #fff; }
     .cart-header { font-size: 20px; font-weight: bold; border-bottom: 1px solid #444; padding-bottom: 10px; margin-bottom: 20px; }
-    .cart-item { display: flex; gap: 15px; padding: 15px 0; border-bottom: 1px solid #333; align-items: flex-start; }
+    .cart-item { display: flex; gap: 15px; padding: 15px 0; border-bottom: 1px solid #333; }
     .cart-item-img { width: 60px; height: 80px; background: #000; object-fit: contain; border: 1px solid #444; }
     .cart-item-info { flex: 1; }
     .cart-item-title { font-size: 14px; font-weight: bold; margin-bottom: 5px; }
@@ -278,21 +286,7 @@
 
     #infoView { display: none; padding: 20px; max-width: 800px; margin: 0 auto; color: #ddd; line-height: 1.8; font-size: 14px; text-align: left; }
     #infoView h2 { color: var(--accent); border-bottom: 1px solid var(--accent); padding-bottom: 10px; margin-top: 30px; }
-    #infoView h3 { color: #fff; margin-top: 25px; font-size: 16px; }
-    .flow-step { background: #252525; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid var(--accent); }
-    .flow-title { font-size: 16px; font-weight: bold; color: var(--accent); margin-bottom: 10px; }
-    .note-box { background: rgba(255, 50, 50, 0.1); border: 1px solid #ff5252; padding: 15px; border-radius: 8px; margin-top: 30px; }
-    .note-title { color: #ff5252; font-weight: bold; margin-bottom: 10px; font-size: 16px; }
-    .faq-q { color: var(--accent); font-weight: bold; }
-    .faq-a { margin-left: 10px; margin-bottom: 20px; }
-
-    .closed-message-container { grid-column: 1 / -1; text-align: center; padding: 60px 20px; margin-top: 40px; border: 3px solid var(--accent); border-radius: 12px; background: rgba(88, 189, 215, 0.1); box-shadow: var(--glow-box); color: #ffffff; }
-    .closed-title { font-size: 26px; font-weight: 900; color: var(--accent); margin-bottom: 20px; text-shadow: var(--glow-text); }
-    .closed-text { font-size: 16px; line-height: 2.0; font-weight: bold; }
-    .loading { text-align: center; padding: 40px; color: #aaa; grid-column: 1 / -1; }
-    .error { background: #330000; color: #ff8a80; padding: 15px; border: 1px solid #ff5252; margin-bottom: 20px; display: none; }
-
-    /* モーダル */
+    
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 10000; justify-content: center; align-items: center; padding: 15px; backdrop-filter: blur(4px); }
     .modal-overlay.active { display: flex; }
     .modal-content { background: #1e1e1e; border: 2px solid var(--accent); border-radius: 12px; width: 100%; max-width: 400px; max-height: 90vh; overflow-y: auto; position: relative; padding: 20px; box-shadow: 0 0 30px rgba(88, 189, 215, 0.2); }
@@ -334,10 +328,6 @@
       #sort { width: auto; min-width: 100px; flex: 1; max-width: 150px; }
       #showSoldOutLabel { white-space: nowrap; margin-left: 0; }
       #reload { display: none; }
-      
-      /* 郵送期限スマホ用改行クラス */
-      .br-sp { display: inline; }
-      .mail-deadline-box { font-size: 11px; padding: 10px 12px; }
     }
   </style>
 </head>
@@ -482,7 +472,7 @@
       <a class="footer-link" onclick="openInfo('terms')">利用規約</a>
     </div>
     <div class="copyright">© 2026 トレカフォース</div>
-    <div class="footer-version">v17.0</div>
+    <div class="footer-version">v18.0</div>
   </footer>
 
   <script>
@@ -514,10 +504,12 @@
       const w = days[now.getDay()];
       const deadlineText = `${m}月${d}日（${w}）`;
       
-      // 注意書き（PC:2行、スマホ:4行になるようbrタグ調整）
+      // スマホでは指定の位置で改行
       el("mailDeadline").innerHTML = `
-        サイトよりご予約いただいた場合、${deadlineText}17時までに商品が到着すれば、<br class="br-sp">お申込時の金額を満額にて買取査定いたします。<br>
-        なお、上記日時を過ぎて商品が到着した場合は、着払いでのご返送、<br class="br-sp">もしくは到着日時点の相場にて再査定となります。
+        サイトよりご予約いただいた場合、${deadlineText}17時までに<br class="br-sp">
+        商品が到着すれば、お申込時の金額を満額にて買取査定いたします。<br>
+        上記日時を過ぎて商品が到着した場合は、着払いでのご返送、<br class="br-sp">
+        もしくは到着日時点の相場にて再査定となります。
       `;
     }
 
@@ -646,7 +638,6 @@
       items.sort((a,b) => {
         let typeA = (a.type==="素体"||a.type==="シングル") ? 3 : (typePrio[a.type]||99);
         let typeB = (b.type==="素体"||b.type==="シングル") ? 3 : (typePrio[b.type]||99);
-        
         if(typeA !== typeB) return typeA - typeB;
         return sort==="price_asc" ? a.price-b.price : b.price-a.price;
       });
@@ -726,17 +717,13 @@
       _addToCartLogic(item, qty);
     }
     
-    // カート追加共通ロジック
     function _addToCartLogic(item, qty) {
-      const key = item.id || item.name; // IDがなければ名前で
+      const key = item.id || item.name;
       if(!CART[key]) CART[key] = { item: item, qty: 0 };
       if(CART[key].qty + qty > item.remaining) { alert("買取可能枚数を超えております"); return; }
       CART[key].qty += qty;
       renderCartBar();
-      
-      // モーダルが開いていたら閉じるか更新する（ここでは閉じる）
       if(el("modal").classList.contains("active")) {
-          // モーダル内のボタンのテキストを一時的に変更
           const btn = el("modalAddBtn");
           btn.textContent = "追加しました";
           setTimeout(() => btn.textContent = "カートに追加", 1000);
@@ -843,13 +830,24 @@
 
     // 情報画面
     const contentData = {
-      privacy: `<h2>プライバシーポリシー</h2><p>（省略：前回の全文）</p>`,
-      terms: `<h2>利用規約</h2><p>（省略：前回の全文）</p>`,
+      privacy: `
+        <h2>プライバシーポリシー</h2>
+        <p>（省略：前回の全文）</p>
+      `,
+      terms: `
+        <h2>利用規約</h2>
+        <p>（省略：前回の全文）</p>
+      `,
       company: `<h2>会社概要</h2><p>現在準備中です。</p>`,
-      flow: `<h2>郵送買取の流れ</h2><div class="flow-step">...</div>`,
+      flow: `
+        <h2>郵送買取の流れ</h2>
+        <div class="flow-step"><div class="flow-title">STEP 1｜商品をカートへ入れて申し込み</div><p>買取一覧にある商品は...</p></div>
+        <div class="flow-step"><div class="flow-title">STEP 2｜受付完了メール確認後に発送</div><p>お申し込み内容の確認が完了すると...</p></div>
+        <div class="flow-step"><div class="flow-title">STEP 3｜査定結果の確認・承諾</div><p>商品到着後に査定を行い...</p></div>
+        <div class="note-box"><div class="note-title">注意事項</div><p>発送期限と価格の取り扱い...</p></div>
+      `,
       rules: `<h2>買取基準</h2><p>（準備中）</p>`
     };
-    // ※ 実際のコードではここに前回の長いテキスト（privacy, terms, flow）をそのまま貼り付けてください。
 
     function openInfo(t) {
       el("mainView").style.display="none"; el("cartView").style.display="none"; el("infoView").style.display="block";
@@ -868,7 +866,6 @@
     const modal = el("modal");
     const closeModalBtn = el("closeModalBtn");
     
-    // モーダル内の数量管理
     let currentModalItem = null;
     el("modalQtyMinus").onclick = () => {
       let v = parseInt(el("modalQtyInput").value);
@@ -903,7 +900,6 @@
       el("modalLimit").textContent = "残り: " + item.remaining;
       el("modalTags").innerHTML = `<span class="type-label">【${item.type}】</span>`;
       
-      // 郵送モードならカートUI表示、かつ数量リセット
       if(isMailMode && item.remaining > 0) {
         el("modalCartActions").style.display = "flex";
         el("modalQtyInput").value = 1;
