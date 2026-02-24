@@ -6,9 +6,11 @@
   
   <title>買取表</title>
   <link rel="icon" href="data:,">
+  
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
   <style>
+    /* ★★★ デザイン設定エリア ★★★ */
     :root {
       --accent: #58BDD7; 
       --accent-hover: #4aaec7;
@@ -22,6 +24,7 @@
       --glow-box: 0 0 12px rgba(88, 189, 215, 0.4);
     }
 
+    /* 郵送買取モードのカラースキーム（薄紫） */
     body.mail-mode {
       --accent: #b472ff; 
       --accent-hover: #9e5be0;
@@ -39,23 +42,37 @@
       background-size: cover;
       background-position: center;
       background-attachment: fixed;
-      display: flex; flex-direction: column; min-height: 100vh;
-      padding-bottom: 80px; 
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      padding-bottom: 80px; /* カートバー用の余白 */
       transition: all 0.5s ease;
     }
+    
     body::before {
-      content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.7); z-index: -1;
+      content: "";
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.7); 
+      z-index: -1;
     }
+
     * { box-sizing: border-box; }
 
-    /* ヘッダー */
+    /* ★★★ ヘッダー (全画面共通) ★★★ */
     header { 
-      background: #111; border-bottom: 2px solid var(--accent); 
-      padding: 0 15px; position: relative; z-index: 100;
-      display: flex; justify-content: space-between; align-items: center; height: 60px;
+      background: #111; 
+      border-bottom: 2px solid var(--accent); 
+      padding: 0 15px; 
+      position: relative;
+      z-index: 100; /* ハンバーガーやロゴを最前面に */
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      height: 60px;
       transition: border-bottom 0.5s ease;
     }
+    
+    /* 左側: ハンバーガー */
     .header-left { display: flex; align-items: center; z-index: 102; position: relative; }
     .hamburger {
       width: 24px; height: 18px; cursor: pointer;
@@ -64,16 +81,22 @@
     .hamburger span {
       display: block; height: 2px; width: 100%; background: var(--text-main); border-radius: 2px; transition: 0.3s;
     }
+
+    /* 中央: タイトル (絶対配置で完全中央寄せ) */
     .header-center {
       position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-      width: 100%; text-align: center; z-index: 101; pointer-events: none;
+      width: 100%; text-align: center; z-index: 101; pointer-events: none; /* クリック透過 */
     }
     .title-text {
       font-size: 20px; font-weight: 800; color: var(--accent); text-shadow: var(--glow-text);
       font-style: italic; letter-spacing: 1px; white-space: nowrap; transition: color 0.5s;
     }
+
+    /* 右側: ロゴ＋カート */
     .header-right { display: flex; align-items: center; gap: 15px; z-index: 102; position: relative; }
     .logo-img { height: 40px; width: auto; object-fit: contain; filter: none; }
+    
+    /* ヘッダー内カートボタン（郵送モードのみ） */
     .header-cart-btn {
       display: none; position: relative; font-size: 20px; color: #fff; cursor: pointer;
     }
@@ -85,9 +108,12 @@
       display: flex; align-items: center; justify-content: center;
       border: 1px solid #fff;
     }
+
+    /* 日付表示 */
     #date-display {
       position: absolute; top: 100%; right: 10px; margin-top: 5px;
-      font-size: 10px; color: #aaa; font-weight: bold; transition: all 0.5s;
+      font-size: 10px; color: #aaa; font-weight: bold;
+      transition: all 0.5s;
     }
 
     /* ドロワーメニュー */
@@ -113,24 +139,34 @@
     }
     .drawer-overlay.open { display: block; opacity: 1; }
 
-    /* スライダー */
+    /* ★★★ スライダーバナー ★★★ */
     .slider-container {
-      width: 100%; max-width: 1000px; margin: 0 auto; position: relative; overflow: hidden; 
-      display: none; background: #000; border-bottom: 1px solid #333;
+      width: 100%; max-width: 1000px; margin: 0 auto;
+      position: relative; overflow: hidden; display: none; background: #000;
+      border-bottom: 1px solid #333;
     }
     body.mail-mode .slider-container { display: block; }
-    .slider-wrapper { display: flex; transition: transform 0.5s ease-in-out; }
-    .slider-slide { min-width: 100%; box-sizing: border-box; }
-    .slider-slide img { width: 100%; height: auto; display: block; max-height: 250px; object-fit: cover; }
+    
+    .slider-wrapper {
+      display: flex; transition: transform 0.5s ease-in-out;
+    }
+    .slider-slide {
+      min-width: 100%; box-sizing: border-box;
+    }
+    .slider-slide img {
+      width: 100%; height: auto; display: block; max-height: 250px; object-fit: cover;
+    }
+    /* インジケーター */
     .slider-dots {
-      position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px;
+      position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 8px;
     }
     .slider-dot {
       width: 8px; height: 8px; background: rgba(255,255,255,0.5); border-radius: 50%; cursor: pointer;
     }
     .slider-dot.active { background: #fff; transform: scale(1.2); box-shadow: 0 0 5px #fff; }
 
-    /* ナビゲーション & フィルタ */
+    /* ナビゲーション */
     .sticky-container {
       position: sticky; top: 0; z-index: 9990;
       background: rgba(18, 18, 18, 0.95); backdrop-filter: blur(5px);
@@ -141,7 +177,7 @@
     .nav-item { cursor: pointer; padding: 14px 12px; font-weight: bold; color: #888; border-bottom: 3px solid transparent; transition: 0.3s; font-size: 14px; }
     .nav-item.active { color: var(--accent); border-bottom-color: var(--accent); text-shadow: var(--glow-text); }
 
-    /* ★ フィルタエリアのレイアウト修正 ★ */
+    /* フィルタエリア */
     .filters { 
       max-width: 1000px; margin: 0 auto; padding: 10px 12px; 
       display: grid;
@@ -188,10 +224,11 @@
       display: flex; align-items: center; font-size: 12px; color: #fff; 
       cursor: pointer; gap: 6px; justify-self: end; white-space: nowrap;
     }
+    body.mail-mode #showSoldOutLabel { display: none; } /* 郵送モードでは非表示 */
 
     #reload { display: none; } /* 更新ボタンは非表示 */
 
-    /* カードリスト */
+    /* ★★★ カードリスト ★★★ */
     .container { max-width: 1000px; margin: 20px auto 0; padding: 0 12px 20px; flex: 1; width: 100%; }
     .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
     
@@ -211,6 +248,7 @@
 
     .card-body { padding: 8px; flex: 1; display: flex; flex-direction: column; position: relative; }
     
+    /* カードヘッダー（タイプと残り枚数を左右に配置） */
     .card-header-row {
       display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;
     }
@@ -385,6 +423,26 @@
       /* カートボタンの段落ち防止 */
       .cart-actions { flex-direction: column; align-items: stretch; }
       .qty-group { margin-bottom: 4px; }
+
+      /* フィルタエリアのレイアウト調整 */
+      .filters {
+        display: grid;
+        grid-template-columns: 1fr auto; /* 左:広がる 右:固定 */
+        gap: 8px;
+      }
+      /* 1段目: 検索バー + (買取の流れボタン or 空) */
+      .search-box { grid-column: 1 / 2; grid-row: 1; width: 100%; }
+      .flow-btn { grid-column: 2 / 3; grid-row: 1; width: 100px; justify-self: end; padding: 8px 4px; font-size: 11px; justify-content: center; }
+      
+      /* 郵送でない時は検索ボックス横いっぱい */
+      body:not(.mail-mode) .search-box { grid-column: 1 / 3; }
+      
+      /* 2段目: ソート + 終了表示チェック */
+      #sort { grid-column: 1 / 2; grid-row: 2; width: 100%; }
+      #showSoldOutLabel { grid-column: 2 / 3; grid-row: 2; justify-self: end; white-space: nowrap; margin-left: 0; }
+      
+      /* 更新ボタンは邪魔なのでスマホでは非表示 */
+      #reload { display: none; }
     }
   </style>
 </head>
@@ -410,10 +468,10 @@
   <div id="drawerMenu" class="drawer">
     <div class="drawer-header">MENU</div>
     <ul class="drawer-list">
-      <li class="drawer-item" id="menuStore">店頭買取表</li>
-      <li class="drawer-item" id="menuMail">郵送買取表</li>
-      <li class="drawer-item" onclick="openInfo('privacy')">プライバシーポリシー</li>
-      <li class="drawer-item" onclick="openInfo('terms')">利用規約</li>
+      <li class="drawer-item" id="menuStore">🏬 店頭買取表</li>
+      <li class="drawer-item" id="menuMail">📦 郵送買取表</li>
+      <li class="drawer-item" onclick="openInfo('privacy')">📝 プライバシーポリシー</li>
+      <li class="drawer-item" onclick="openInfo('terms')">📜 利用規約</li>
     </ul>
   </div>
 
@@ -448,6 +506,7 @@
           <option value="type_sotai">素体</option>
           <option value="type_box">BOX</option>
         </select>
+        
         <label id="showSoldOutLabel">
           <input type="checkbox" id="showSoldOut" checked> 終了も表示
         </label>
@@ -508,7 +567,7 @@
       <a class="footer-link" onclick="openInfo('privacy')">プライバシーポリシー</a><span style="color:#333">|</span><a class="footer-link" onclick="openInfo('terms')">利用規約</a>
     </div>
     <div class="copyright">© 2026 トレカフォース</div>
-    <div class="footer-version">v9.3</div>
+    <div class="footer-version">v10.0</div>
   </footer>
 
   <script>
@@ -517,8 +576,8 @@
     
     // ★ 設定: バナー画像URL（最大5つまで）
     const BANNER_IMAGES = [
-      "banner1.png",
-      "banner2.png"
+      "https://placehold.jp/3d4070/ffffff/1000x250.png?text=郵送買取バナー1",
+      "https://placehold.jp/703d40/ffffff/1000x250.png?text=郵送買取バナー2"
     ];
 
     let ALL_DATA = {}, CURRENT_ITEMS = [], CUR_PAGE = 1, CART = {};
@@ -529,6 +588,12 @@
 
     const el = (id) => document.getElementById(id);
     const yen = (n) => "¥" + Number(n).toLocaleString();
+
+    // ★ セッションストレージを使ったキャッシュ機能
+    // キー名: cache_カテゴリ名
+    // 値: { timestamp: 1234567890, data: {...} }
+    // 期限: 10分 (600000ms)
+    const CACHE_DURATION = 600000; 
 
     function updateDate(d) {
       if(!d) d = new Date();
@@ -563,22 +628,53 @@
     }
     setInterval(() => { if(isMailMode) moveSlide((slideIdx+1)%BANNER_IMAGES.length); }, 4000);
 
-    // データ取得
+    // ★ データ取得 (キャッシュ対応版)
     async function loadData() {
       const sheetName = isMailMode ? "郵送"+currentCategory : currentCategory;
+
+      // 1. メモリ上の変数にあればそれを使う
       if(ALL_DATA[sheetName]) { render(); return; }
+
+      // 2. セッションストレージを確認
+      const cacheKey = `cache_${sheetName}`;
+      const cached = sessionStorage.getItem(cacheKey);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Date.now() - parsed.timestamp < CACHE_DURATION) {
+          ALL_DATA[sheetName] = parsed.data;
+          render();
+          return;
+        }
+      }
+
+      // 3. なければAPIから取得
       el("grid").innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#aaa;">読み込み中...</div>';
       try {
         const res = await fetch(`${API}?category=${sheetName}&t=${Date.now()}`);
         const data = await res.json();
         if(data.error) throw new Error(data.error);
+        
         ALL_DATA[sheetName] = data;
+        
+        // キャッシュ保存
+        sessionStorage.setItem(cacheKey, JSON.stringify({
+          timestamp: Date.now(),
+          data: data
+        }));
+
         updateDate();
         render();
       } catch(e) {
         el("grid").innerHTML = `<div style="grid-column:1/-1;color:red;text-align:center;">エラー: ${e.message}</div>`;
       }
     }
+
+    // 更新ボタン: キャッシュを破棄して再ロード
+    el("reload").onclick = () => {
+      ALL_DATA = {};
+      sessionStorage.clear(); // 全キャッシュクリア
+      loadData();
+    };
 
     function render() {
       const data = ALL_DATA[isMailMode ? "郵送"+currentCategory : currentCategory];
@@ -774,7 +870,6 @@
 
     el("sort").onchange = render; el("showSoldOut").onchange = render;
     el("q").oninput = () => setTimeout(render, 300);
-    el("reload").onclick = () => { ALL_DATA={}; loadData(); };
     
     // ページロード
     el("prevBtn").onclick = () => { CUR_PAGE--; renderPage(); };
@@ -909,5 +1004,3 @@
   </script>
 </body>
 </html>
-
-
