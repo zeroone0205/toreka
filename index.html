@@ -73,7 +73,7 @@
     }
     
     /* 左側: ハンバーガー */
-    .header-left { display: flex; align-items: center; gap: 15px; z-index: 102; position: relative; }
+    .header-left { display: flex; align-items: center; z-index: 102; position: relative; }
     .hamburger {
       width: 24px; height: 18px; cursor: pointer;
       display: flex; flex-direction: column; justify-content: space-between;
@@ -111,10 +111,23 @@
     }
 
     /* 日付表示 */
+    #date-display-container {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      margin-top: 15px;
+      margin-bottom: 5px;
+    }
     #date-display {
-      position: absolute; top: 100%; right: 10px; margin-top: 5px;
-      font-size: 10px; color: #aaa; font-weight: bold;
-      transition: all 0.5s;
+      font-size: 12px;
+      color: #fff;
+      font-weight: bold;
+      padding: 6px 16px;
+      border-radius: 20px;
+      border: 2px solid var(--accent);
+      box-shadow: var(--glow-box);
+      background: rgba(0, 0, 0, 0.6);
+      transition: all 0.5s ease;
     }
 
     /* ドロワーメニュー */
@@ -170,6 +183,23 @@
     .nav-item:hover { color: #fff; text-shadow: 0 0 5px #fff; }
     .nav-item.active { color: var(--accent); border-bottom-color: var(--accent); text-shadow: var(--glow-text); }
 
+    /* ★★★ 到着期限案内ボックス (郵送モード用) ★★★ */
+    .mail-deadline-box {
+      display: none;
+      max-width: 1000px; margin: 10px auto 0; padding: 12px;
+      /* 黄色い見やすいフレーム */
+      border: 2px solid #FFD700; 
+      background: rgba(212, 175, 55, 0.15); 
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: bold;
+      line-height: 1.6;
+      border-radius: 6px;
+      text-align: left;
+    }
+    body.mail-mode .mail-deadline-box { display: block; }
+    .deadline-highlight { color: #FFD700; text-shadow: 0 0 5px rgba(255, 215, 0, 0.5); font-size:13px;}
+
     /* フィルタエリア */
     .filters { 
       max-width: 1000px; margin: 0 auto; padding: 10px 12px; 
@@ -179,12 +209,11 @@
       align-items: center;
     }
     
-    /* 1段目: 検索ボックス(左) + 買取の流れボタン(右・郵送時のみ) */
+    /* 1段目 */
     .search-box { 
       grid-column: 1 / 2; grid-row: 1; 
       position: relative; width: 100%; 
     }
-    /* 郵送モードでない時は検索ボックスを横いっぱいに */
     body:not(.mail-mode) .search-box { grid-column: 1 / 3; }
 
     .search-box input { 
@@ -204,8 +233,7 @@
     .flow-btn:hover { background: rgba(180, 114, 255, 0.1); }
     body.mail-mode .flow-btn { display: flex; }
 
-    /* 2段目: ソート(左) + 買取終了チェック(右) */
-    /* 修正：ソートバーを「文字数分の幅」にするため、flexコンテナで包む */
+    /* 2段目 */
     .filter-row-2 {
       grid-column: 1 / 3; grid-row: 2;
       display: flex; align-items: center; gap: 10px;
@@ -214,17 +242,16 @@
     #sort { 
       padding: 8px; border: 1px solid #555; border-radius: 4px; 
       background: rgba(30, 30, 30, 0.8); color: #fff; cursor: pointer; font-size: 12px; 
-      width: auto; /* ★修正: 幅を自動調整（短くする） */
-      min-width: 100px;
+      width: auto; min-width: 100px;
     }
     
     #showSoldOutLabel {
       display: flex; align-items: center; font-size: 12px; color: #fff; 
       cursor: pointer; gap: 6px; white-space: nowrap;
     }
-    body.mail-mode #showSoldOutLabel { display: none; } /* 郵送モードでは非表示 */
+    body.mail-mode #showSoldOutLabel { display: none; }
 
-    #reload { display: none; } /* 更新ボタンは非表示 */
+    #reload { display: none; }
 
     /* ★★★ カードリスト ★★★ */
     .container { max-width: 1000px; margin: 20px auto 0; padding: 0 12px 20px; flex: 1; width: 100%; }
@@ -235,7 +262,6 @@
       border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.6);
       display: flex; flex-direction: column; position: relative; transition: all 0.2s ease;
     }
-    /* 店頭モードのみhoverで浮く */
     body:not(.mail-mode) .card:hover { transform: translateY(-4px); border-color: var(--accent); box-shadow: var(--glow-box); }
 
     .card.sold-out { border-color: #333; box-shadow: none; }
@@ -246,7 +272,6 @@
 
     .card-body { padding: 8px; flex: 1; display: flex; flex-direction: column; position: relative; }
     
-    /* カードヘッダー */
     .card-header-row {
       display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;
     }
@@ -293,21 +318,7 @@
     }
     .add-btn:active { transform: scale(0.95); }
 
-    /* 郵送モード：買取終了時の表示 */
-    .mail-sold-out-block {
-      background: #333;
-      color: #ff5252;
-      font-weight: bold;
-      font-size: 13px;
-      text-align: center;
-      padding: 6px;
-      border-radius: 4px;
-      margin-top: 8px;
-      border: 1px solid #ff5252;
-      box-shadow: 0 0 5px rgba(255, 82, 82, 0.4);
-    }
-
-    /* 店頭モード：買取終了オーバーレイ */
+    /* 買取終了オーバーレイ (店頭・郵送共通) */
     .sold-out-overlay {
       position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:50; 
       display:flex; align-items:center; justify-content:center;
@@ -316,7 +327,7 @@
       background: var(--accent); color: #fff; font-weight: 900; font-size: 12px; padding: 6px 12px; border-radius: 4px; border: 2px solid #fff;
       box-shadow: var(--glow-box);
     }
-    /* 郵送モードでもオーバーレイを使う（ご要望により） */
+    /* 郵送モードの場合の色 */
     body.mail-mode .sold-out-badge { background: #b472ff; }
 
     /* カート固定バー */
@@ -427,7 +438,7 @@
       /* フィルタエリアのレイアウト調整 */
       .filters {
         display: grid;
-        grid-template-columns: 1fr auto; /* 左:広がる 右:固定 */
+        grid-template-columns: 1fr auto; 
         gap: 8px;
       }
       /* 1段目: 検索バー + (買取の流れボタン or 空) */
@@ -445,7 +456,6 @@
       #sort { width: auto; min-width: 120px; flex: 1; }
       #showSoldOutLabel { white-space: nowrap; margin-left: 0; }
       
-      /* 更新ボタンは邪魔なのでスマホでは非表示 */
       #reload { display: none; }
     }
   </style>
@@ -480,7 +490,9 @@
   </div>
 
   <div id="mainView">
-    <div id="date-display"></div>
+    <div id="date-display-container">
+      <div id="date-display"></div>
+    </div>
 
     <div class="slider-container" id="bannerSlider">
       <div class="slider-wrapper" id="sliderWrapper"></div>
@@ -498,6 +510,12 @@
           <li class="nav-item" data-cat="その他">その他</li>
         </ul>
       </div>
+
+      <div id="mailDeadline" class="mail-deadline-box">
+        サイトよりご予約いただきましたら<span id="deadlineDate" class="deadline-highlight"></span>の17時到着まで申込時の金額を満額として買取査定させていただきます。<br>
+        約束の日時以降に商品が到着した場合には着払いで返送または到着日の相場での買取査定となります。
+      </div>
+
       <div class="filters">
         <div class="search-box"><span class="search-icon">🔍</span><input id="q" placeholder="検索" /></div>
         <button id="flowBtn" class="flow-btn" onclick="openInfo('flow')"><i class="fa-solid fa-book-open"></i> 買取の流れ</button>
@@ -572,7 +590,7 @@
       <a class="footer-link" onclick="openInfo('privacy')">プライバシーポリシー</a><span style="color:#333">|</span><a class="footer-link" onclick="openInfo('terms')">利用規約</a>
     </div>
     <div class="copyright">© 2026 トレカフォース</div>
-    <div class="footer-version">v10.1</div>
+    <div class="footer-version">v12.0</div>
   </footer>
 
   <script>
@@ -597,18 +615,35 @@
     const el = (id) => document.getElementById(id);
     const yen = (n) => "¥" + Number(n).toLocaleString();
 
+    // 日付更新（データロード時のみ更新するため自動更新タイマーは廃止）
     function updateDate(d) {
       if(!d) d = new Date();
       const m = (d.getMinutes()<30?"00":"30"); 
-      el("date-display").textContent = `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')} 更新`;
+      // データロード時の時刻を表示
+      const min = String(d.getMinutes()).padStart(2, '0');
+      el("date-display").textContent = `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${min} 更新`;
     }
-    updateDate();
+
+    // 郵送買取の期限日を計算・表示
+    function updateDeadline() {
+      const days = ['日', '月', '火', '水', '木', '金', '土'];
+      const now = new Date();
+      now.setDate(now.getDate() + 2); // 2日後
+      const m = now.getMonth() + 1;
+      const d = now.getDate();
+      const w = days[now.getDay()];
+      
+      const deadlineText = `${m}月${d}日(${w})`;
+      const target = el("deadlineDate");
+      if(target) target.textContent = deadlineText;
+    }
 
     function updateModeUI() {
       if(isMailMode) {
         document.body.classList.add('mail-mode');
         el("mainTitle").textContent = "郵送買取表";
         initSlider(); renderCartBar();
+        updateDeadline(); // 期限更新
       } else {
         document.body.classList.remove('mail-mode');
         el("mainTitle").textContent = "店頭買取表";
@@ -644,6 +679,10 @@
         const parsed = JSON.parse(cached);
         if (Date.now() - parsed.timestamp < CACHE_DURATION) {
           ALL_DATA[sheetName] = parsed.data;
+          
+          // キャッシュのタイムスタンプを使って更新日時を表示（重要）
+          updateDate(new Date(parsed.timestamp));
+          
           render();
           return;
         }
@@ -652,7 +691,8 @@
       // 3. なければAPIから取得
       el("grid").innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#aaa;">読み込み中...</div>';
       try {
-        const res = await fetch(`${API}?category=${sheetName}&t=${Date.now()}`);
+        const fetchTime = Date.now();
+        const res = await fetch(`${API}?category=${sheetName}&t=${fetchTime}`);
         const data = await res.json();
         if(data.error) throw new Error(data.error);
         
@@ -660,11 +700,11 @@
         
         // キャッシュ保存
         sessionStorage.setItem(cacheKey, JSON.stringify({
-          timestamp: Date.now(),
+          timestamp: fetchTime,
           data: data
         }));
 
-        updateDate();
+        updateDate(new Date(fetchTime)); // 取得した時刻で表示
         render();
       } catch(e) {
         el("grid").innerHTML = `<div style="grid-column:1/-1;color:red;text-align:center;">エラー: ${e.message}</div>`;
