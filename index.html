@@ -205,18 +205,24 @@
     body.mail-mode .flow-btn { display: flex; }
 
     /* 2段目: ソート(左) + 買取終了チェック(右) */
+    /* 修正：ソートバーを「文字数分の幅」にするため、flexコンテナで包む */
+    .filter-row-2 {
+      grid-column: 1 / 3; grid-row: 2;
+      display: flex; align-items: center; gap: 10px;
+    }
+
     #sort { 
-      grid-column: 1 / 2; grid-row: 2;
       padding: 8px; border: 1px solid #555; border-radius: 4px; 
       background: rgba(30, 30, 30, 0.8); color: #fff; cursor: pointer; font-size: 12px; 
-      width: 100%;
+      width: auto; /* ★修正: 幅を自動調整（短くする） */
+      min-width: 100px;
     }
     
     #showSoldOutLabel {
-      grid-column: 2 / 3; grid-row: 2;
       display: flex; align-items: center; font-size: 12px; color: #fff; 
-      cursor: pointer; gap: 6px; justify-self: end; white-space: nowrap;
+      cursor: pointer; gap: 6px; white-space: nowrap;
     }
+    body.mail-mode #showSoldOutLabel { display: none; } /* 郵送モードでは非表示 */
 
     #reload { display: none; } /* 更新ボタンは非表示 */
 
@@ -232,7 +238,6 @@
     /* 店頭モードのみhoverで浮く */
     body:not(.mail-mode) .card:hover { transform: translateY(-4px); border-color: var(--accent); box-shadow: var(--glow-box); }
 
-    /* 買取終了時のスタイル */
     .card.sold-out { border-color: #333; box-shadow: none; }
     .card.sold-out:hover { transform: none; border-color: #333; }
 
@@ -288,7 +293,21 @@
     }
     .add-btn:active { transform: scale(0.95); }
 
-    /* 買取終了オーバーレイ (店頭・郵送共通) */
+    /* 郵送モード：買取終了時の表示 */
+    .mail-sold-out-block {
+      background: #333;
+      color: #ff5252;
+      font-weight: bold;
+      font-size: 13px;
+      text-align: center;
+      padding: 6px;
+      border-radius: 4px;
+      margin-top: 8px;
+      border: 1px solid #ff5252;
+      box-shadow: 0 0 5px rgba(255, 82, 82, 0.4);
+    }
+
+    /* 店頭モード：買取終了オーバーレイ */
     .sold-out-overlay {
       position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:50; 
       display:flex; align-items:center; justify-content:center;
@@ -297,6 +316,8 @@
       background: var(--accent); color: #fff; font-weight: 900; font-size: 12px; padding: 6px 12px; border-radius: 4px; border: 2px solid #fff;
       box-shadow: var(--glow-box);
     }
+    /* 郵送モードでもオーバーレイを使う（ご要望により） */
+    body.mail-mode .sold-out-badge { background: #b472ff; }
 
     /* カート固定バー */
     .cart-bar {
@@ -417,8 +438,12 @@
       body:not(.mail-mode) .search-box { grid-column: 1 / 3; }
       
       /* 2段目: ソート + 終了表示チェック */
-      #sort { grid-column: 1 / 2; grid-row: 2; width: 100%; }
-      #showSoldOutLabel { grid-column: 2 / 3; grid-row: 2; justify-self: end; white-space: nowrap; margin-left: 0; }
+      .filter-row-2 { 
+        grid-column: 1 / 3; grid-row: 2; 
+        display: flex; align-items: center; gap: 10px;
+      }
+      #sort { width: auto; min-width: 120px; flex: 1; }
+      #showSoldOutLabel { white-space: nowrap; margin-left: 0; }
       
       /* 更新ボタンは邪魔なのでスマホでは非表示 */
       #reload { display: none; }
@@ -447,10 +472,10 @@
   <div id="drawerMenu" class="drawer">
     <div class="drawer-header">MENU</div>
     <ul class="drawer-list">
-      <li class="drawer-item" id="menuStore">🏬 店頭買取表</li>
-      <li class="drawer-item" id="menuMail">📦 郵送買取表</li>
-      <li class="drawer-item" onclick="openInfo('privacy')">📝 プライバシーポリシー</li>
-      <li class="drawer-item" onclick="openInfo('terms')">📜 利用規約</li>
+      <li class="drawer-item" id="menuStore">店頭買取表</li>
+      <li class="drawer-item" id="menuMail">郵送買取表</li>
+      <li class="drawer-item" onclick="openInfo('privacy')">プライバシーポリシー</li>
+      <li class="drawer-item" onclick="openInfo('terms')">利用規約</li>
     </ul>
   </div>
 
@@ -477,18 +502,19 @@
         <div class="search-box"><span class="search-icon">🔍</span><input id="q" placeholder="検索" /></div>
         <button id="flowBtn" class="flow-btn" onclick="openInfo('flow')"><i class="fa-solid fa-book-open"></i> 買取の流れ</button>
         
-        <select id="sort">
-          <option value="price_desc">高い順</option>
-          <option value="price_asc">安い順</option>
-          <option value="type_psa10">PSA10</option>
-          <option value="type_mikaifu">未開封</option> 
-          <option value="type_sotai">素体</option>
-          <option value="type_box">BOX</option>
-        </select>
-        
-        <label id="showSoldOutLabel">
-          <input type="checkbox" id="showSoldOut" checked> 終了も表示
-        </label>
+        <div class="filter-row-2">
+          <select id="sort">
+            <option value="price_desc">高い順</option>
+            <option value="price_asc">安い順</option>
+            <option value="type_psa10">PSA10</option>
+            <option value="type_mikaifu">未開封</option> 
+            <option value="type_sotai">素体</option>
+            <option value="type_box">BOX</option>
+          </select>
+          <label id="showSoldOutLabel">
+            <input type="checkbox" id="showSoldOut" checked> 終了も表示
+          </label>
+        </div>
         
         <button id="reload">更新</button>
       </div>
@@ -512,7 +538,7 @@
     <div style="text-align:right; margin-top:20px; font-size:18px; font-weight:bold;">
       合計 <span style="color:var(--accent); font-size:24px;" id="cartViewTotal">¥0</span>
     </div>
-    </div>
+  </div>
 
   <div id="cartBar" class="cart-bar">
     <div class="cart-total-info">
@@ -546,17 +572,17 @@
       <a class="footer-link" onclick="openInfo('privacy')">プライバシーポリシー</a><span style="color:#333">|</span><a class="footer-link" onclick="openInfo('terms')">利用規約</a>
     </div>
     <div class="copyright">© 2026 トレカフォース</div>
-    <div class="footer-version">v10.0</div>
+    <div class="footer-version">v10.1</div>
   </footer>
 
   <script>
     // ★ GAS URL（必ずご自身のものに書き換えてください）
-    const API = "https://script.google.com/macros/s/AKfycbzXzCyRO_SEEiVcegf5N8PSa7721ocJ-OPA_DU14eRkZG6JEUh4cFETStPTmcc91BdU/exec";
+    const API = "https://script.google.com/macros/s/AKfycbw08oFxfH6FsxcJ77mgNLeticvOFaq2rknNBK3emZgwmhsM5-sB_ltBhbuKamoXHkV8/exec";
     
     // ★ 設定: バナー画像URL（最大5つまで）
     const BANNER_IMAGES = [
-      "banner1.png",
-      "banner2.png"
+      "./banner1.png",
+      "./banner2.png"
     ];
 
     // キャッシュ有効期限：1分
@@ -689,7 +715,6 @@
         let actions = "";
         let overlay = "";
 
-        // ★ 郵送モード: 売切時はカード中央にオーバーレイ。在庫があればカート。
         if(isMailMode) {
           if(isSold) {
              overlay = `<div class="sold-out-overlay"><div class="sold-out-badge">買取終了</div></div>`;
@@ -707,7 +732,6 @@
               </div>`;
           }
         } 
-        // ★ 店頭モード: 売切時はカード中央にオーバーレイ。
         else {
           if (isSold) {
              overlay = `<div class="sold-out-overlay"><div class="sold-out-badge">買取終了</div></div>`;
@@ -988,4 +1012,3 @@
   </script>
 </body>
 </html>
-
