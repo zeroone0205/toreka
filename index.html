@@ -48,7 +48,7 @@
       min-height: 100vh;
       padding-bottom: 80px; 
       transition: all 0.5s ease;
-      /* ここはブラウザデフォルトのスクロール挙動に任せる */
+      /* Pull to Refresh制御のため native scroll behaviorは維持しつつJSで制御 */
     }
     
     body::before {
@@ -60,7 +60,7 @@
 
     * { box-sizing: border-box; }
 
-    /* Pull to Refresh インジケータ */
+    /* ★★★ Pull to Refresh インジケータ ★★★ */
     #ptr-indicator {
       position: fixed;
       top: -100px; /* 初期位置 */
@@ -69,19 +69,20 @@
       background: rgba(30, 30, 30, 0.95);
       border: 2px solid var(--accent);
       color: var(--accent);
-      padding: 12px 24px;
+      padding: 10px 20px;
       border-radius: 30px;
       font-weight: bold;
-      z-index: 99999; /* 最前面 */
+      font-size: 12px;
+      z-index: 11000;
       opacity: 0;
-      transition: top 0.3s ease, opacity 0.3s ease;
+      transition: top 0.2s ease, opacity 0.2s ease;
       pointer-events: none;
-      display: flex; align-items: center; gap: 10px;
+      display: flex; align-items: center; gap: 8px;
       box-shadow: 0 0 15px var(--accent);
     }
-    #ptr-indicator.visible { opacity: 1; top: 100px; }
+    #ptr-indicator.visible { opacity: 1; top: 90px; }
     .spinner {
-      width: 18px; height: 18px; border: 3px solid transparent; 
+      width: 16px; height: 16px; border: 3px solid transparent; 
       border-top-color: var(--accent); border-right-color: var(--accent);
       border-radius: 50%; animation: spin 0.8s linear infinite;
     }
@@ -113,10 +114,10 @@
       margin-bottom: 4px; transition: color 0.5s;
     }
     #date-display {
+      display: block;
       font-size: 10px; color: #fff; font-weight: bold; padding: 2px 10px;
       border-radius: 12px; border: 1px solid var(--accent); box-shadow: var(--glow-box);
       background: rgba(0, 0, 0, 0.6); white-space: nowrap; transition: all 0.5s ease;
-      display: block; 
     }
     .header-right { display: flex; align-items: center; gap: 15px; z-index: 102; position: relative; }
     .logo-img { height: 40px; width: auto; object-fit: contain; filter: none; }
@@ -253,17 +254,20 @@
     .card-img { width: 100%; aspect-ratio: 3/4; background: #000; object-fit: contain; border-bottom: 1px solid #333; }
     .no-img { display: flex; align-items: center; justify-content: center; color: #555; font-size: 10px; background: #222; }
     .card-body { padding: 8px; flex: 1; display: flex; flex-direction: column; position: relative; }
+    
     .card-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
     
-    /* カード内ラベル（塗りつぶし） */
+    /* ★修正: カード内ラベル（塗りつぶし・スタイリッシュ版・小さく） */
     .type-label { 
-      font-size: 10px; color: #fff; font-weight: 900; 
-      background: var(--accent);
+      display: inline-block;
+      font-size: 9px; color: #fff; font-weight: 900; 
+      background: var(--accent); /* 背景塗りつぶし */
       border: 1px solid var(--accent); 
-      padding: 2px 8px; border-radius: 4px;
+      padding: 1px 5px; border-radius: 3px;
+      line-height: 1.2;
       box-shadow: var(--glow-box);
     }
-
+    
     .limit-badge { font-size: 10px; color: #fff; background: #444; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
     .card-title { font-size: 12px; font-weight: bold; line-height: 1.4; margin-bottom: 6px; color: #fff; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 34px; }
     .card-tags { position: absolute; top: 4px; right: 4px; display: flex; flex-direction: column; gap: 2px; align-items: flex-end; }
@@ -305,7 +309,7 @@
     .cart-item-actions { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
     .delete-btn { background: #ff5252; color: #fff; padding: 5px 10px; font-size: 11px; border-radius: 4px; border: none; cursor: pointer; }
 
-    #infoView { display: none; padding: 20px 20px 80px; max-width: 800px; margin: 0 auto; color: #ddd; line-height: 1.8; font-size: 14px; text-align: left; }
+    #infoView { display: none; padding: 20px; max-width: 800px; margin: 0 auto; color: #ddd; line-height: 1.8; font-size: 14px; text-align: left; }
     
     /* 会社概要ボタンのスタイル */
     .company-links { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 40px; }
@@ -334,6 +338,7 @@
     .faq-q { color: var(--accent); font-weight: bold; margin-bottom: 5px; }
     .faq-a { margin-left: 10px; color: #ddd; font-size: 13px; }
 
+    /* モーダル */
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 10000; justify-content: center; align-items: center; padding: 15px; backdrop-filter: blur(4px); }
     .modal-overlay.active { display: flex; }
     .modal-content { background: #1e1e1e; border: 2px solid var(--accent); border-radius: 12px; width: 100%; max-width: 400px; max-height: 90vh; overflow-y: auto; position: relative; padding: 20px; box-shadow: 0 0 30px rgba(88, 189, 215, 0.2); }
@@ -345,7 +350,7 @@
     .modal-row { display: flex; justify-content: space-between; align-items: baseline; margin-top:10px;}
     .modal-price { font-size: 32px; color: #ffffff; font-weight: 900; text-shadow: var(--glow-price); }
     .modal-label { font-size: 12px; color: #aaa; }
-    /* モーダル内カートアクション */
+    /* ★復元: モーダル内カートアクション */
     .modal-cart-actions { margin-top: 15px; border-top: 1px solid #444; padding-top: 15px; display: none; align-items: center; gap: 10px; }
     body.mail-mode .modal-cart-actions { display: flex; }
     .modal-qty-group { display: flex; align-items: center; border: 1px solid #555; border-radius: 4px; background: #fff; height: 36px; overflow: hidden; }
@@ -526,7 +531,7 @@
       <a class="footer-link" onclick="openInfo('terms')">利用規約</a>
     </div>
     <div class="copyright">© 2026 トレカフォース</div>
-    <div class="footer-version">v25.1</div>
+    <div class="footer-version">v30.0</div>
   </footer>
 
   <script>
@@ -625,7 +630,9 @@
       
       // 下方向へのスワイプのみ反応
       if (diff > 0 && (document.documentElement.scrollTop === 0 && document.body.scrollTop === 0)) {
-        // 少し抵抗感を持たせる
+        // iOS等でのバウンススクロールを防止して自作UIを見せる
+        if (e.cancelable) e.preventDefault(); 
+        
         if (diff > 70) { 
           ptrIndicator.classList.add('visible');
         } else {
@@ -635,7 +642,7 @@
         isPulling = false;
         ptrIndicator.classList.remove('visible');
       }
-    }, {passive: true});
+    }, {passive: false}); // passive:false で preventDefault有効化
 
     window.addEventListener('touchend', (e) => {
       if (!isPulling) return;
@@ -729,6 +736,8 @@
         const isSold = item.remaining <= 0;
         const img = item.imageUrl ? `<img src="${item.imageUrl}" class="card-img" loading="lazy">` : `<div class="card-img no-img">No Image</div>`;
         const badge = (item.type==="素体"||item.type==="シングル") && item.grade ? `<span class="badge-sotai">${item.grade}</span>` : "";
+        
+        // ★修正: ラベル表記の「【】」を削除し、divタグ自体にスタイルを当てる
         const displayType = (item.type === "素体") ? "シングル" : (item.type || "PSA10");
 
         let actions = "";
@@ -1068,7 +1077,9 @@
       el("modalTitle").textContent = item.name;
       el("modalPrice").textContent = yen(item.price);
       el("modalLimit").textContent = "残り: " + item.remaining;
-      el("modalTags").innerHTML = `<span class="type-label">【${item.type}】</span>`;
+      // ★修正: モーダル内も「シングル」等に変換し、括弧なし
+      const displayType = (item.type === "素体") ? "シングル" : (item.type || "PSA10");
+      el("modalTags").innerHTML = `<span class="type-label">${displayType}</span>`;
       
       if(isMailMode && item.remaining > 0) {
         el("modalCartActions").style.display = "flex";
