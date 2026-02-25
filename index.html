@@ -48,8 +48,7 @@
       min-height: 100vh;
       padding-bottom: 80px; 
       transition: all 0.5s ease;
-      /* 引っ張って更新を自作するため、ブラウザ標準のバウンス等は残す（Android対策） */
-      /* overscroll-behavior-y: contain;  ←これを外しました */
+      /* ここはブラウザデフォルトのスクロール挙動に任せる */
     }
     
     body::before {
@@ -61,26 +60,26 @@
 
     * { box-sizing: border-box; }
 
-    /* ★★★ Pull to Refresh (カスタム実装) ★★★ */
+    /* Pull to Refresh インジケータ */
     #ptr-indicator {
       position: fixed;
-      top: -60px; /* 初期位置 */
+      top: -100px; /* 初期位置 */
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(20, 20, 20, 0.9);
-      border: 1px solid var(--accent);
+      background: rgba(30, 30, 30, 0.95);
+      border: 2px solid var(--accent);
       color: var(--accent);
       padding: 12px 24px;
       border-radius: 30px;
       font-weight: bold;
-      z-index: 11000;
+      z-index: 99999; /* 最前面 */
       opacity: 0;
       transition: top 0.3s ease, opacity 0.3s ease;
       pointer-events: none;
       display: flex; align-items: center; gap: 10px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      box-shadow: 0 0 15px var(--accent);
     }
-    #ptr-indicator.visible { opacity: 1; top: 90px; }
+    #ptr-indicator.visible { opacity: 1; top: 100px; }
     .spinner {
       width: 18px; height: 18px; border: 3px solid transparent; 
       border-top-color: var(--accent); border-right-color: var(--accent);
@@ -117,6 +116,7 @@
       font-size: 10px; color: #fff; font-weight: bold; padding: 2px 10px;
       border-radius: 12px; border: 1px solid var(--accent); box-shadow: var(--glow-box);
       background: rgba(0, 0, 0, 0.6); white-space: nowrap; transition: all 0.5s ease;
+      display: block; 
     }
     .header-right { display: flex; align-items: center; gap: 15px; z-index: 102; position: relative; }
     .logo-img { height: 40px; width: auto; object-fit: contain; filter: none; }
@@ -140,16 +140,13 @@
       border-bottom: 1px solid #333; background: #111; text-shadow: var(--glow-text);
     }
     .drawer-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; }
-    
     .drawer-item {
       padding: 15px 20px; border-bottom: 1px solid #2a2a2a; 
       cursor: pointer; color: #eee; font-weight: bold; font-size:15px;
-      text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
-      transition: all 0.3s;
+      text-shadow: 0 0 5px rgba(255, 255, 255, 0.3); transition: all 0.3s;
     }
     .drawer-item:hover { 
-      background: #2a2a2a; color: var(--accent); 
-      text-shadow: var(--glow-text);
+      background: #2a2a2a; color: var(--accent); text-shadow: var(--glow-text);
     }
     .drawer-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -233,8 +230,7 @@
     #sort { 
       padding: 8px; border: 1px solid #555; border-radius: 4px; 
       background: rgba(30, 30, 30, 0.8); color: #fff; cursor: pointer; font-size: 12px; 
-      width: auto; min-width: 100px; max-width: 160px;
-      flex: 0 1 auto;
+      width: auto; min-width: 100px; max-width: 160px; flex: 0 1 auto;
     }
     #showSoldOutLabel {
       display: flex; align-items: center; font-size: 12px; color: #fff; 
@@ -257,16 +253,17 @@
     .card-img { width: 100%; aspect-ratio: 3/4; background: #000; object-fit: contain; border-bottom: 1px solid #333; }
     .no-img { display: flex; align-items: center; justify-content: center; color: #555; font-size: 10px; background: #222; }
     .card-body { padding: 8px; flex: 1; display: flex; flex-direction: column; position: relative; }
-    
     .card-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
     
-    /* カード内ラベル（フレーム付き） */
+    /* カード内ラベル（塗りつぶし） */
     .type-label { 
-      font-size: 10px; color: var(--accent); font-weight: 900; 
-      border: 1px solid var(--accent); padding: 1px 6px; border-radius: 4px;
-      text-shadow: var(--glow-text); box-shadow: var(--glow-box);
+      font-size: 10px; color: #fff; font-weight: 900; 
+      background: var(--accent);
+      border: 1px solid var(--accent); 
+      padding: 2px 8px; border-radius: 4px;
+      box-shadow: var(--glow-box);
     }
-    
+
     .limit-badge { font-size: 10px; color: #fff; background: #444; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
     .card-title { font-size: 12px; font-weight: bold; line-height: 1.4; margin-bottom: 6px; color: #fff; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 34px; }
     .card-tags { position: absolute; top: 4px; right: 4px; display: flex; flex-direction: column; gap: 2px; align-items: flex-end; }
@@ -308,7 +305,7 @@
     .cart-item-actions { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
     .delete-btn { background: #ff5252; color: #fff; padding: 5px 10px; font-size: 11px; border-radius: 4px; border: none; cursor: pointer; }
 
-    #infoView { display: none; padding: 20px; max-width: 800px; margin: 0 auto; color: #ddd; line-height: 1.8; font-size: 14px; text-align: left; }
+    #infoView { display: none; padding: 20px 20px 80px; max-width: 800px; margin: 0 auto; color: #ddd; line-height: 1.8; font-size: 14px; text-align: left; }
     
     /* 会社概要ボタンのスタイル */
     .company-links { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 40px; }
@@ -529,7 +526,7 @@
       <a class="footer-link" onclick="openInfo('terms')">利用規約</a>
     </div>
     <div class="copyright">© 2026 トレカフォース</div>
-    <div class="footer-version">v24.0</div>
+    <div class="footer-version">v25.1</div>
   </footer>
 
   <script>
@@ -606,15 +603,18 @@
        if(Math.abs(diff)>50) moveSlide(slideIdx+(diff>0?1:-1));
     },{passive:true});
 
-    // ★★★ Pull to Refresh (カスタム実装) ★★★
+    // ★★★ Pull to Refresh (改良版) ★★★
     let ptrStartY = 0;
     let isPulling = false;
     const ptrIndicator = el("ptr-indicator");
 
     window.addEventListener('touchstart', (e) => {
-      if (window.scrollY === 0) {
+      // ページのトップにいる時だけ開始
+      if (document.documentElement.scrollTop === 0 && document.body.scrollTop === 0) {
         ptrStartY = e.touches[0].clientY;
         isPulling = true;
+      } else {
+        isPulling = false;
       }
     }, {passive: true});
 
@@ -622,9 +622,17 @@
       if (!isPulling) return;
       const y = e.touches[0].clientY;
       const diff = y - ptrStartY;
-      if (diff > 80 && window.scrollY === 0) { 
-        ptrIndicator.classList.add('visible');
+      
+      // 下方向へのスワイプのみ反応
+      if (diff > 0 && (document.documentElement.scrollTop === 0 && document.body.scrollTop === 0)) {
+        // 少し抵抗感を持たせる
+        if (diff > 70) { 
+          ptrIndicator.classList.add('visible');
+        } else {
+          ptrIndicator.classList.remove('visible');
+        }
       } else {
+        isPulling = false;
         ptrIndicator.classList.remove('visible');
       }
     }, {passive: true});
@@ -632,13 +640,20 @@
     window.addEventListener('touchend', (e) => {
       if (!isPulling) return;
       isPulling = false;
+      
       const y = e.changedTouches[0].clientY;
       const diff = y - ptrStartY;
-      if (diff > 80 && window.scrollY === 0) {
+
+      if (diff > 70 && (document.documentElement.scrollTop === 0 && document.body.scrollTop === 0)) {
+         // リロード実行
          ALL_DATA = {};
-         sessionStorage.clear();
+         sessionStorage.clear(); // キャッシュクリア
+         
+         // 読み込み完了までインジケータを表示したままにする
          loadData().then(() => {
-           setTimeout(() => ptrIndicator.classList.remove('visible'), 500);
+           setTimeout(() => {
+             ptrIndicator.classList.remove('visible');
+           }, 800);
          });
       } else {
         ptrIndicator.classList.remove('visible');
@@ -714,8 +729,6 @@
         const isSold = item.remaining <= 0;
         const img = item.imageUrl ? `<img src="${item.imageUrl}" class="card-img" loading="lazy">` : `<div class="card-img no-img">No Image</div>`;
         const badge = (item.type==="素体"||item.type==="シングル") && item.grade ? `<span class="badge-sotai">${item.grade}</span>` : "";
-        
-        // ★修正: ラベル表記の「【】」を削除し、divタグ自体にスタイルを当てる
         const displayType = (item.type === "素体") ? "シングル" : (item.type || "PSA10");
 
         let actions = "";
@@ -994,7 +1007,7 @@
     function openInfo(t) {
       el("mainView").style.display="none"; el("cartView").style.display="none"; el("infoView").style.display="block";
       
-      // タイトル変更 & 日時非表示
+      // ★修正: ページに合わせてタイトル変更 & 日時非表示
       if(t === 'company') el("mainTitle").textContent = "会社概要";
       else if(t === 'privacy') el("mainTitle").textContent = "プライバシーポリシー";
       else if(t === 'terms') el("mainTitle").textContent = "利用規約";
