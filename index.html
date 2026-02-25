@@ -48,7 +48,7 @@
       min-height: 100vh;
       padding-bottom: 80px; 
       transition: all 0.5s ease;
-      /* ここはブラウザデフォルトのスクロール挙動に任せる */
+      /* 引っ張って更新を自作するため、ブラウザ標準のバウンス等は残す */
     }
     
     body::before {
@@ -60,7 +60,7 @@
 
     * { box-sizing: border-box; }
 
-    /* Pull to Refresh インジケータ */
+    /* Pull to Refresh */
     #ptr-indicator {
       position: fixed;
       top: -100px; /* 初期位置 */
@@ -72,7 +72,7 @@
       padding: 12px 24px;
       border-radius: 30px;
       font-weight: bold;
-      z-index: 99999; /* 最前面 */
+      z-index: 99999;
       opacity: 0;
       transition: top 0.3s ease, opacity 0.3s ease;
       pointer-events: none;
@@ -113,10 +113,10 @@
       margin-bottom: 4px; transition: color 0.5s;
     }
     #date-display {
+      display: block;
       font-size: 10px; color: #fff; font-weight: bold; padding: 2px 10px;
       border-radius: 12px; border: 1px solid var(--accent); box-shadow: var(--glow-box);
       background: rgba(0, 0, 0, 0.6); white-space: nowrap; transition: all 0.5s ease;
-      display: block; 
     }
     .header-right { display: flex; align-items: center; gap: 15px; z-index: 102; position: relative; }
     .logo-img { height: 40px; width: auto; object-fit: contain; filter: none; }
@@ -178,7 +178,6 @@
     }
     body.mail-mode .mail-deadline-box { display: block; }
     .deadline-highlight { color: #FFD700; text-shadow: 0 0 5px rgba(255, 215, 0, 0.5); font-size:13px;}
-    
     @media (min-width: 601px) { .br-sp { display: none; } }
     @media (max-width: 600px) {
       .br-sp { display: block; }
@@ -217,8 +216,7 @@
       background: transparent; border: 1px solid var(--accent); color: var(--accent);
       display: flex; align-items: center; gap: 5px; box-shadow: none;
       padding: 8px 8px; font-size: 11px; justify-self: end; border-radius: 4px; cursor: pointer;
-      width: 100px; justify-content: center;
-      white-space: nowrap;
+      width: 100px; justify-content: center; white-space: nowrap;
     }
     .header-action-btn:hover { background: rgba(88, 189, 215, 0.1); }
     body.mail-mode .header-action-btn:hover { background: rgba(180, 114, 255, 0.1); }
@@ -257,10 +255,9 @@
     
     /* カード内ラベル（塗りつぶし） */
     .type-label { 
-      font-size: 10px; color: #fff; font-weight: 900; 
+      font-size: 9px; color: #fff; font-weight: 900; 
       background: var(--accent);
-      border: 1px solid var(--accent); 
-      padding: 2px 8px; border-radius: 4px;
+      border: 1px solid var(--accent); padding: 1px 5px; border-radius: 3px;
       box-shadow: var(--glow-box);
     }
 
@@ -305,9 +302,9 @@
     .cart-item-actions { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
     .delete-btn { background: #ff5252; color: #fff; padding: 5px 10px; font-size: 11px; border-radius: 4px; border: none; cursor: pointer; }
 
-    #infoView { display: none; padding: 20px 20px 80px; max-width: 800px; margin: 0 auto; color: #ddd; line-height: 1.8; font-size: 14px; text-align: left; }
+    #infoView { display: none; padding: 20px; max-width: 800px; margin: 0 auto; color: #ddd; line-height: 1.8; font-size: 14px; text-align: left; }
     
-    /* 会社概要ボタンのスタイル */
+    /* 会社概要ボタン */
     .company-links { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 40px; }
     .company-btn {
       padding: 15px 0; background: #1a1a1a; border: 2px solid var(--accent); 
@@ -317,7 +314,7 @@
     }
     .company-btn:hover { background: var(--accent); color: #fff; box-shadow: var(--glow-text); }
     
-    /* 情報画面の「一覧に戻る」ボタン */
+    /* 一覧に戻るボタン */
     .back-btn-container { text-align: left; margin-bottom: 20px; }
     .back-btn-container button {
        padding: 8px 16px; background: #333; color: #fff; border: 1px solid #555;
@@ -325,7 +322,7 @@
     }
     .back-btn-container button:hover { border-color: var(--accent); color: var(--accent); }
 
-    /* 買取の流れ（デザイン復旧用クラス） */
+    /* 復元：情報画面用スタイル */
     .flow-step { background: #252525; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid var(--accent); }
     .flow-title { font-size: 16px; font-weight: bold; color: var(--accent); margin-bottom: 10px; text-shadow: var(--glow-text); }
     .note-box { background: rgba(255, 50, 50, 0.1); border: 1px solid #ff5252; padding: 15px; border-radius: 8px; margin-top: 30px; }
@@ -334,6 +331,7 @@
     .faq-q { color: var(--accent); font-weight: bold; margin-bottom: 5px; }
     .faq-a { margin-left: 10px; color: #ddd; font-size: 13px; }
 
+    /* モーダル */
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 10000; justify-content: center; align-items: center; padding: 15px; backdrop-filter: blur(4px); }
     .modal-overlay.active { display: flex; }
     .modal-content { background: #1e1e1e; border: 2px solid var(--accent); border-radius: 12px; width: 100%; max-width: 400px; max-height: 90vh; overflow-y: auto; position: relative; padding: 20px; box-shadow: 0 0 30px rgba(88, 189, 215, 0.2); }
@@ -345,7 +343,8 @@
     .modal-row { display: flex; justify-content: space-between; align-items: baseline; margin-top:10px;}
     .modal-price { font-size: 32px; color: #ffffff; font-weight: 900; text-shadow: var(--glow-price); }
     .modal-label { font-size: 12px; color: #aaa; }
-    /* モーダル内カートアクション */
+    
+    /* ★復元: モーダル内カートアクション */
     .modal-cart-actions { margin-top: 15px; border-top: 1px solid #444; padding-top: 15px; display: none; align-items: center; gap: 10px; }
     body.mail-mode .modal-cart-actions { display: flex; }
     .modal-qty-group { display: flex; align-items: center; border: 1px solid #555; border-radius: 4px; background: #fff; height: 36px; overflow: hidden; }
@@ -526,7 +525,7 @@
       <a class="footer-link" onclick="openInfo('terms')">利用規約</a>
     </div>
     <div class="copyright">© 2026 トレカフォース</div>
-    <div class="footer-version">v25.1</div>
+    <div class="footer-version">v28.0</div>
   </footer>
 
   <script>
@@ -603,13 +602,12 @@
        if(Math.abs(diff)>50) moveSlide(slideIdx+(diff>0?1:-1));
     },{passive:true});
 
-    // ★★★ Pull to Refresh (改良版) ★★★
+    // ★★★ Pull to Refresh (カスタム実装) ★★★
     let ptrStartY = 0;
     let isPulling = false;
     const ptrIndicator = el("ptr-indicator");
 
     window.addEventListener('touchstart', (e) => {
-      // ページのトップにいる時だけ開始
       if (document.documentElement.scrollTop === 0 && document.body.scrollTop === 0) {
         ptrStartY = e.touches[0].clientY;
         isPulling = true;
@@ -623,9 +621,7 @@
       const y = e.touches[0].clientY;
       const diff = y - ptrStartY;
       
-      // 下方向へのスワイプのみ反応
       if (diff > 0 && (document.documentElement.scrollTop === 0 && document.body.scrollTop === 0)) {
-        // 少し抵抗感を持たせる
         if (diff > 70) { 
           ptrIndicator.classList.add('visible');
         } else {
@@ -647,9 +643,8 @@
       if (diff > 70 && (document.documentElement.scrollTop === 0 && document.body.scrollTop === 0)) {
          // リロード実行
          ALL_DATA = {};
-         sessionStorage.clear(); // キャッシュクリア
+         sessionStorage.clear(); 
          
-         // 読み込み完了までインジケータを表示したままにする
          loadData().then(() => {
            setTimeout(() => {
              ptrIndicator.classList.remove('visible');
@@ -1007,7 +1002,7 @@
     function openInfo(t) {
       el("mainView").style.display="none"; el("cartView").style.display="none"; el("infoView").style.display="block";
       
-      // ★修正: ページに合わせてタイトル変更 & 日時非表示
+      // タイトル変更 & 日時非表示
       if(t === 'company') el("mainTitle").textContent = "会社概要";
       else if(t === 'privacy') el("mainTitle").textContent = "プライバシーポリシー";
       else if(t === 'terms') el("mainTitle").textContent = "利用規約";
