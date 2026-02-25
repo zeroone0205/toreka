@@ -48,7 +48,8 @@
       min-height: 100vh;
       padding-bottom: 80px; 
       transition: all 0.5s ease;
-      overscroll-behavior-y: contain; 
+      /* 引っ張って更新を自作するため、ブラウザ標準のバウンス等は残す（Android対策） */
+      /* overscroll-behavior-y: contain;  ←これを外しました */
     }
     
     body::before {
@@ -60,10 +61,10 @@
 
     * { box-sizing: border-box; }
 
-    /* Pull to Refresh */
+    /* ★★★ Pull to Refresh (カスタム実装) ★★★ */
     #ptr-indicator {
       position: fixed;
-      top: -60px; /* 初期位置は隠す */
+      top: -60px; /* 初期位置 */
       left: 50%;
       transform: translateX(-50%);
       background: rgba(20, 20, 20, 0.9);
@@ -112,9 +113,7 @@
       font-style: italic; letter-spacing: 1px; white-space: nowrap; line-height: 1.1;
       margin-bottom: 4px; transition: color 0.5s;
     }
-    /* ★修正: 更新日時表示 */
     #date-display {
-      display: block; /* 初期表示 */
       font-size: 10px; color: #fff; font-weight: bold; padding: 2px 10px;
       border-radius: 12px; border: 1px solid var(--accent); box-shadow: var(--glow-box);
       background: rgba(0, 0, 0, 0.6); white-space: nowrap; transition: all 0.5s ease;
@@ -152,7 +151,6 @@
       background: #2a2a2a; color: var(--accent); 
       text-shadow: var(--glow-text);
     }
-    
     .drawer-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.7); backdrop-filter: blur(2px); z-index: 99998;
@@ -262,7 +260,7 @@
     
     .card-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
     
-    /* ★修正: カード内ラベル（フレーム付き） */
+    /* カード内ラベル（フレーム付き） */
     .type-label { 
       font-size: 10px; color: var(--accent); font-weight: 900; 
       border: 1px solid var(--accent); padding: 1px 6px; border-radius: 4px;
@@ -531,7 +529,7 @@
       <a class="footer-link" onclick="openInfo('terms')">利用規約</a>
     </div>
     <div class="copyright">© 2026 トレカフォース</div>
-    <div class="footer-version">v25.0</div>
+    <div class="footer-version">v24.0</div>
   </footer>
 
   <script>
@@ -552,7 +550,7 @@
       if(!d) d = new Date();
       const min = String(d.getMinutes()).padStart(2, '0');
       el("date-display").textContent = `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${min} 更新`;
-      el("date-display").style.display = "block"; // 復活
+      el("date-display").style.display = "block"; 
     }
 
     function updateDeadline() {
@@ -584,7 +582,6 @@
         el("cartBar").classList.remove("visible");
         el("showSoldOutLabel").style.display = "flex"; 
       }
-      // 通常時は日時表示
       el("date-display").style.display = "block";
     }
 
@@ -609,7 +606,7 @@
        if(Math.abs(diff)>50) moveSlide(slideIdx+(diff>0?1:-1));
     },{passive:true});
 
-    // Pull to Refresh
+    // ★★★ Pull to Refresh (カスタム実装) ★★★
     let ptrStartY = 0;
     let isPulling = false;
     const ptrIndicator = el("ptr-indicator");
