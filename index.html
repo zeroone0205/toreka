@@ -38,6 +38,13 @@
       display: flex; flex-direction: column; min-height: 100vh; 
       padding-bottom: 0; transition: all 0.5s ease;
     }
+    /* ★修正: 情報画面表示中はカートボタン等を隠すためのクラス */
+    body.viewing-info .header-cart-btn,
+    body.viewing-info .cart-bar,
+    body.viewing-info .cart-actions {
+       display: none !important;
+    }
+
     body::before {
       content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0, 0, 0, 0.7); z-index: -1;
@@ -561,7 +568,7 @@
       <a class="footer-link" onclick="openInfo('terms')">利用規約</a>
     </div>
     <div class="copyright">© 2026 トレカフォース</div>
-    <div class="footer-version">v36.0</div>
+    <div class="footer-version">v38.0</div>
   </footer>
 
   <script>
@@ -572,7 +579,7 @@
 
     let ALL_DATA = {}, CURRENT_ITEMS = [], CUR_PAGE = 1, CART = {};
     let lineUserId = ""; 
-    let memberData = { name: "", tel: "", address: "", bank: "" }; // 会員情報一時保存
+    let memberData = { name: "", tel: "", address: "", bank: "" }; 
 
     const ITEMS_per_PAGE = 60;
     const urlParams = new URLSearchParams(window.location.search);
@@ -583,7 +590,6 @@
     const el = (id) => document.getElementById(id);
     const yen = (n) => "¥" + Number(n).toLocaleString();
 
-    // LIFF初期化
     window.onload = function() {
       updateModeUI();
       loadData();
@@ -593,9 +599,13 @@
     };
 
     function initializeLiff(myLiffId) {
-      liff
-        .init({ liffId: myLiffId })
-        .then(() => {
+      // 404エラー対策: IDが未設定なら警告
+      if(myLiffId === "YOUR_LIFF_ID_HERE") {
+         console.warn("LIFF IDが設定されていません");
+         return;
+      }
+
+      liff.init({ liffId: myLiffId }).then(() => {
           // 自動ログインはしない（外部ブラウザ対策）
           if (liff.isLoggedIn()) {
              getProfile();
@@ -605,8 +615,7 @@
                 openInfo('member');
              }
           }
-        })
-        .catch((err) => { console.log('LIFF Initialization failed ', err); });
+      }).catch((err) => { console.log('LIFF Initialization failed ', err); });
     }
 
     function getProfile() {
@@ -616,23 +625,28 @@
         
         // ★仮: GASから会員情報を取得した体にする
         // 本番ではここで fetch(API + '?action=get_member&uid=' + lineUserId) する
-        memberData = {
-           name: profile.displayName, // LINE名で仮埋め
-           tel: "090-0000-0000",
-           address: "東京都...",
-           bank: "未登録"
-        };
-        
+        // 未登録の場合は memberData は空のまま
+        // memberData = { name: profile.displayName, ... }; 
+
+        // 情報がなければ登録画面へ誘導（モックとして名前だけ入れる）
+        if(!memberData.name) {
+           memberData.name = profile.displayName; 
+        }
+
         // カート画面の表示更新
         updateCartViewLoginState();
 
+        // ログイン完了後、会員画面を開く指定があれば開く
         if (actionParam === 'member') {
            openInfo('member'); 
+        } else if(el("infoView").style.display === 'block' && el("memberSection").style.display === 'block') {
+           // 既に会員画面を開いていてログイン完了した場合、画面を更新
+           openInfo('member');
         }
+
       });
     }
     
-    // ★修正: ログイン処理
     function liffLogin() {
       if(!liff.isLoggedIn()) {
         // 外部ブラウザでも動くように redirectUri を明示
@@ -640,18 +654,14 @@
       }
     }
 
-    /* --- カート・買取申込関連 --- */
     function updateCartViewLoginState() {
        if (lineUserId) {
-          // ログイン済み
           el("cartLoginReq").style.display = "none";
           el("cartPurchaseForm").style.display = "block";
-          // 情報をセット
           el("confName").innerText = memberData.name || "未設定";
           el("confTel").innerText = memberData.tel || "未設定";
           el("confBank").innerText = memberData.bank || "未設定";
        } else {
-          // 未ログイン
           el("cartLoginReq").style.display = "block";
           el("cartPurchaseForm").style.display = "none";
        }
@@ -660,44 +670,21 @@
     function submitPurchase() {
        if(Object.keys(CART).length === 0) { alert("カートが空です"); return; }
        if(!confirm("この内容で買取を申し込みますか？\n（リコアへのデータ送信・在庫連携を行います）")) return;
-       
-       // 送信データ作成
-       const payload = {
-          lineUserId: lineUserId,
-          items: CART,
-          member: memberData
-       };
-       
-       // ★GASへ送信 (今はモック)
+       const payload = { lineUserId: lineUserId, items: CART, member: memberData };
        console.log("Sending to GAS:", payload);
-       
-       // 送信中の演出
        const btn = document.querySelector(".purchase-btn");
-       btn.disabled = true;
-       btn.innerText = "送信中...";
-       
+       btn.disabled = true; btn.innerText = "送信中...";
        setTimeout(() => {
-          // 完了後の処理
-          alert("買取受付が完了しました！");
-          CART = {}; // カートを空に
-          renderCartBar();
-          
-          // 完了画面へ切り替え
-          el("cartView").style.display = "none";
-          el("infoView").style.display = "block";
-          el("memberSection").style.display = "none";
-          el("infoContent").innerHTML = ""; // クリア
-          
+          alert("買取受付が完了しました！"); CART = {}; renderCartBar();
+          el("cartView").style.display = "none"; el("infoView").style.display = "block";
+          el("memberSection").style.display = "none"; el("infoContent").innerHTML = ""; 
           el("successView").style.display = "block";
-          // ランダムな受付コード生成
           const code = "REQ-" + Math.floor(100000 + Math.random() * 900000);
           el("successCode").innerText = code;
-          
           window.scrollTo(0,0);
        }, 1500);
     }
 
-    /* --- 既存機能群 --- */
     function updateDate(d) {
       if(!d) d = new Date();
       const min = String(d.getMinutes()).padStart(2, '0');
@@ -709,7 +696,13 @@
       const days = ['日', '月', '火', '水', '木', '金', '土'];
       const now = new Date(); now.setDate(now.getDate() + 2); 
       const m = now.getMonth() + 1; const d = now.getDate(); const w = days[now.getDay()];
-      el("mailDeadline").innerHTML = `サイトよりご予約いただいた場合、${m}月${d}日（${w}）17時までに...`;
+      const deadlineText = `${m}月${d}日（${w}）`;
+      el("mailDeadline").innerHTML = `
+        サイトよりご予約いただいた場合、${deadlineText}17時までに<br class="br-sp">
+        商品が到着すれば、お申込時の金額を満額にて買取査定いたします。<br>
+        上記日時を過ぎて商品が到着した場合は、着払いでのご返送、<br class="br-sp">
+        もしくは到着日時点の相場にて再査定となります。
+      `;
     }
 
     function updateModeUI() {
@@ -860,6 +853,10 @@
     };
     function openInfo(t) {
       el("mainView").style.display="none"; el("cartView").style.display="none"; el("infoView").style.display="block";
+      
+      // ★修正: 情報画面表示中はカートボタン等を非表示にするクラスを追加
+      document.body.classList.add('viewing-info');
+
       let title = "情報";
       if(t === 'member') title = "会員登録"; else if(t === 'company') title = "会社概要"; else if(t === 'privacy') title = "プライバシーポリシー"; else if(t === 'terms') title = "利用規約"; else if(t === 'flow') title = "買取の流れ"; else if(t === 'rules') title = "買取基準";
       el("mainTitle").textContent = title; el("date-display").style.display = "none"; 
@@ -885,7 +882,14 @@
     }
     function showBarcode() { if(!el("instoreAgree").checked) { alert("注意事項を確認し、同意チェックを入れてください"); return; } el("instoreRequestView").style.display = "none"; el("memberCardView").style.display = "block"; drawBarcode("MEM-00001"); el("memNo").innerText = "MEM-00001"; el("memName").innerText = el("regName").value || "名無し"; }
     function drawBarcode(code) { JsBarcode("#barcode", code, {format: "CODE128", displayValue: true, width:2, height:50}); }
-    function closeInfo() { el("infoView").style.display="none"; el("mainView").style.display="block"; const url = new URL(location); url.searchParams.delete("action"); history.pushState({},"",url); actionParam = null; switchMode(); window.scrollTo(0,0); }
+    
+    function closeInfo() { 
+       el("infoView").style.display="none"; el("mainView").style.display="block"; 
+       // ★修正: クラスを削除してカートボタンを復活
+       document.body.classList.remove('viewing-info');
+
+       const url = new URL(location); url.searchParams.delete("action"); history.pushState({},"",url); actionParam = null; switchMode(); window.scrollTo(0,0); 
+    }
 
     const modal = el("modal"); const closeModalBtn = el("closeModalBtn"); let currentModalItem = null;
     el("modalQtyMinus").onclick = () => { let v = parseInt(el("modalQtyInput").value); if(v > 1) el("modalQtyInput").value = v - 1; };
