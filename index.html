@@ -62,11 +62,21 @@
 
     /* Pull to Refresh */
     #ptr-indicator {
-      position: fixed; top: -60px; left: 50%; transform: translateX(-50%);
-      background: rgba(20, 20, 20, 0.9); border: 1px solid var(--accent); color: var(--accent);
-      padding: 12px 24px; border-radius: 30px; font-weight: bold; z-index: 11000;
-      opacity: 0; transition: top 0.3s ease, opacity 0.3s ease;
-      pointer-events: none; display: flex; align-items: center; gap: 10px;
+      position: fixed;
+      top: -60px; /* 初期位置は隠す */
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(20, 20, 20, 0.9);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-weight: bold;
+      z-index: 11000;
+      opacity: 0;
+      transition: top 0.3s ease, opacity 0.3s ease;
+      pointer-events: none;
+      display: flex; align-items: center; gap: 10px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.5);
     }
     #ptr-indicator.visible { opacity: 1; top: 90px; }
@@ -102,7 +112,9 @@
       font-style: italic; letter-spacing: 1px; white-space: nowrap; line-height: 1.1;
       margin-bottom: 4px; transition: color 0.5s;
     }
+    /* ★修正: 更新日時表示 */
     #date-display {
+      display: block; /* 初期表示 */
       font-size: 10px; color: #fff; font-weight: bold; padding: 2px 10px;
       border-radius: 12px; border: 1px solid var(--accent); box-shadow: var(--glow-box);
       background: rgba(0, 0, 0, 0.6); white-space: nowrap; transition: all 0.5s ease;
@@ -140,6 +152,7 @@
       background: #2a2a2a; color: var(--accent); 
       text-shadow: var(--glow-text);
     }
+    
     .drawer-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.7); backdrop-filter: blur(2px); z-index: 99998;
@@ -246,8 +259,16 @@
     .card-img { width: 100%; aspect-ratio: 3/4; background: #000; object-fit: contain; border-bottom: 1px solid #333; }
     .no-img { display: flex; align-items: center; justify-content: center; color: #555; font-size: 10px; background: #222; }
     .card-body { padding: 8px; flex: 1; display: flex; flex-direction: column; position: relative; }
+    
     .card-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-    .type-label { font-size: 10px; color: var(--accent); font-weight: 900; text-shadow: var(--glow-text); }
+    
+    /* ★修正: カード内ラベル（フレーム付き） */
+    .type-label { 
+      font-size: 10px; color: var(--accent); font-weight: 900; 
+      border: 1px solid var(--accent); padding: 1px 6px; border-radius: 4px;
+      text-shadow: var(--glow-text); box-shadow: var(--glow-box);
+    }
+    
     .limit-badge { font-size: 10px; color: #fff; background: #444; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
     .card-title { font-size: 12px; font-weight: bold; line-height: 1.4; margin-bottom: 6px; color: #fff; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 34px; }
     .card-tags { position: absolute; top: 4px; right: 4px; display: flex; flex-direction: column; gap: 2px; align-items: flex-end; }
@@ -510,7 +531,7 @@
       <a class="footer-link" onclick="openInfo('terms')">利用規約</a>
     </div>
     <div class="copyright">© 2026 トレカフォース</div>
-    <div class="footer-version">v24.0</div>
+    <div class="footer-version">v25.0</div>
   </footer>
 
   <script>
@@ -531,6 +552,7 @@
       if(!d) d = new Date();
       const min = String(d.getMinutes()).padStart(2, '0');
       el("date-display").textContent = `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${min} 更新`;
+      el("date-display").style.display = "block"; // 復活
     }
 
     function updateDeadline() {
@@ -562,6 +584,8 @@
         el("cartBar").classList.remove("visible");
         el("showSoldOutLabel").style.display = "flex"; 
       }
+      // 通常時は日時表示
+      el("date-display").style.display = "block";
     }
 
     // Slider
@@ -693,6 +717,8 @@
         const isSold = item.remaining <= 0;
         const img = item.imageUrl ? `<img src="${item.imageUrl}" class="card-img" loading="lazy">` : `<div class="card-img no-img">No Image</div>`;
         const badge = (item.type==="素体"||item.type==="シングル") && item.grade ? `<span class="badge-sotai">${item.grade}</span>` : "";
+        
+        // ★修正: ラベル表記の「【】」を削除し、divタグ自体にスタイルを当てる
         const displayType = (item.type === "素体") ? "シングル" : (item.type || "PSA10");
 
         let actions = "";
@@ -721,7 +747,7 @@
               <div class="card-tags">${badge}</div>
               <div class="card-body">
                 <div class="card-header-row">
-                  <span class="type-label">【${displayType}】</span>
+                  <span class="type-label">${displayType}</span>
                   <span class="limit-badge">残:${item.remaining}</span>
                 </div>
                 <div class="card-title">${item.name}</div>
