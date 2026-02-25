@@ -35,7 +35,9 @@
       color: var(--text-main); background-color: var(--bg-dark);
       background-image: url('./bg-gray.jpg.png'); background-size: cover;
       background-position: center; background-attachment: fixed;
-      display: flex; flex-direction: column; min-height: 100vh; padding-bottom: 80px; 
+      display: flex; flex-direction: column; min-height: 100vh; 
+      /* padding-bottomはfooterの高さ分確保して重なり防止 */
+      padding-bottom: 0; 
       transition: all 0.5s ease;
     }
     body::before {
@@ -252,6 +254,7 @@
     .form-label { display: block; margin-bottom: 5px; font-weight: bold; color: var(--accent); }
     .form-input { width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #555; background: #222; color: #fff; }
     .form-submit { width: 100%; padding: 15px; background: var(--accent); color: #fff; font-weight: bold; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; margin-top: 10px; }
+    .login-btn { width: 100%; padding: 15px; background: #06C755; color: #fff; font-weight: bold; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; display:flex; align-items:center; justify-content:center; gap:10px;}
     .upload-btn-wrapper { position: relative; overflow: hidden; display: inline-block; width: 100%; }
     .upload-btn { border: 2px dashed #555; color: #aaa; background: #222; padding: 20px; border-radius: 8px; width: 100%; text-align: center; cursor: pointer; }
     .upload-btn:hover { border-color: var(--accent); color: var(--accent); }
@@ -329,7 +332,7 @@
     <ul class="drawer-list">
       <li class="drawer-item" id="menuStore">店頭買取表</li>
       <li class="drawer-item" id="menuMail">郵送買取表</li>
-      <li class="drawer-item" onclick="openInfo('member')">会員証・登録</li>
+      <li class="drawer-item" onclick="openInfo('member')">会員登録</li>
       <li class="drawer-item" onclick="openInfo('company')">会社概要</li>
       <li class="drawer-item" onclick="openInfo('privacy')">プライバシーポリシー</li>
       <li class="drawer-item" onclick="openInfo('terms')">利用規約</li>
@@ -413,6 +416,12 @@
     </div>
     
     <div id="memberSection" style="display:none;">
+       
+       <div id="memberLoginView" style="display:none; text-align:center; padding:40px 0;">
+          <p style="margin-bottom:20px;">会員登録・ログインにはLINE連携が必要です</p>
+          <button class="login-btn" onclick="liffLogin()"><i class="fa-brands fa-line" style="font-size:24px;"></i> LINEでログインして登録</button>
+       </div>
+
        <div id="memberCardView" style="display:none;">
           <div class="member-card">
              <div class="member-card-title">TRECA FORCE MEMBER</div>
@@ -424,7 +433,7 @@
           <button class="company-btn" onclick="showMemberEdit()">登録情報を修正</button>
        </div>
 
-       <div id="memberRegView">
+       <div id="memberRegView" style="display:none;">
           <h3>会員登録 / 情報編集</h3>
           <div class="form-group">
             <label class="form-label">お名前</label>
@@ -489,7 +498,7 @@
       <a class="footer-link" onclick="openInfo('terms')">利用規約</a>
     </div>
     <div class="copyright">© 2026 トレカフォース</div>
-    <div class="footer-version">v32.0</div>
+    <div class="footer-version">v33.0</div>
   </footer>
 
   <script>
@@ -497,10 +506,10 @@
     const BANNER_IMAGES = ["./banner1.png", "./banner2.png"];
     const CACHE_DURATION = 60000; 
     // ★重要: ここに取得したLIFF IDを入れてください
-    const YOUR_LIFF_ID = "2009235415-7g6be2ed"; 
+    const YOUR_LIFF_ID = "YOUR_LIFF_ID_HERE"; 
 
     let ALL_DATA = {}, CURRENT_ITEMS = [], CUR_PAGE = 1, CART = {};
-    let lineUserId = ""; // LINE ID保持用
+    let lineUserId = ""; 
     const ITEMS_per_PAGE = 60;
     const urlParams = new URLSearchParams(window.location.search);
     let currentCategory = urlParams.get('cat') || "ポケモン";
@@ -511,11 +520,8 @@
 
     // LIFF初期化
     window.onload = function() {
-      // 既存の初期化
       updateModeUI();
       loadData();
-
-      // LIFF SDKが入っているか確認
       if(typeof liff !== 'undefined') {
         initializeLiff(YOUR_LIFF_ID);
       }
@@ -527,25 +533,27 @@
         .then(() => {
           if (liff.isLoggedIn()) {
              getProfile();
-          } else {
-             // ログインしていなければログイン画面へ（強制する場合）
-             // liff.login();
           }
         })
-        .catch((err) => {
-          console.log('LIFF Initialization failed ', err);
-        });
+        .catch((err) => { console.log('LIFF Initialization failed ', err); });
     }
 
     function getProfile() {
       liff.getProfile().then(function(profile) {
         lineUserId = profile.userId;
-        // 本来はここでGASに問い合わせて会員情報を取得する
-        // 今回はモックとしてコンソール出力のみ
         console.log("LINE ID: " + lineUserId);
-      }).catch(function(error) {
-        console.log('Error getting profile: ' + error);
+        // ログイン後は会員画面を更新（もし開いていれば）
+        if(el("memberSection").style.display === "block"){
+           openInfo('member'); 
+        }
       });
+    }
+    
+    // LINEログインボタン用関数
+    function liffLogin() {
+      if(!liff.isLoggedIn()) {
+        liff.login();
+      }
     }
 
     function updateDate(d) {
@@ -607,44 +615,11 @@
        if(Math.abs(diff)>50) moveSlide(slideIdx+(diff>0?1:-1));
     },{passive:true});
 
-    // Pull to Refresh (改良版)
-    let ptrStartY = 0;
-    let isPulling = false;
-    const ptrIndicator = el("ptr-indicator");
-
-    window.addEventListener('touchstart', (e) => {
-      if (document.documentElement.scrollTop === 0 && document.body.scrollTop === 0) {
-        ptrStartY = e.touches[0].clientY;
-        isPulling = true;
-      } else {
-        isPulling = false;
-      }
-    }, {passive: true});
-
-    window.addEventListener('touchmove', (e) => {
-      if (!isPulling) return;
-      const y = e.touches[0].clientY;
-      const diff = y - ptrStartY;
-      if (diff > 0 && (document.documentElement.scrollTop === 0 && document.body.scrollTop === 0)) {
-        if (e.cancelable) e.preventDefault(); 
-        if (diff > 70) { ptrIndicator.classList.add('visible'); } else { ptrIndicator.classList.remove('visible'); }
-      } else {
-        isPulling = false; ptrIndicator.classList.remove('visible');
-      }
-    }, {passive: false});
-
-    window.addEventListener('touchend', (e) => {
-      if (!isPulling) return;
-      isPulling = false;
-      const y = e.changedTouches[0].clientY;
-      const diff = y - ptrStartY;
-      if (diff > 70 && (document.documentElement.scrollTop === 0 && document.body.scrollTop === 0)) {
-         ALL_DATA = {}; sessionStorage.clear(); 
-         loadData().then(() => { setTimeout(() => { ptrIndicator.classList.remove('visible'); }, 800); });
-      } else {
-        ptrIndicator.classList.remove('visible');
-      }
-    }, {passive: true});
+    // Pull to Refresh
+    let ptrStartY = 0; let isPulling = false; const ptrIndicator = el("ptr-indicator");
+    window.addEventListener('touchstart', (e) => { if (document.documentElement.scrollTop === 0 && document.body.scrollTop === 0) { ptrStartY = e.touches[0].clientY; isPulling = true; } else { isPulling = false; } }, {passive: true});
+    window.addEventListener('touchmove', (e) => { if (!isPulling) return; const y = e.touches[0].clientY; const diff = y - ptrStartY; if (diff > 0 && (document.documentElement.scrollTop === 0 && document.body.scrollTop === 0)) { if (e.cancelable) e.preventDefault(); if (diff > 70) { ptrIndicator.classList.add('visible'); } else { ptrIndicator.classList.remove('visible'); } } else { isPulling = false; ptrIndicator.classList.remove('visible'); } }, {passive: false});
+    window.addEventListener('touchend', (e) => { if (!isPulling) return; isPulling = false; const y = e.changedTouches[0].clientY; const diff = y - ptrStartY; if (diff > 70 && (document.documentElement.scrollTop === 0 && document.body.scrollTop === 0)) { ALL_DATA = {}; sessionStorage.clear(); loadData().then(() => { setTimeout(() => { ptrIndicator.classList.remove('visible'); }, 800); }); } else { ptrIndicator.classList.remove('visible'); } }, {passive: true});
 
     // Data Load
     async function loadData() {
@@ -877,22 +852,18 @@
 
     // 情報画面データ
     const contentData = {
-      privacy: `<p>（省略：v27.0と同じ）</p>`, // ★長くなるので省略、実際はv27.0の中身を入れてください
-      terms: `<p>（省略：v27.0と同じ）</p>`,   // ★長くなるので省略
+      privacy: `<p>（省略：v27.0と同じ）</p>`, // ★実装時はv27.0の中身を入れてください
+      terms: `<p>（省略：v27.0と同じ）</p>`,   // ★実装時はv27.0の中身を入れてください
       company: `...（v29.0と同じ）...`,
       flow: `...（v29.0と同じ）...`,
       rules: `<p>（準備中）</p>`
     };
     
-    // ★コンテンツデータ（テキスト量が多いので省略していますが、v29.0と同じものを使用してください）
-    // 実際の実装時はここに全文を入れてください。
-
     function openInfo(t) {
       el("mainView").style.display="none"; el("cartView").style.display="none"; el("infoView").style.display="block";
       
-      // タイトル変更 & 日時非表示
       let title = "情報";
-      if(t === 'member') title = "会員証・登録";
+      if(t === 'member') title = "会員登録";
       else if(t === 'company') title = "会社概要";
       else if(t === 'privacy') title = "プライバシーポリシー";
       else if(t === 'terms') title = "利用規約";
@@ -905,15 +876,20 @@
       // 会員画面と通常情報画面の切り替え
       if(t === 'member') {
         el("memberSection").style.display = "block";
-        el("infoContent").innerHTML = ""; // 空にする
+        el("infoContent").innerHTML = ""; 
         
-        // 仮のロジック：とりあえず未登録状態を表示
-        // 実装時はLINE IDでGASに問い合わせて分岐
-        el("memberRegView").style.display = "block"; 
-        el("memberCardView").style.display = "none";
-        
-        // バーコード生成テスト
-        // JsBarcode("#barcode", "123456789", {format: "CODE128", displayValue: true});
+        // ★修正: LINEログイン状態による分岐
+        if (liff.isLoggedIn()) {
+           // ログイン済み -> 登録フォーム or 会員証を表示（現状は仮で登録フォーム）
+           el("memberLoginView").style.display = "none";
+           el("memberRegView").style.display = "block"; 
+           el("memberCardView").style.display = "none";
+        } else {
+           // 未ログイン（外部ブラウザなど） -> ログインボタンを表示
+           el("memberLoginView").style.display = "block";
+           el("memberRegView").style.display = "none";
+           el("memberCardView").style.display = "none";
+        }
         
       } else {
         el("memberSection").style.display = "none";
