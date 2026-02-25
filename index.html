@@ -36,9 +36,7 @@
       background-image: url('./bg-gray.jpg.png'); background-size: cover;
       background-position: center; background-attachment: fixed;
       display: flex; flex-direction: column; min-height: 100vh; 
-      /* padding-bottomはfooterの高さ分確保して重なり防止 */
-      padding-bottom: 0; 
-      transition: all 0.5s ease;
+      padding-bottom: 0; transition: all 0.5s ease;
     }
     body::before {
       content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -258,6 +256,14 @@
     .upload-btn-wrapper { position: relative; overflow: hidden; display: inline-block; width: 100%; }
     .upload-btn { border: 2px dashed #555; color: #aaa; background: #222; padding: 20px; border-radius: 8px; width: 100%; text-align: center; cursor: pointer; }
     .upload-btn:hover { border-color: var(--accent); color: var(--accent); }
+    
+    /* 店頭買取チェックリスト用 */
+    .checklist-box { background: #222; border: 1px solid #555; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+    .check-item { margin-bottom: 10px; font-size: 14px; display: flex; align-items: flex-start; gap: 8px; }
+    .check-item input { margin-top: 4px; transform: scale(1.2); }
+    .attention-list { list-style: none; padding: 0; margin: 0 0 15px 0; font-size: 13px; color: #ddd; }
+    .attention-list li { margin-bottom: 8px; padding-left: 1em; text-indent: -1em; }
+    .attention-list li::before { content: "• "; color: #ff5252; }
 
     /* Modal */
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 10000; justify-content: center; align-items: center; padding: 15px; backdrop-filter: blur(4px); }
@@ -422,6 +428,27 @@
           <button class="login-btn" onclick="liffLogin()"><i class="fa-brands fa-line" style="font-size:24px;"></i> LINEでログインして登録</button>
        </div>
 
+       <div id="instoreRequestView" style="display:none;">
+          <h3>店頭買取受付</h3>
+          <p style="font-size:13px; margin-bottom:15px; color:#aaa;">以下の内容をご確認のうえ、受付コードを発行してください。</p>
+          
+          <div class="checklist-box">
+             <div class="note-title">確認事項</div>
+             <ul class="attention-list">
+               <li>身分証明書の住所と現住所が一致していることを確認してください。</li>
+               <li>未成年の方は保護者の同意書が必要です。</li>
+               <li>査定にはお時間をいただく場合があります。</li>
+             </ul>
+             
+             <div class="check-item">
+                <input type="checkbox" id="instoreAgree">
+                <label for="instoreAgree">上記内容を確認し、同意します</label>
+             </div>
+          </div>
+          
+          <button class="form-submit" onclick="showBarcode()">同意して受付コードを表示</button>
+       </div>
+
        <div id="memberCardView" style="display:none;">
           <div class="member-card">
              <div class="member-card-title">TRECA FORCE MEMBER</div>
@@ -436,11 +463,11 @@
        <div id="memberRegView" style="display:none;">
           <h3>会員登録 / 情報編集</h3>
           <div class="form-group">
-            <label class="form-label">お名前</label>
+            <label class="form-label">お名前 <span style="color:red">*</span></label>
             <input class="form-input" id="regName" placeholder="山田 太郎">
           </div>
           <div class="form-group">
-            <label class="form-label">電話番号</label>
+            <label class="form-label">電話番号 <span style="color:red">*</span></label>
             <input class="form-input" id="regTel" placeholder="090-1234-5678">
           </div>
           <div class="form-group">
@@ -498,7 +525,7 @@
       <a class="footer-link" onclick="openInfo('terms')">利用規約</a>
     </div>
     <div class="copyright">© 2026 トレカフォース</div>
-    <div class="footer-version">v33.0</div>
+    <div class="footer-version">v34.0</div>
   </footer>
 
   <script>
@@ -514,6 +541,8 @@
     const urlParams = new URLSearchParams(window.location.search);
     let currentCategory = urlParams.get('cat') || "ポケモン";
     let isMailMode = urlParams.get('mode') === 'mail';
+    // URLパラメータでアクション判定
+    let actionParam = urlParams.get('action');
 
     const el = (id) => document.getElementById(id);
     const yen = (n) => "¥" + Number(n).toLocaleString();
@@ -533,6 +562,11 @@
         .then(() => {
           if (liff.isLoggedIn()) {
              getProfile();
+          } else {
+             // ログインしていない場合
+             if (actionParam === 'member') {
+                openInfo('member'); // 未ログイン状態の会員画面（ログインボタン）を表示
+             }
           }
         })
         .catch((err) => { console.log('LIFF Initialization failed ', err); });
@@ -542,14 +576,14 @@
       liff.getProfile().then(function(profile) {
         lineUserId = profile.userId;
         console.log("LINE ID: " + lineUserId);
-        // ログイン後は会員画面を更新（もし開いていれば）
-        if(el("memberSection").style.display === "block"){
+        
+        // アクション指定がある場合は自動で開く
+        if (actionParam === 'member') {
            openInfo('member'); 
         }
       });
     }
     
-    // LINEログインボタン用関数
     function liffLogin() {
       if(!liff.isLoggedIn()) {
         liff.login();
@@ -878,17 +912,33 @@
         el("memberSection").style.display = "block";
         el("infoContent").innerHTML = ""; 
         
-        // ★修正: LINEログイン状態による分岐
-        if (liff.isLoggedIn()) {
-           // ログイン済み -> 登録フォーム or 会員証を表示（現状は仮で登録フォーム）
-           el("memberLoginView").style.display = "none";
-           el("memberRegView").style.display = "block"; 
-           el("memberCardView").style.display = "none";
-        } else {
-           // 未ログイン（外部ブラウザなど） -> ログインボタンを表示
+        const isLoggedIn = (typeof liff !== 'undefined' && liff.isLoggedIn());
+        
+        // ★状態判定（未登録、登録済み、店頭受付）
+        // ※実際はGASに問い合わせて判定するが、今回はUIの動きのみ実装
+        
+        // 1. 未ログインの場合
+        if (!isLoggedIn) {
            el("memberLoginView").style.display = "block";
            el("memberRegView").style.display = "none";
            el("memberCardView").style.display = "none";
+           el("instoreRequestView").style.display = "none";
+        
+        // 2. ログイン済みの場合
+        } else {
+           el("memberLoginView").style.display = "none";
+           
+           // URLパラメータ ?action=member (リッチメニュー「店頭買取」) の場合
+           if (actionParam === 'member') {
+              el("instoreRequestView").style.display = "block"; // 注意事項画面
+              el("memberCardView").style.display = "none";
+              el("memberRegView").style.display = "none";
+           } else {
+              // 通常は登録済みかどうかで分岐（仮で未登録扱い）
+              el("memberRegView").style.display = "block"; 
+              el("memberCardView").style.display = "none";
+              el("instoreRequestView").style.display = "none";
+           }
         }
         
       } else {
@@ -910,18 +960,58 @@
     }
     
     function submitMember() {
-      alert("登録処理（仮）");
+      // ★バリデーション追加
+      const name = el("regName").value;
+      const tel = el("regTel").value;
+      if(!name || !tel) {
+         alert("お名前と電話番号は必須です");
+         return;
+      }
+      
+      alert("登録完了しました（仮）");
       // ここでGASに送信する処理を書く
-      el("memberRegView").style.display = "none";
-      el("memberCardView").style.display = "block";
-      JsBarcode("#barcode", "MEM-00001", {format: "CODE128", displayValue: true});
-      el("memNo").innerText = "MEM-00001";
-      el("memName").innerText = el("regName").value || "名無し";
+      
+      // 登録完了後の遷移
+      if(actionParam === 'member') {
+         // 店頭買取モードなら注意事項画面へ
+         el("memberRegView").style.display = "none";
+         el("instoreRequestView").style.display = "block";
+      } else {
+         // 通常モードなら会員証へ
+         el("memberRegView").style.display = "none";
+         el("memberCardView").style.display = "block";
+         drawBarcode("MEM-00001");
+         el("memNo").innerText = "MEM-00001";
+         el("memName").innerText = name;
+      }
+    }
+    
+    function showBarcode() {
+       if(!el("instoreAgree").checked) {
+          alert("注意事項を確認し、同意チェックを入れてください");
+          return;
+       }
+       el("instoreRequestView").style.display = "none";
+       el("memberCardView").style.display = "block";
+       drawBarcode("MEM-00001");
+       el("memNo").innerText = "MEM-00001";
+       el("memName").innerText = el("regName").value || "名無し";
+    }
+    
+    function drawBarcode(code) {
+       JsBarcode("#barcode", code, {format: "CODE128", displayValue: true, width:2, height:50});
     }
     
     function closeInfo() {
       el("infoView").style.display="none"; el("mainView").style.display="block"; 
-      switchMode(); // タイトル等を元に戻す
+      
+      // URLパラメータをクリアしてモードを戻す
+      const url = new URL(location);
+      url.searchParams.delete("action");
+      history.pushState({},"",url);
+      actionParam = null;
+      
+      switchMode(); 
       window.scrollTo(0,0);
     }
 
