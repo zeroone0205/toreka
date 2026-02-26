@@ -38,7 +38,7 @@
       display: flex; flex-direction: column; min-height: 100vh; 
       padding-bottom: 0; transition: all 0.5s ease;
     }
-    /* ★修正: 情報画面表示中はカートボタン等を隠すためのクラス */
+    /* 情報画面表示中はカート等を隠す */
     body.viewing-info .header-cart-btn,
     body.viewing-info .cart-bar,
     body.viewing-info .cart-actions {
@@ -361,7 +361,7 @@
     <ul class="drawer-list">
       <li class="drawer-item" id="menuStore">店頭買取表</li>
       <li class="drawer-item" id="menuMail">郵送買取表</li>
-      <li class="drawer-item" onclick="openInfo('member')">会員登録</li>
+      <li class="drawer-item" onclick="openInfo('member')">会員登録 / ログイン</li>
       <li class="drawer-item" onclick="openInfo('company')">会社概要</li>
       <li class="drawer-item" onclick="openInfo('privacy')">プライバシーポリシー</li>
       <li class="drawer-item" onclick="openInfo('terms')">利用規約</li>
@@ -465,7 +465,7 @@
        
        <div id="memberLoginView" style="display:none; text-align:center; padding:40px 0;">
           <p style="margin-bottom:20px;">会員登録・ログインにはLINE連携が必要です</p>
-          <button class="login-btn" onclick="liffLogin()"><i class="fa-brands fa-line" style="font-size:24px;"></i> LINEでログインして登録</button>
+          <button class="login-btn" onclick="liffLogin()"><i class="fa-brands fa-line" style="font-size:24px;"></i> LINEで会員登録 / ログイン</button>
        </div>
 
        <div id="instoreRequestView" style="display:none;">
@@ -499,6 +499,7 @@
 
        <div id="memberRegView" style="display:none;">
           <h3>会員登録 / 情報編集</h3>
+          <p style="font-size:12px; color:#aaa; margin-bottom:15px;">LINEログインが完了しました。<br>初回のみ、以下の情報を入力してください。</p>
           <div class="form-group">
             <label class="form-label">お名前 <span style="color:red">*</span></label>
             <input class="form-input" id="regName" placeholder="山田 太郎">
@@ -568,13 +569,14 @@
       <a class="footer-link" onclick="openInfo('terms')">利用規約</a>
     </div>
     <div class="copyright">© 2026 トレカフォース</div>
-    <div class="footer-version">v38.0</div>
+    <div class="footer-version">v39.0</div>
   </footer>
 
   <script>
     const API = "https://script.google.com/macros/s/AKfycbw08oFxfH6FsxcJ77mgNLeticvOFaq2rknNBK3emZgwmhsM5-sB_ltBhbuKamoXHkV8/exec";
     const BANNER_IMAGES = ["./banner1.png", "./banner2.png"];
     const CACHE_DURATION = 60000; 
+    // ★重要: ここに取得したLIFF IDを入れてください
     const YOUR_LIFF_ID = "2009235415-7g6be2ed"; 
 
     let ALL_DATA = {}, CURRENT_ITEMS = [], CUR_PAGE = 1, CART = {};
@@ -599,18 +601,15 @@
     };
 
     function initializeLiff(myLiffId) {
-      // 404エラー対策: IDが未設定なら警告
       if(myLiffId === "YOUR_LIFF_ID_HERE") {
          console.warn("LIFF IDが設定されていません");
          return;
       }
 
       liff.init({ liffId: myLiffId }).then(() => {
-          // 自動ログインはしない（外部ブラウザ対策）
           if (liff.isLoggedIn()) {
              getProfile();
           } else {
-             // 未ログイン時の初期表示制御
              if (actionParam === 'member') {
                 openInfo('member');
              }
@@ -623,24 +622,21 @@
         lineUserId = profile.userId;
         console.log("LINE ID: " + lineUserId);
         
-        // ★仮: GASから会員情報を取得した体にする
-        // 本番ではここで fetch(API + '?action=get_member&uid=' + lineUserId) する
-        // 未登録の場合は memberData は空のまま
+        // ★仮のデータ取得（本来はGASから取得）
         // memberData = { name: profile.displayName, ... }; 
 
-        // 情報がなければ登録画面へ誘導（モックとして名前だけ入れる）
+        // データが空なら登録画面へ（まだ登録していない扱い）
         if(!memberData.name) {
-           memberData.name = profile.displayName; 
+           // 名前入力欄にLINEの表示名を入れてあげる
+           el("regName").value = profile.displayName;
         }
 
-        // カート画面の表示更新
         updateCartViewLoginState();
 
-        // ログイン完了後、会員画面を開く指定があれば開く
+        // ログイン完了後の画面遷移制御
         if (actionParam === 'member') {
            openInfo('member'); 
         } else if(el("infoView").style.display === 'block' && el("memberSection").style.display === 'block') {
-           // 既に会員画面を開いていてログイン完了した場合、画面を更新
            openInfo('member');
         }
 
@@ -649,7 +645,6 @@
     
     function liffLogin() {
       if(!liff.isLoggedIn()) {
-        // 外部ブラウザでも動くように redirectUri を明示
         liff.login({ redirectUri: location.href });
       }
     }
