@@ -38,93 +38,39 @@
       display: flex; flex-direction: column; min-height: 100vh; 
       padding-bottom: 0; transition: all 0.5s ease;
     }
-    /* 情報画面表示中はカート等を隠す */
     body.viewing-info .header-cart-btn,
     body.viewing-info .cart-bar,
-    body.viewing-info .cart-actions {
-       display: none !important;
-    }
-
-    body::before {
-      content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.7); z-index: -1;
-    }
+    body.viewing-info .cart-actions { display: none !important; }
+    body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: -1; }
     * { box-sizing: border-box; }
 
     /* Pull to Refresh */
-    #ptr-indicator {
-      position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
-      background: rgba(30, 30, 30, 0.95); border: 2px solid var(--accent); color: var(--accent);
-      padding: 10px 20px; border-radius: 30px; font-weight: bold; font-size: 12px;
-      z-index: 11000; opacity: 0; transition: top 0.2s ease, opacity 0.2s ease;
-      pointer-events: none; display: flex; align-items: center; gap: 8px;
-      box-shadow: 0 0 15px var(--accent);
-    }
+    #ptr-indicator { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background: rgba(30, 30, 30, 0.95); border: 2px solid var(--accent); color: var(--accent); padding: 10px 20px; border-radius: 30px; font-weight: bold; font-size: 12px; z-index: 11000; opacity: 0; transition: top 0.2s ease, opacity 0.2s ease; pointer-events: none; display: flex; align-items: center; gap: 8px; box-shadow: 0 0 15px var(--accent); }
     #ptr-indicator.visible { opacity: 1; top: 90px; }
-    .spinner {
-      width: 16px; height: 16px; border: 3px solid transparent; 
-      border-top-color: var(--accent); border-right-color: var(--accent);
-      border-radius: 50%; animation: spin 0.8s linear infinite;
-    }
+    .spinner { width: 16px; height: 16px; border: 3px solid transparent; border-top-color: var(--accent); border-right-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
 
     /* Header */
-    header { 
-      background: #111; border-bottom: 2px solid var(--accent); 
-      padding: 5px 15px; position: relative; z-index: 100;
-      display: flex; justify-content: space-between; align-items: center; 
-      height: 70px; transition: border-bottom 0.5s ease;
-    }
+    header { background: #111; border-bottom: 2px solid var(--accent); padding: 5px 15px; position: relative; z-index: 100; display: flex; justify-content: space-between; align-items: center; height: 70px; transition: border-bottom 0.5s ease; }
     .header-left, .header-right { display: flex; align-items: center; gap: 15px; z-index: 102; position: relative; }
     .hamburger { width: 24px; height: 18px; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; }
     .hamburger span { display: block; height: 2px; width: 100%; background: var(--text-main); border-radius: 2px; transition: 0.3s; }
-    .header-center {
-      position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-      width: 100%; text-align: center; z-index: 101; pointer-events: none;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-    }
-    .title-text {
-      font-size: 22px; font-weight: 900; color: var(--accent); text-shadow: var(--glow-text);
-      font-style: italic; letter-spacing: 1px; white-space: nowrap; line-height: 1.1;
-      margin-bottom: 4px; transition: color 0.5s;
-    }
-    #date-display {
-      display: block; font-size: 10px; color: #fff; font-weight: bold; padding: 2px 10px;
-      border-radius: 12px; border: 1px solid var(--accent); box-shadow: var(--glow-box);
-      background: rgba(0, 0, 0, 0.6); white-space: nowrap; transition: all 0.5s ease;
-    }
+    .header-center { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 100%; text-align: center; z-index: 101; pointer-events: none; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .title-text { font-size: 22px; font-weight: 900; color: var(--accent); text-shadow: var(--glow-text); font-style: italic; letter-spacing: 1px; white-space: nowrap; line-height: 1.1; margin-bottom: 4px; transition: color 0.5s; }
+    #date-display { display: block; font-size: 10px; color: #fff; font-weight: bold; padding: 2px 10px; border-radius: 12px; border: 1px solid var(--accent); box-shadow: var(--glow-box); background: rgba(0, 0, 0, 0.6); white-space: nowrap; transition: all 0.5s ease; }
     .logo-img { height: 40px; width: auto; object-fit: contain; filter: none; }
     .header-cart-btn { display: none; position: relative; font-size: 20px; color: #fff; cursor: pointer; }
     body.mail-mode .header-cart-btn { display: block; }
-    .cart-badge {
-      position: absolute; top: -8px; right: -10px; background: #ff5252; color: #fff;
-      font-size: 10px; font-weight: bold; width: 18px; height: 18px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center; border: 1px solid #fff;
-    }
+    .cart-badge { position: absolute; top: -8px; right: -10px; background: #ff5252; color: #fff; font-size: 10px; font-weight: bold; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #fff; }
 
     /* Drawer */
-    .drawer {
-      position: fixed; top: 0; left: -280px; width: 260px; height: 100%;
-      background: #1a1a1a; z-index: 99999; transition: left 0.3s ease;
-      box-shadow: 2px 0 15px rgba(0,0,0,0.8); display: flex; flex-direction: column;
-    }
+    .drawer { position: fixed; top: 0; left: -280px; width: 260px; height: 100%; background: #1a1a1a; z-index: 99999; transition: left 0.3s ease; box-shadow: 2px 0 15px rgba(0,0,0,0.8); display: flex; flex-direction: column; }
     .drawer.open { left: 0; }
-    .drawer-header {
-      padding: 20px; font-size: 18px; font-weight: bold; color: var(--accent);
-      border-bottom: 1px solid #333; background: #111; text-shadow: var(--glow-text);
-    }
+    .drawer-header { padding: 20px; font-size: 18px; font-weight: bold; color: var(--accent); border-bottom: 1px solid #333; background: #111; text-shadow: var(--glow-text); }
     .drawer-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; }
-    .drawer-item {
-      padding: 15px 20px; border-bottom: 1px solid #2a2a2a; 
-      cursor: pointer; color: #eee; font-weight: bold; font-size:15px;
-      text-shadow: 0 0 5px rgba(255, 255, 255, 0.3); transition: all 0.3s;
-    }
+    .drawer-item { padding: 15px 20px; border-bottom: 1px solid #2a2a2a; cursor: pointer; color: #eee; font-weight: bold; font-size:15px; text-shadow: 0 0 5px rgba(255, 255, 255, 0.3); transition: all 0.3s; }
     .drawer-item:hover { background: #2a2a2a; color: var(--accent); text-shadow: var(--glow-text); }
-    .drawer-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.7); backdrop-filter: blur(2px); z-index: 99998;
-      display: none; opacity: 0; transition: opacity 0.3s ease;
-    }
+    .drawer-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(2px); z-index: 99998; display: none; opacity: 0; transition: opacity 0.3s ease; }
     .drawer-overlay.open { display: block; opacity: 1; }
 
     /* Main UI Elements */
@@ -137,22 +83,12 @@
     .slider-dot { width: 8px; height: 8px; background: rgba(255,255,255,0.5); border-radius: 50%; cursor: pointer; }
     .slider-dot.active { background: #fff; transform: scale(1.2); box-shadow: 0 0 5px #fff; }
 
-    .mail-deadline-box {
-      display: none; max-width: 1000px; margin: 15px auto 5px; padding: 12px;
-      border: 2px solid #FFD700; background: rgba(212, 175, 55, 0.15); 
-      color: #ffffff; font-size: 12px; font-weight: bold; line-height: 1.6;
-      border-radius: 6px; text-align: left;
-    }
+    .mail-deadline-box { display: none; max-width: 1000px; margin: 15px auto 5px; padding: 12px; border: 2px solid #FFD700; background: rgba(212, 175, 55, 0.15); color: #ffffff; font-size: 12px; font-weight: bold; line-height: 1.6; border-radius: 6px; text-align: left; }
     body.mail-mode .mail-deadline-box { display: block; }
-    .deadline-highlight { color: #FFD700; text-shadow: 0 0 5px rgba(255, 215, 0, 0.5); font-size:13px;}
     @media (max-width: 600px) { .br-sp { display: block; } .mail-deadline-box { font-size: 11px; line-height: 1.5; padding: 10px 12px; } }
     @media (min-width: 601px) { .br-sp { display: none; } }
 
-    .sticky-container {
-      position: sticky; top: 0; z-index: 9990;
-      background: rgba(18, 18, 18, 0.95); backdrop-filter: blur(5px);
-      border-bottom: 1px solid #444; box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-    }
+    .sticky-container { position: sticky; top: 0; z-index: 9990; background: rgba(18, 18, 18, 0.95); backdrop-filter: blur(5px); border-bottom: 1px solid #444; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
     .nav-scroll { overflow-x: auto; white-space: nowrap; padding: 0 10px; border-bottom: 1px solid #333; }
     .nav-tabs { display: flex; gap: 10px; max-width: 1000px; margin: 0 auto; padding: 0; list-style: none; align-items: center; }
     .nav-item { cursor: pointer; padding: 14px 12px; font-weight: bold; color: #888; border-bottom: 3px solid transparent; transition: 0.3s; font-size: 14px; }
@@ -166,11 +102,7 @@
     .search-box input:focus { border-color: var(--accent); box-shadow: 0 0 5px var(--accent); }
     .search-icon { position: absolute; left: 8px; top: 9px; color: #aaa; font-size: 12px; }
 
-    .header-action-btn {
-      grid-column: 2 / 3; grid-row: 1; background: transparent; border: 1px solid var(--accent); color: var(--accent);
-      display: flex; align-items: center; gap: 5px; padding: 8px 8px; font-size: 11px; justify-self: end; border-radius: 4px; cursor: pointer;
-      width: 100px; justify-content: center; white-space: nowrap;
-    }
+    .header-action-btn { grid-column: 2 / 3; grid-row: 1; background: transparent; border: 1px solid var(--accent); color: var(--accent); display: flex; align-items: center; gap: 5px; padding: 8px 8px; font-size: 11px; justify-self: end; border-radius: 4px; cursor: pointer; width: 100px; justify-content: center; white-space: nowrap; }
     .header-action-btn:hover { background: rgba(88, 189, 215, 0.1); }
     body.mail-mode .header-action-btn:hover { background: rgba(180, 114, 255, 0.1); }
     .flow-btn, .rules-btn { display: none; }
@@ -192,11 +124,7 @@
     .no-img { display: flex; align-items: center; justify-content: center; color: #555; font-size: 10px; background: #222; }
     .card-body { padding: 8px; flex: 1; display: flex; flex-direction: column; position: relative; }
     .card-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-    .type-label { 
-      display: inline-block; font-size: 9px; color: #fff; font-weight: 900; 
-      background: var(--accent); border: 1px solid var(--accent); 
-      padding: 1px 5px; border-radius: 3px; line-height: 1.2; box-shadow: var(--glow-box);
-    }
+    .type-label { display: inline-block; font-size: 9px; color: #fff; font-weight: 900; background: var(--accent); border: 1px solid var(--accent); padding: 1px 5px; border-radius: 3px; line-height: 1.2; box-shadow: var(--glow-box); }
     .limit-badge { font-size: 10px; color: #fff; background: #444; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
     .card-title { font-size: 12px; font-weight: bold; line-height: 1.4; margin-bottom: 6px; color: #fff; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 34px; }
     .card-tags { position: absolute; top: 4px; right: 4px; display: flex; flex-direction: column; gap: 2px; align-items: flex-end; }
@@ -234,7 +162,6 @@
     .cart-item-actions { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
     .delete-btn { background: #ff5252; color: #fff; padding: 5px 10px; font-size: 11px; border-radius: 4px; border: none; cursor: pointer; }
     
-    /* 買取申込エリア（カート内） */
     .purchase-area { margin-top: 30px; background: #222; border: 1px solid #555; border-radius: 8px; padding: 20px; }
     .purchase-title { font-size: 16px; font-weight: bold; margin-bottom: 15px; color: var(--accent); border-bottom: 1px solid #444; padding-bottom: 10px; }
     .confirm-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; }
@@ -246,11 +173,7 @@
     /* Info View & Member Card */
     #infoView { display: none; padding: 20px; max-width: 800px; margin: 0 auto; color: #ddd; line-height: 1.8; font-size: 14px; text-align: left; }
     .company-links { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 40px; }
-    .company-btn {
-      padding: 15px 0; background: #1a1a1a; border: 2px solid var(--accent); 
-      color: var(--accent); font-weight: 900; font-size: 16px; border-radius: 8px; cursor: pointer;
-      text-decoration: none; display: flex; justify-content: center; align-items: center; transition: all 0.3s;
-    }
+    .company-btn { padding: 15px 0; background: #1a1a1a; border: 2px solid var(--accent); color: var(--accent); font-weight: 900; font-size: 16px; border-radius: 8px; cursor: pointer; text-decoration: none; display: flex; justify-content: center; align-items: center; transition: all 0.3s; }
     .company-btn:hover { background: var(--accent); color: #fff; box-shadow: var(--glow-text); }
     .back-btn-container { text-align: left; margin-bottom: 20px; }
     .back-btn-container button { padding: 8px 16px; background: #333; color: #fff; border: 1px solid #555; border-radius: 4px; cursor: pointer; font-size: 13px; }
@@ -260,28 +183,20 @@
     .note-box { background: rgba(255, 50, 50, 0.1); border: 1px solid #ff5252; padding: 15px; border-radius: 8px; margin-top: 30px; }
     .note-title { color: #ff5252; font-weight: bold; margin-bottom: 10px; font-size: 16px; }
 
-    /* 会員証・登録フォームのデザイン */
-    .member-card { background: #fff; color: #000; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 30px; box-shadow: 0 0 20px rgba(255,255,255,0.2); }
-    .member-card-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; border-bottom: 2px solid #000; padding-bottom: 5px; display:inline-block;}
-    .member-barcode { margin: 20px 0; }
-    .member-info-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; border-bottom:1px solid #eee; padding-bottom:4px;}
+    /* フォーム周り（店頭買取申込・会員登録共通） */
     .form-group { margin-bottom: 15px; }
-    .form-label { display: block; margin-bottom: 5px; font-weight: bold; color: var(--accent); }
-    .form-input { width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #555; background: #222; color: #fff; }
-    .form-submit { width: 100%; padding: 15px; background: var(--accent); color: #fff; font-weight: bold; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; margin-top: 10px; }
+    .form-row { display: flex; gap: 10px; }
+    .form-col { flex: 1; }
+    .form-label { display: block; margin-bottom: 5px; font-weight: bold; font-size:13px; color: #ccc; }
+    .form-input { width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #555; background: #fff; color: #000; font-size:16px;}
+    .form-select { width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #555; background: #fff; color: #000; font-size:16px;}
+    .form-submit { width: 100%; padding: 15px; background: var(--accent); color: #fff; font-weight: bold; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; margin-top: 10px; box-shadow: var(--glow-box); }
     .login-btn { width: 100%; padding: 15px; background: #06C755; color: #fff; font-weight: bold; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; display:flex; align-items:center; justify-content:center; gap:10px;}
-    .upload-btn-wrapper { position: relative; overflow: hidden; display: inline-block; width: 100%; }
-    .upload-btn { border: 2px dashed #555; color: #aaa; background: #222; padding: 20px; border-radius: 8px; width: 100%; text-align: center; cursor: pointer; }
-    .upload-btn:hover { border-color: var(--accent); color: var(--accent); }
     
-    /* 店頭買取チェックリスト用 */
-    .checklist-box { background: #222; border: 1px solid #555; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
-    .check-item { margin-bottom: 10px; font-size: 14px; display: flex; align-items: flex-start; gap: 8px; }
-    .check-item input { margin-top: 4px; transform: scale(1.2); }
-    .attention-list { list-style: none; padding: 0; margin: 0 0 15px 0; font-size: 13px; color: #ddd; }
-    .attention-list li { margin-bottom: 8px; padding-left: 1em; text-indent: -1em; }
-    .attention-list li::before { content: "• "; color: #ff5252; }
-
+    /* 店頭買取申込専用デザイン */
+    .instore-desc { font-size: 13px; background: #eef9fd; color: #000; padding: 15px; border-radius: 8px; margin-bottom: 20px; line-height: 1.6; }
+    .instore-link { color: #007bff; text-decoration: none; font-weight: bold; }
+    
     /* 受付完了画面 */
     #successView { display: none; padding: 40px 20px; text-align: center; color: #fff; }
     .success-icon { font-size: 60px; color: var(--accent); margin-bottom: 20px; }
@@ -469,32 +384,97 @@
        </div>
 
        <div id="instoreRequestView" style="display:none;">
-          <h3>店頭買取受付</h3>
-          <p style="font-size:13px; margin-bottom:15px; color:#aaa;">以下の内容をご確認のうえ、受付コードを発行してください。</p>
-          <div class="checklist-box">
-             <div class="note-title">確認事項</div>
-             <ul class="attention-list">
-               <li>身分証明書の住所と現住所が一致していることを確認してください。</li>
-               <li>未成年の方は保護者の同意書が必要です。</li>
-               <li>査定にはお時間をいただく場合があります。</li>
-             </ul>
-             <div class="check-item">
-                <input type="checkbox" id="instoreAgree">
-                <label for="instoreAgree">上記内容を確認し、同意します</label>
+          <h3>店頭買取仮申込</h3>
+          <div class="instore-desc">
+             こちらはトレカフォースの店頭買取仮申込みページです。<br>
+             店頭買取ご利用の方は以下の申込み情報を入力しお申し込みください。<br>
+             郵送買取をご利用の方は<a href="#" onclick="isMailMode=true; switchMode(); closeInfo();" class="instore-link">こちら</a>になります。
+          </div>
+          
+          <div class="purchase-title">申込み情報</div>
+          
+          <div class="form-row">
+             <div class="form-col">
+                <label class="form-label">姓</label>
+                <input class="form-input" id="reqLastName" placeholder="山田">
+             </div>
+             <div class="form-col">
+                <label class="form-label">名</label>
+                <input class="form-input" id="reqFirstName" placeholder="太郎">
              </div>
           </div>
-          <button class="form-submit" onclick="showBarcode()">同意して受付コードを表示</button>
-       </div>
-
-       <div id="memberCardView" style="display:none;">
-          <div class="member-card">
-             <div class="member-card-title">TRECA FORCE MEMBER</div>
-             <canvas id="barcode"></canvas>
-             <div class="member-info-row"><span>会員番号</span><span id="memNo">未発行</span></div>
-             <div class="member-info-row"><span>お名前</span><span id="memName">ゲスト</span></div>
-             <div class="member-info-row"><span>ポイント</span><span id="memPoint" style="color:#ff5252;font-weight:bold;">0 pt</span></div>
+          
+          <div class="form-row">
+             <div class="form-col">
+                <label class="form-label">姓（カナ）</label>
+                <input class="form-input" id="reqLastNameKana" placeholder="ヤマダ">
+             </div>
+             <div class="form-col">
+                <label class="form-label">名（カナ）</label>
+                <input class="form-input" id="reqFirstNameKana" placeholder="タロウ">
+             </div>
           </div>
-          <button class="company-btn" onclick="showMemberEdit()">登録情報を修正</button>
+
+          <div class="form-group">
+             <label class="form-label">メールアドレス</label>
+             <input class="form-input" id="reqEmail" placeholder="example@gmail.com">
+          </div>
+
+          <div class="form-group">
+             <label class="form-label">電話番号</label>
+             <input class="form-input" id="reqTelInstore" placeholder="09012345678">
+          </div>
+
+          <div class="form-group">
+             <label class="form-label">郵便番号</label>
+             <div style="display:flex; gap:10px;">
+                <input class="form-input" id="reqZip" placeholder="1000001">
+                <button style="white-space:nowrap; padding:0 10px; font-size:12px; cursor:pointer;" onclick="alert('住所自動入力機能は準備中です')">住所を自動入力</button>
+             </div>
+          </div>
+
+          <div class="form-group">
+             <label class="form-label">都道府県</label>
+             <select class="form-select" id="reqPref">
+                <option value="東京都">東京都</option>
+                <option value="神奈川県">神奈川県</option>
+                <option value="埼玉県">埼玉県</option>
+                <option value="千葉県">千葉県</option>
+                <option value="その他">その他</option>
+             </select>
+          </div>
+
+          <div class="form-group">
+             <label class="form-label">市区町村</label>
+             <input class="form-input" id="reqCity" placeholder="千代田区">
+          </div>
+
+          <div class="form-group">
+             <label class="form-label">その他住所</label>
+             <input class="form-input" id="reqAddressOther" placeholder="千代田1-1-1">
+          </div>
+
+          <div class="form-group">
+             <label class="form-label">生年月日（例：19900101）</label>
+             <input class="form-input" id="reqBirth" placeholder="20000101">
+          </div>
+
+          <div class="form-group">
+             <label class="form-label">職業</label>
+             <select class="form-select" id="reqJob">
+                <option value="会社員">会社員</option>
+                <option value="自営業">自営業</option>
+                <option value="学生">学生</option>
+                <option value="その他">その他</option>
+             </select>
+          </div>
+
+          <div class="check-item" style="margin:20px 0;">
+             <input type="checkbox" id="instoreAgreeNew">
+             <label for="instoreAgreeNew" style="font-weight:bold; font-size:14px;">買取注意事項を確認しました</label>
+          </div>
+
+          <button class="form-submit" onclick="submitInstoreRequest()">店頭買取仮申込</button>
        </div>
 
        <div id="memberRegView" style="display:none;">
@@ -516,22 +496,16 @@
             <label class="form-label">振込先口座</label>
             <input class="form-input" id="regBank" placeholder="〇〇銀行 〇〇支店 普通 1234567">
           </div>
-          <div class="form-group">
-             <label class="form-label">身分証画像（免許証など）</label>
-             <div class="upload-btn-wrapper">
-               <div class="upload-btn">画像をアップロード</div>
-               <input type="file" id="regLicense" style="position:absolute;top:0;left:0;opacity:0;width:100%;height:100%;">
-             </div>
-          </div>
           <button class="form-submit" onclick="submitMember()">登録する</button>
        </div>
     </div>
 
     <div id="successView" style="display:none;">
         <div class="success-icon"><i class="fa-regular fa-circle-check"></i></div>
-        <div class="success-title">買取受付完了</div>
-        <p>以下のコードを商品と一緒に送付してください</p>
+        <div class="success-title">申込完了</div>
+        <p>以下の受付コードを店頭にてスタッフにご提示ください。</p>
         <div class="success-code" id="successCode">ABC-12345</div>
+        <p style="font-size:12px; color:#aaa; margin-top:10px;">※ご本人様確認のため、身分証明書と振込先口座のわかるものをご持参ください。</p>
         <button class="company-btn" onclick="location.reload()">トップへ戻る</button>
     </div>
 
@@ -569,14 +543,14 @@
       <a class="footer-link" onclick="openInfo('terms')">利用規約</a>
     </div>
     <div class="copyright">© 2026 トレカフォース</div>
-    <div class="footer-version">v39.0</div>
+    <div class="footer-version">v40.0</div>
   </footer>
 
   <script>
     const API = "https://script.google.com/macros/s/AKfycbw08oFxfH6FsxcJ77mgNLeticvOFaq2rknNBK3emZgwmhsM5-sB_ltBhbuKamoXHkV8/exec";
     const BANNER_IMAGES = ["./banner1.png", "./banner2.png"];
     const CACHE_DURATION = 60000; 
-    // ★重要: ここに取得したLIFF IDを入れてください
+    // ★重要: 作成した「LINEログイン」チャネルのIDを入れる
     const YOUR_LIFF_ID = "2009235415-7g6be2ed"; 
 
     let ALL_DATA = {}, CURRENT_ITEMS = [], CUR_PAGE = 1, CART = {};
@@ -605,7 +579,6 @@
          console.warn("LIFF IDが設定されていません");
          return;
       }
-
       liff.init({ liffId: myLiffId }).then(() => {
           if (liff.isLoggedIn()) {
              getProfile();
@@ -622,24 +595,25 @@
         lineUserId = profile.userId;
         console.log("LINE ID: " + lineUserId);
         
-        // ★仮のデータ取得（本来はGASから取得）
-        // memberData = { name: profile.displayName, ... }; 
-
-        // データが空なら登録画面へ（まだ登録していない扱い）
+        // ★本来はここでGASから既存会員情報を取得する
+        // 今回はLINEプロフィール名などを仮でセット
         if(!memberData.name) {
-           // 名前入力欄にLINEの表示名を入れてあげる
-           el("regName").value = profile.displayName;
+           memberData.name = profile.displayName; 
         }
+        
+        // フォームへの自動入力（会員情報があれば）
+        el("regName").value = memberData.name || "";
+        el("reqLastName").value = (memberData.name || "").split(" ")[0] || ""; 
+        el("reqFirstName").value = (memberData.name || "").split(" ")[1] || "";
+        el("reqTelInstore").value = memberData.tel || "";
 
         updateCartViewLoginState();
 
-        // ログイン完了後の画面遷移制御
         if (actionParam === 'member') {
            openInfo('member'); 
         } else if(el("infoView").style.display === 'block' && el("memberSection").style.display === 'block') {
            openInfo('member');
         }
-
       });
     }
     
@@ -660,6 +634,48 @@
           el("cartLoginReq").style.display = "block";
           el("cartPurchaseForm").style.display = "none";
        }
+    }
+
+    // 店頭買取申込送信処理
+    function submitInstoreRequest() {
+        if(!el("instoreAgreeNew").checked) {
+            alert("注意事項を確認し、チェックを入れてください");
+            return;
+        }
+        // バリデーション（簡易）
+        if(!el("reqLastName").value || !el("reqTelInstore").value) {
+            alert("必須項目（氏名、電話番号など）を入力してください");
+            return;
+        }
+
+        if(!confirm("この内容で店頭買取仮申込みを行いますか？")) return;
+
+        const reqData = {
+            lineUserId: lineUserId,
+            type: "instore_request",
+            lastName: el("reqLastName").value,
+            firstName: el("reqFirstName").value,
+            lastNameKana: el("reqLastNameKana").value,
+            firstNameKana: el("reqFirstNameKana").value,
+            email: el("reqEmail").value,
+            tel: el("reqTelInstore").value,
+            zip: el("reqZip").value,
+            pref: el("reqPref").value,
+            city: el("reqCity").value,
+            addrOther: el("reqAddressOther").value,
+            birth: el("reqBirth").value,
+            job: el("reqJob").value
+        };
+
+        // ★ここでGASへ送信（モック）
+        console.log("Sending Request to GAS:", reqData);
+        
+        // 完了画面へ
+        el("instoreRequestView").style.display = "none";
+        el("successView").style.display = "block";
+        const code = "BSOM-" + Math.floor(10000000 + Math.random() * 90000000);
+        el("successCode").innerText = code;
+        window.scrollTo(0,0);
     }
 
     function submitPurchase() {
