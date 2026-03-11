@@ -596,7 +596,7 @@
     <div class="footer-version">v45.0</div>
   </footer>
 
-  <script>
+ <script>
     const API = "https://script.google.com/macros/s/AKfycbw26bteaUJ1SUswJ7ZN5lY7DwaN3Nj2PZh22q-wndaAeg1KWHWr04ggK7THIL5Uu63z/exec";
     const BANNER_IMAGES = ["./banner1.png", "./banner2.png"];
     const CACHE_DURATION = 60000; 
@@ -622,7 +622,7 @@
 
     const el = (id) => document.getElementById(id);
     
-    // ★修正箇所①: 数字以外（ASK等）の場合はそのまま文字を返す
+    // 数字以外（ASK等）の場合はそのまま文字を返す
     const yen = (n) => {
       const num = Number(n);
       return isNaN(num) ? n : "¥" + num.toLocaleString();
@@ -904,7 +904,6 @@
       const sort = el("sort").value;
       const typePrio = {"PSA10":1,"未開封":2,"素体":3,"シングル":3,"BOX":4};
       
-      // ★修正箇所②: 並び替えの時にASKを0円として扱う
       items.sort((a,b) => {
         let typeA = (a.type==="素体"||a.type==="シングル") ? 3 : (typePrio[a.type]||99);
         let typeB = (b.type==="素体"||b.type==="シングル") ? 3 : (typePrio[b.type]||99);
@@ -931,7 +930,11 @@
             const key = item.id || `temp-${idx}`; 
             actions = `<div class="cart-actions"><div class="qty-group"><button class="qty-btn" onclick="event.stopPropagation();chQty('${key}', -1)">-</button><input class="qty-input" id="qty-${key}" value="1" readonly onclick="event.stopPropagation()"><button class="qty-btn" onclick="event.stopPropagation();chQty('${key}', 1, ${item.remaining})">+</button></div><button class="add-btn" onclick="event.stopPropagation();addCart('${key}', ${idx})">追加</button></div>`;
         }
-        return `<div class="card ${isSold?'sold-out':''}" data-index="${idx}">${overlay}<div style="${isSold?'opacity:0.6':''}">${img}<div class="card-tags"></div><div class="card-body"><div class="card-header-row"><span class="type-label">${displayType}</span><span class="limit-badge">残:${item.remaining}</span></div><div class="card-title">${item.name}</div><div class="card-footer"><div class="price-row"><span class="price-label">買取価格</span><span class="price-value">${yen(item.price)}</span></div>${actions}</div></div></div></div>`;
+        
+        // ★修正箇所: 型番(item.series)をカード名と一緒に表示
+        const displayName = item.series ? `${item.name} ${item.series}` : item.name;
+
+        return `<div class="card ${isSold?'sold-out':''}" data-index="${idx}">${overlay}<div style="${isSold?'opacity:0.6':''}">${img}<div class="card-tags"></div><div class="card-body"><div class="card-header-row"><span class="type-label">${displayType}</span><span class="limit-badge">残:${item.remaining}</span></div><div class="card-title">${displayName}</div><div class="card-footer"><div class="price-row"><span class="price-label">買取価格</span><span class="price-value">${yen(item.price)}</span></div>${actions}</div></div></div></div>`;
       }).join("");
       el("paginationCtrl").style.display = CURRENT_ITEMS.length > ITEMS_per_PAGE ? "flex" : "none";
       el("pageInfo").innerText = `${CUR_PAGE} / ${Math.ceil(CURRENT_ITEMS.length/ITEMS_per_PAGE)}`;
@@ -951,7 +954,6 @@
       const keys = Object.keys(CART);
       if(keys.length===0) { el("cartBar").classList.remove("visible"); el("headerCartCount").style.display='none'; return; }
       
-      // ★修正箇所③: カートバーの合計計算時にASKを除外
       let count=0, total=0; 
       keys.forEach(k => { 
         count += CART[k].qty; 
@@ -970,7 +972,6 @@
       if(keys.length===0) { list.innerHTML = "<p style='text-align:center;color:#aaa'>カートは空です</p>"; el("cartViewTotal").innerText = "¥0"; return; }
       let total = 0;
       
-      // ★修正箇所④: カート詳細画面でのASK計算と表示を除外・変更
       list.innerHTML = keys.map(k => {
         const c = CART[k]; 
         const p = isNaN(c.item.price) ? 0 : Number(c.item.price);
@@ -978,7 +979,10 @@
         const img = c.item.imageUrl ? `<img src="${c.item.imageUrl}" class="cart-item-img">` : `<div class="cart-item-img"></div>`;
         const subTotalStr = isNaN(c.item.price) ? "要査定" : yen(p * c.qty);
         
-        return `<div class="cart-item">${img}<div class="cart-item-info"><div class="cart-item-title">${c.item.name}</div><div class="cart-item-meta">【${c.item.type}】 単価:${yen(c.item.price)}</div><div class="cart-item-price">小計: ${subTotalStr}</div><div class="cart-item-actions"><div class="qty-group"><button class="qty-btn" onclick="updateCart('${k}', -1)">-</button><input class="qty-input" value="${c.qty}" readonly><button class="qty-btn" onclick="updateCart('${k}', 1, ${c.item.remaining})">+</button></div><button class="delete-btn" onclick="removeCart('${k}')">削除</button></div></div></div>`;
+        // ★修正箇所: カートのリストにも型番を表示
+        const displayName = c.item.series ? `${c.item.name} ${c.item.series}` : c.item.name;
+
+        return `<div class="cart-item">${img}<div class="cart-item-info"><div class="cart-item-title">${displayName}</div><div class="cart-item-meta">【${c.item.type}】 単価:${yen(c.item.price)}</div><div class="cart-item-price">小計: ${subTotalStr}</div><div class="cart-item-actions"><div class="qty-group"><button class="qty-btn" onclick="updateCart('${k}', -1)">-</button><input class="qty-input" value="${c.qty}" readonly><button class="qty-btn" onclick="updateCart('${k}', 1, ${c.item.remaining})">+</button></div><button class="delete-btn" onclick="removeCart('${k}')">削除</button></div></div></div>`;
       }).join("");
       
       el("cartViewTotal").innerText = yen(total);
@@ -1082,11 +1086,32 @@
     el("modalQtyPlus").onclick = () => { let v = parseInt(el("modalQtyInput").value); if(currentModalItem && v < currentModalItem.remaining) el("modalQtyInput").value = v + 1; };
     el("modalAddBtn").onclick = () => { if(currentModalItem) { const qty = parseInt(el("modalQtyInput").value); _addToCartLogic(currentModalItem, qty); } };
     el("grid").addEventListener("click", (e) => { if(e.target.closest(".cart-actions")) return; const card = e.target.closest(".card"); if (card) { const item = CURRENT_ITEMS[card.dataset.index]; if (item) openModal(item); } });
-    function openModal(item) { currentModalItem = item; el("modalImg").style.display = item.imageUrl ? "inline-block" : "none"; if(item.imageUrl) el("modalImg").src = item.imageUrl; el("modalTitle").textContent = item.name; el("modalPrice").textContent = yen(item.price); el("modalLimit").textContent = "残り: " + item.remaining; const displayType = (item.type === "素体") ? "シングル" : (item.type || "PSA10"); el("modalTags").innerHTML = `<span class="type-label">${displayType}</span>`; if(isMailMode && item.remaining > 0) { el("modalCartActions").style.display = "flex"; el("modalQtyInput").value = 1; } else { el("modalCartActions").style.display = "none"; } modal.classList.add("active"); }
+    
+    function openModal(item) { 
+      currentModalItem = item; 
+      el("modalImg").style.display = item.imageUrl ? "inline-block" : "none"; 
+      if(item.imageUrl) el("modalImg").src = item.imageUrl; 
+      
+      // ★修正箇所: モーダルのタイトルにも型番を表示
+      const displayName = item.series ? `${item.name} ${item.series}` : item.name;
+      el("modalTitle").textContent = displayName; 
+      
+      el("modalPrice").textContent = yen(item.price); 
+      el("modalLimit").textContent = "残り: " + item.remaining; 
+      const displayType = (item.type === "素体") ? "シングル" : (item.type || "PSA10"); 
+      el("modalTags").innerHTML = `<span class="type-label">${displayType}</span>`; 
+      if(isMailMode && item.remaining > 0) { 
+        el("modalCartActions").style.display = "flex"; el("modalQtyInput").value = 1; 
+      } else { 
+        el("modalCartActions").style.display = "none"; 
+      } 
+      modal.classList.add("active"); 
+    }
     closeModalBtn.onclick = () => modal.classList.remove("active"); modal.onclick = (e) => { if(e.target === modal) modal.classList.remove("active"); };
     
     updateModeUI(); loadData();
   </script>
 </body>
 </html>
+
 
