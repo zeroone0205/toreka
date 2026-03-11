@@ -596,7 +596,7 @@
     <div class="footer-version">v45.0</div>
   </footer>
 
- <script>
+<script>
     const API = "https://script.google.com/macros/s/AKfycbxRCNbvHrwFbcB2L8ovLRmE4k2iFFS50juT4-z8T1FDEDJz99tUmUgVTl8xTWLoRkdk/exec";
     const BANNER_IMAGES = ["./banner1.png", "./banner2.png"];
     const CACHE_DURATION = 60000; 
@@ -923,7 +923,11 @@
       el("grid").innerHTML = pageItems.map((item, i) => {
         const idx = start + i; const isSold = item.remaining <= 0;
         const img = item.imageUrl ? `<img src="${item.imageUrl}" class="card-img" loading="lazy">` : `<div class="card-img no-img">No Image</div>`;
-        const displayType = (item.type === "素体") ? "シングル" : (item.type || "PSA10");
+        
+        // ★修正: D列（item.type）の文字をそのまま反映。空欄ならバッジを出さない
+        const displayType = item.type || "";
+        const typeBadge = displayType ? `<span class="type-label">${displayType}</span>` : "";
+
         let actions = ""; let overlay = "";
         if (isSold) overlay = `<div class="sold-out-overlay"><div class="sold-out-badge">買取終了</div></div>`;
         else if (isMailMode) {
@@ -931,10 +935,10 @@
             actions = `<div class="cart-actions"><div class="qty-group"><button class="qty-btn" onclick="event.stopPropagation();chQty('${key}', -1)">-</button><input class="qty-input" id="qty-${key}" value="1" readonly onclick="event.stopPropagation()"><button class="qty-btn" onclick="event.stopPropagation();chQty('${key}', 1, ${item.remaining})">+</button></div><button class="add-btn" onclick="event.stopPropagation();addCart('${key}', ${idx})">追加</button></div>`;
         }
         
-        // ★修正箇所: 型番(item.series)をカード名と一緒に表示
         const displayName = item.series ? `${item.name} ${item.series}` : item.name;
 
-        return `<div class="card ${isSold?'sold-out':''}" data-index="${idx}">${overlay}<div style="${isSold?'opacity:0.6':''}">${img}<div class="card-tags"></div><div class="card-body"><div class="card-header-row"><span class="type-label">${displayType}</span><span class="limit-badge">残:${item.remaining}</span></div><div class="card-title">${displayName}</div><div class="card-footer"><div class="price-row"><span class="price-label">買取価格</span><span class="price-value">${yen(item.price)}</span></div>${actions}</div></div></div></div>`;
+        // ★修正: バッジ部分に typeBadge を使用
+        return `<div class="card ${isSold?'sold-out':''}" data-index="${idx}">${overlay}<div style="${isSold?'opacity:0.6':''}">${img}<div class="card-tags"></div><div class="card-body"><div class="card-header-row">${typeBadge}<span class="limit-badge">残:${item.remaining}</span></div><div class="card-title">${displayName}</div><div class="card-footer"><div class="price-row"><span class="price-label">買取価格</span><span class="price-value">${yen(item.price)}</span></div>${actions}</div></div></div></div>`;
       }).join("");
       el("paginationCtrl").style.display = CURRENT_ITEMS.length > ITEMS_per_PAGE ? "flex" : "none";
       el("pageInfo").innerText = `${CUR_PAGE} / ${Math.ceil(CURRENT_ITEMS.length/ITEMS_per_PAGE)}`;
@@ -979,10 +983,12 @@
         const img = c.item.imageUrl ? `<img src="${c.item.imageUrl}" class="cart-item-img">` : `<div class="cart-item-img"></div>`;
         const subTotalStr = isNaN(c.item.price) ? "要査定" : yen(p * c.qty);
         
-        // ★修正箇所: カートのリストにも型番を表示
         const displayName = c.item.series ? `${c.item.name} ${c.item.series}` : c.item.name;
 
-        return `<div class="cart-item">${img}<div class="cart-item-info"><div class="cart-item-title">${displayName}</div><div class="cart-item-meta">【${c.item.type}】 単価:${yen(c.item.price)}</div><div class="cart-item-price">小計: ${subTotalStr}</div><div class="cart-item-actions"><div class="qty-group"><button class="qty-btn" onclick="updateCart('${k}', -1)">-</button><input class="qty-input" value="${c.qty}" readonly><button class="qty-btn" onclick="updateCart('${k}', 1, ${c.item.remaining})">+</button></div><button class="delete-btn" onclick="removeCart('${k}')">削除</button></div></div></div>`;
+        // ★修正: カート一覧のバッジ表記もD列そのままに
+        const displayType = c.item.type || "未指定";
+
+        return `<div class="cart-item">${img}<div class="cart-item-info"><div class="cart-item-title">${displayName}</div><div class="cart-item-meta">【${displayType}】 単価:${yen(c.item.price)}</div><div class="cart-item-price">小計: ${subTotalStr}</div><div class="cart-item-actions"><div class="qty-group"><button class="qty-btn" onclick="updateCart('${k}', -1)">-</button><input class="qty-input" value="${c.qty}" readonly><button class="qty-btn" onclick="updateCart('${k}', 1, ${c.item.remaining})">+</button></div><button class="delete-btn" onclick="removeCart('${k}')">削除</button></div></div></div>`;
       }).join("");
       
       el("cartViewTotal").innerText = yen(total);
@@ -1092,14 +1098,16 @@
       el("modalImg").style.display = item.imageUrl ? "inline-block" : "none"; 
       if(item.imageUrl) el("modalImg").src = item.imageUrl; 
       
-      // ★修正箇所: モーダルのタイトルにも型番を表示
       const displayName = item.series ? `${item.name} ${item.series}` : item.name;
       el("modalTitle").textContent = displayName; 
       
       el("modalPrice").textContent = yen(item.price); 
       el("modalLimit").textContent = "残り: " + item.remaining; 
-      const displayType = (item.type === "素体") ? "シングル" : (item.type || "PSA10"); 
-      el("modalTags").innerHTML = `<span class="type-label">${displayType}</span>`; 
+      
+      // ★修正: モーダルのタグもD列そのままに
+      const displayType = item.type || ""; 
+      el("modalTags").innerHTML = displayType ? `<span class="type-label">${displayType}</span>` : ""; 
+
       if(isMailMode && item.remaining > 0) { 
         el("modalCartActions").style.display = "flex"; el("modalQtyInput").value = 1; 
       } else { 
@@ -1113,6 +1121,7 @@
   </script>
 </body>
 </html>
+
 
 
 
