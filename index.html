@@ -186,6 +186,7 @@
     .company-btn { padding: 15px 0; background: #1a1a1a; border: 2px solid var(--accent); color: var(--accent); font-weight: 900; font-size: 16px; border-radius: 8px; cursor: pointer; text-decoration: none; display: flex; justify-content: center; align-items: center; transition: all 0.3s; }
     .company-btn:hover { background: var(--accent); color: #fff; box-shadow: var(--glow-text); }
     
+    /* 戻るボタン */
     .back-btn-container { text-align: left; margin-bottom: 20px; }
     .back-btn-container button { padding: 10px 20px; background: #333; color: #fff; border: 1px solid #555; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight:bold; width: 100%; box-shadow: 0 4px 6px rgba(0,0,0,0.3);}
     .back-btn-container button:hover { border-color: var(--accent); color: var(--accent); }
@@ -270,7 +271,6 @@
     .footer-link { color: #888; font-size: 12px; text-decoration: none; cursor: pointer; }
     .footer-version { position: absolute; bottom: 5px; left: 10px; font-size: 9px; color: #444; }
 
-    /* ★修正: スマホ時のボタン折り返し対応 */
     @media (max-width: 600px) {
       .grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
       .card-title { font-size: 10px; height: 28px; }
@@ -427,7 +427,7 @@
   </div>
 
   <div id="infoView">
-    <div class="back-btn-container" id="infoBackBtnTop" style="display:none;">
+    <div class="back-btn-container" id="infoBackBtnTop">
       <button onclick="closeInfo()">＜ 買取表へ戻る</button>
     </div>
     
@@ -615,19 +615,17 @@
       <a class="footer-link" onclick="openInfo('terms')">利用規約</a>
     </div>
     <div class="copyright">© 2026 トレカフォース</div>
-    <div class="footer-version">v49.0</div>
+    <div class="footer-version">v50.0</div>
   </footer>
 
   <script>
     // ★API_URLは必ず「GASの新しいデプロイURL」に書き換えてください。
-    const API = "https://script.google.com/macros/s/AKfycbwFaDYF7iOUvHgwMISAsn1ejycixvxrJKMSdkR2_u8GBAqjG5GKoHNO2vxZrnv4k2f5/exec";
+    const API = "https://script.google.com/macros/s/AKfycbw5PuDNSKqttlBMCU3-TsQmy_TGimylkS32XCC5_dx_yUaPMcvekpu54vi3OONDdynw/exec";
     const BANNER_IMAGES = ["./banner1.png", "./banner2.png"];
-    
-    // キャッシュ時間を0にしてすぐに反映されるようにしています
     const CACHE_DURATION = 0; 
     
     // ★LINEログインチャネルのLIFF_IDに書き換えてください。
-    const YOUR_LIFF_ID = "YOUR_LIFF_ID_HERE"; 
+    const YOUR_LIFF_ID = "2009235415-7g6be2ed"; 
 
     let ALL_DATA = {}, CURRENT_ITEMS = [], CUR_PAGE = 1, CART = {};
     let lineUserId = ""; 
@@ -649,7 +647,6 @@
 
     const el = (id) => document.getElementById(id);
     
-    // ASKなどの文字をそのまま表示する関数
     const yen = (n) => {
       if (!n) return "¥0";
       const num = Number(n);
@@ -668,12 +665,36 @@
       });
     };
 
+    // ★追加: ブラウザバック（戻る）を検知したときの処理
+    window.addEventListener('popstate', (event) => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const action = urlParams.get('action');
+        const mode = urlParams.get('mode');
+        
+        if (mode === 'mail') {
+           isMailMode = true;
+           updateModeUI();
+        } else {
+           isMailMode = false;
+           updateModeUI();
+        }
+
+        if (action) {
+            _showInfoViewOnly(action);
+        } else {
+            el("infoView").style.display="none"; 
+            el("cartView").style.display="none";
+            el("mainView").style.display="block"; 
+            document.body.classList.remove('viewing-info');
+        }
+    });
+
     function initializeLiff(myLiffId) {
       if(myLiffId === "YOUR_LIFF_ID_HERE") { console.warn("LIFF ID未設定"); return; }
       liff.init({ liffId: myLiffId }).then(() => {
           if (liff.isLoggedIn()) { getProfile(); } else {
              if (['member', 'purchase', 'company', 'privacy', 'terms', 'flow', 'rules', 'mail_rules'].includes(actionParam)) { 
-                 openInfo(actionParam); 
+                 _showInfoViewOnly(actionParam); 
              }
           }
       }).catch((err) => { console.log('LIFF Init failed ', err); });
@@ -717,9 +738,7 @@
 
     function validateNumber(input) { input.value = input.value.replace(/[^0-9]/g, ''); }
     function validateKana(input) { input.value = input.value.replace(/[^\u30A0-\u30FF\u3000\s]/g, ''); }
-    function checkZipLength(input) {
-        if(input.value.length === 7) fetchAddress();
-    }
+    function checkZipLength(input) { if(input.value.length === 7) fetchAddress(); }
     
     async function fetchAddress() {
        const zip = el("regZip").value;
@@ -1029,7 +1048,13 @@
     el("hamburgerBtn").onclick = toggleDrawer; overlay.onclick = toggleDrawer;
     el("menuStore").onclick = () => { isMailMode=false; switchMode(); toggleDrawer(); closeInfo(); };
     el("menuMail").onclick = () => { isMailMode=true; switchMode(); toggleDrawer(); closeInfo(); };
-    function switchMode() { const url = new URL(location); url.searchParams.set("cat", currentCategory); if(isMailMode) url.searchParams.set("mode","mail"); else url.searchParams.delete("mode"); history.pushState({},"",url); closeCart(); updateModeUI(); loadData(); }
+    function switchMode() { 
+       const url = new URL(location); 
+       url.searchParams.set("cat", currentCategory); 
+       if(isMailMode) url.searchParams.set("mode","mail"); else url.searchParams.delete("mode"); 
+       history.pushState({},"",url); 
+       closeCart(); updateModeUI(); loadData(); 
+    }
     document.querySelectorAll(".nav-item").forEach(t => { t.onclick = (e) => { document.querySelectorAll(".nav-item").forEach(x=>x.classList.remove("active")); e.target.classList.add("active"); currentCategory = e.target.dataset.cat; switchMode(); }; });
     el("sort").onchange = render; el("showSoldOut").onchange = render; el("q").oninput = () => setTimeout(render, 300);
     el("prevBtn").onclick = () => { CUR_PAGE--; renderPage(); }; el("nextBtn").onclick = () => { CUR_PAGE++; renderPage(); };
@@ -1060,7 +1085,7 @@
           </div>
         </div>
       `,
-      rules: `<img src="./買取基準@4x.jpg" alt="買取基準" style="width: 100%; height: auto; border-radius: 8px;">`,
+      rules: `<img src="./kijun.png" alt="買取基準" style="width: 100%; height: auto; border-radius: 8px;">`,
       mail_rules: `
         <h3 class="neon-title" style="font-size:18px;">郵送買取 ご利用ルール・注意事項</h3>
         
@@ -1106,14 +1131,10 @@
       `
     };
 
-    function openInfo(t) {
+    function _showInfoViewOnly(t) {
       el("mainView").style.display="none"; el("cartView").style.display="none"; el("infoView").style.display="block";
       document.body.classList.add('viewing-info');
       
-      const newUrl = new URL(location);
-      newUrl.searchParams.set("action", t);
-      history.pushState({}, "", newUrl);
-
       let title = "情報";
       if(t === 'member') title = "会員登録"; 
       else if(t === 'purchase') title = "買取申込"; 
@@ -1124,7 +1145,10 @@
       else if(t === 'rules') title = "買取基準";
       else if(t === 'mail_rules') title = "注意事項";
       
-      el("mainTitle").textContent = title; el("date-display").style.display = "none"; 
+      el("mainTitle").textContent = title; 
+      el("date-display").style.display = "none"; 
+      // ★修正: 戻るボタンを確実に表示
+      el("infoBackBtnTop").style.display = "block";
       
       if(t === 'member' || t === 'purchase') {
         el("memberSection").style.display = "block"; el("infoContent").innerHTML = ""; el("successView").style.display = "none";
@@ -1137,7 +1161,6 @@
             el("memberCardView").style.display = "none";
         } else {
            el("memberLoginView").style.display = "none";
-           
            if(!memberData.lastName) {
                el("memberRegView").style.display = "block"; 
                el("purchaseReqView").style.display = "none"; 
@@ -1147,7 +1170,6 @@
                    el("purchaseReqView").style.display = "block"; 
                    el("memberRegView").style.display = "none"; 
                    el("memberCardView").style.display = "none";
-                   
                    const fullName = (memberData.lastName || "") + " " + (memberData.firstName || "");
                    el("reqConfName").innerText = fullName.trim() || "未設定";
                    el("reqConfTel").innerText = memberData.tel || "未設定";
@@ -1168,11 +1190,31 @@
       }
       if(drawer.classList.contains("open")) toggleDrawer(); window.scrollTo(0,0);
     }
+
+    function openInfo(t) {
+      // ★修正: シンプルなURLに変更し、履歴に追加
+      const newUrl = new URL(location);
+      newUrl.searchParams.delete("cat"); // 余計なパラメータを消す
+      newUrl.searchParams.delete("mode");
+      newUrl.searchParams.set("action", t);
+      history.pushState({ action: t }, "", newUrl);
+
+      _showInfoViewOnly(t);
+    }
     
     function closeInfo() { 
        el("infoView").style.display="none"; el("mainView").style.display="block"; 
        document.body.classList.remove('viewing-info');
-       const url = new URL(location); url.searchParams.delete("action"); history.pushState({},"",url); actionParam = null; switchMode(); window.scrollTo(0,0); 
+       
+       const url = new URL(location); 
+       url.searchParams.delete("action"); 
+       if (isMailMode) { url.searchParams.set("mode", "mail"); }
+       url.searchParams.set("cat", currentCategory);
+       
+       history.pushState({},"",url); 
+       actionParam = null; 
+       switchMode(); 
+       window.scrollTo(0,0); 
     }
     
     function showMemberEdit() { 
