@@ -368,8 +368,8 @@
     <ul class="drawer-list">
       <li class="drawer-item" onclick="openInfo('home')">ホームページ</li>
       <li class="drawer-item" id="menuStore">店頭買取表</li>
-      <li class="drawer-item" id="menuMail">郵送買取表</li>
-      <li class="drawer-item" onclick="openInfo('member')">会員登録 / ログイン</li>
+      <li class="drawer-item" id="menuMail" style="display:none;">郵送買取表</li>
+      <li class="drawer-item" onclick="openInfo('member')" style="display:none;">会員登録 / ログイン</li>
       <li class="drawer-item" onclick="openInfo('privacy')">プライバシーポリシー</li>
       <li class="drawer-item" onclick="openInfo('terms')">利用規約</li>
     </ul>
@@ -714,13 +714,8 @@
         const action = urlParams.get('action');
         const mode = urlParams.get('mode');
         
-        if (mode === 'mail') {
-           isMailMode = true;
-           updateModeUI();
-        } else {
-           isMailMode = false;
-           updateModeUI();
-        }
+        isMailMode = false; // 郵送買取を一時無効化
+        updateModeUI();
 
         if (action) {
             _showInfoViewOnly(action);
@@ -1371,3 +1366,5 @@
   </script>
 </body>
 </html>
+
+郵送買取と会員登録消えてないよ
