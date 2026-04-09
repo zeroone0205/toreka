@@ -212,7 +212,6 @@
     
     /* ホーム画面・バナー周り */
     .home-hero { text-align:center; padding: 30px 10px; border-bottom: 1px dashed #444; margin-bottom: 30px; }
-    /* ここから white-space: nowrap を削除し、画面幅に合わせて折り返すようにしました */
     .home-hero-title { font-size: 26px; color: var(--accent); font-style: italic; text-shadow: var(--glow-text); margin-bottom: 10px; font-weight: 900; line-height: 1.3; word-break: auto-phrase;}
     .home-hero-subtitle { color: #fff; font-size: 13px; font-weight: bold; margin-bottom: 25px; line-height: 1.6; }
     
@@ -984,7 +983,15 @@
     
     function render() {
       const data = ALL_DATA[isMailMode ? "郵送"+currentCategory : currentCategory];
-      if(!data || !data.items) return;
+      if(!data) return;
+
+      if (data.isOpen === false) {
+        el("grid").innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:30px 20px; background:#222; border-radius:8px; border:1px solid #555; margin-top:20px;"><i class="fa-solid fa-store-slash" style="font-size:40px; color:#ff5252; margin-bottom:15px; display:block;"></i><div style="font-size:18px; font-weight:bold; color:#fff; margin-bottom:8px;">本日の買取受付は終了いたしました</div><div style="font-size:13px; color:#aaa;">営業開始までしばらくお待ちください。</div></div>';
+        el("paginationCtrl").style.display = "none";
+        return;
+      }
+
+      if(!data.items) return;
       let items = data.items.filter(x => { 
          const searchTarget = (x.name + " " + x.modelNumber).toLowerCase();
          return !el("q").value || searchTarget.includes(el("q").value.toLowerCase()); 
@@ -1120,12 +1127,12 @@
 
         <div class="rule-section">
           <div class="rule-heading" style="text-align:center; border:none; padding:0; font-size:20px; font-weight:900;">買取の流れ</div>
-        <div class="flow-grid">
-            <div class="flow-step">
-              <div class="flow-num">1</div>
-              <div class="flow-title">ご来店</div>
-              <p class="flow-desc">平日 13:00-19:00<br>土日祝 12:00-19:00<br>横浜駅西口 5分</p>
-            </div>
+          <div class="flow-grid">
+            <div class="flow-step">
+              <div class="flow-num">1</div>
+              <div class="flow-title">ご来店</div>
+              <p class="flow-desc">平日 13:00-19:00<br>土日祝 12:00-19:00<br>横浜駅西口 5分</p>
+            </div>
             <div class="flow-step">
               <div class="flow-num">2</div>
               <div class="flow-title">商品査定</div>
@@ -1366,5 +1373,4 @@
   </script>
 </body>
 </html>
-
 
