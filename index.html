@@ -387,10 +387,10 @@
         <ul class="nav-tabs" id="categoryTabs">
           <li class="nav-item active" data-cat="ポケモン">ポケモン</li>
           <li class="nav-item" data-cat="ワンピース">ワンピース</li>
+          <li class="nav-item" data-cat="BOX">BOX</li>
           <li class="nav-item" data-cat="ドラゴンボール">ドラゴンボール</li>
           <li class="nav-item" data-cat="遊戯王">遊戯王</li>
           <li class="nav-item" data-cat="ヴァイス">ヴァイス</li>
-          <li class="nav-item" data-cat="BOX">BOX</li>
         </ul>
       </div>
       
@@ -997,7 +997,22 @@
          return !el("q").value || searchTarget.includes(el("q").value.toLowerCase()); 
       });
       if(!el("showSoldOut").checked) items = items.filter(x => x.remaining > 0);
+      
       const sort = el("sort").value;
+      
+      // ▼種類の絞り込み（D列）
+      if (sort.startsWith("type_")) {
+        const targetType = sort.replace("type_", "");
+        items = items.filter(x => {
+          const typeStr = (x.type || "").toUpperCase();
+          if (targetType === "psa10") return typeStr === "PSA10";
+          if (targetType === "mikaifu") return typeStr === "未開封";
+          if (targetType === "sotai") return typeStr === "シングル" || typeStr === "素体";
+          if (targetType === "box") return typeStr === "BOX";
+          return true;
+        });
+      }
+
       const typePrio = {"PSA10":1,"未開封":2,"素体":3,"シングル":3,"BOX":4};
       
       items.sort((a,b) => {
