@@ -661,6 +661,7 @@
     <div class="footer-version">v53.0</div>
   </footer>
 
+  <script src="./storefront-price-feed.js"></script>
   <script>
     // ★API_URLは必ず「GASの新しいデプロイURL」に書き換えてください。
     const API = "https://script.google.com/macros/s/AKfycbzhBHdaKOuK69G_mhLuOoo3rS3HShuGY0vjevqj_swTEFclcEkvwF94GEnE8piI0Lv8/exec";
@@ -972,8 +973,14 @@
       el("grid").innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#aaa;">読み込み中...</div>';
       try {
         const res = await fetch(`${API}?category=${sheetName}&t=${Date.now()}`);
-        const data = await res.json();
+        let data = await res.json();
         if(data.error) throw new Error(data.error);
+        if (!isMailMode && window.TrecaPriceFeed) {
+          try {
+            const feedResponse = await fetch(`./price-feed.json?t=${Date.now()}`, {cache: "no-store"});
+            if (feedResponse.ok) data = TrecaPriceFeed.apply(data, currentCategory, await feedResponse.json());
+          } catch (feedError) { console.warn("Price feed unavailable", feedError); }
+        }
         ALL_DATA[sheetName] = data;
         sessionStorage.setItem(cacheKey, JSON.stringify({ timestamp: Date.now(), data: data }));
         updateDate(new Date()); render();
@@ -1048,7 +1055,7 @@
         const displayModel = item.modelNumber ? `<div class="card-model">${item.modelNumber}</div>` : "";
         const displayName = item.name; 
 
-        return `<div class="card ${isSold?'sold-out':''}" data-index="${idx}">${overlay}<div style="${isSold?'opacity:0.6':''}">${img}<div class="card-tags"></div><div class="card-body"><div class="card-header-row">${typeBadge}<span class="limit-badge">残:${item.remaining}</span></div>${displayModel}<div class="card-title">${displayName}</div><div class="card-footer"><div class="price-row"><span class="price-label">買取価格</span><span class="price-value">${yen(item.price)}</span></div>${actions}</div></div></div></div>`;
+        return `<div class="card ${isSold?'sold-out':''}" data-index="${idx}">${overlay}<div style="${isSold?'opacity:0.6':''}">${img}<div class="card-tags"></div><div class="card-body"><div class="card-header-row">${typeBadge}<span class="limit-badge">残:${item.remaining}</span></div>${displayModel}<div class="card-title">${displayName}</div><div class="card-footer"><div class="price-row"><span class="price-label">買取価格${item.priceConfirmedAt && window.TrecaPriceFeed ? "<br>"+TrecaPriceFeed.confirmedLabel(item.priceConfirmedAt) : ""}</span><span class="price-value">${yen(item.price)}</span></div>${actions}</div></div></div></div>`;
       }).join("");
       el("paginationCtrl").style.display = CURRENT_ITEMS.length > ITEMS_per_PAGE ? "flex" : "none";
       el("pageInfo").innerText = `${CUR_PAGE} / ${Math.ceil(CURRENT_ITEMS.length/ITEMS_per_PAGE)}`;
