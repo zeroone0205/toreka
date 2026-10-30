@@ -17,14 +17,17 @@
     if(!data||!Array.isArray(data.items)||!feed||feed.enabled!==true||feed.schemaVersion!==1||!Array.isArray(feed.items))return data;
     const now=options.now?new Date(options.now):new Date();if(!Number.isFinite(now.getTime()))return data;
     const parts=jstParts(now);let changed=0;
+    const lookupKey=e=>[e.category,kind(e.type),norm(e.name),norm(e.modelNumber)].join('\u0001');
+    const index=new Map();
+    for(const e of feed.items){if(e.channel!=='storefront'||e.category!==category)continue;const k=lookupKey(e);if(!index.has(k))index.set(k,[]);index.get(k).push(e);}
     const items=data.items.map(item=>{
       const type=kind(item.type);if(type!=='PSA10'&&type!=='シングル')return item;
-      const candidates=feed.items.filter(e=>e.channel==='storefront'&&match(item,e,category));
+      const candidates=(index.get(lookupKey({...item,category}))||[]).filter(e=>match(item,e,category));
       if(candidates.length!==1)return item;
       const entry=candidates[0];if(entry.price!==null&&!(Number.isSafeInteger(entry.price)&&entry.price>0))return item;
       const at=new Date(entry.confirmedAt);if(!Number.isFinite(at.getTime())||at>now)return item;
       const date=jstParts(at).date;
-      const expired=type==='PSA10'?entry.effectiveDate!==parts.date:(date<parts.date&&parts.hour>=12);
+      const expired=entry.expiryPolicy==='persistent'?false:(type==='PSA10'?entry.effectiveDate!==parts.date:(date<parts.date&&parts.hour>=12));
       changed++;
       return{...item,price:expired||entry.price===null?'ASK':entry.price,priceConfirmedAt:entry.confirmedAt};
     });
@@ -36,4 +39,3 @@
   }
   return{apply,confirmedLabel};
 });
-
